@@ -11,18 +11,13 @@ import (
 	"github.com/pkg/errors"
 )
 
-const (
-	DefaultEmail    string = "jess@lawrence.pm"
-	DefaultPassword string = "jess@lawrence.pm"
-)
-
 var (
 	subdomain = flag.String("subdomain", "", "subdomain to add")
 )
 
 func main() {
 	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "Usage: %s [domain] -subdomain\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "Usage: %s [email] [domain] -subdomain\n", os.Args[0])
 		flag.PrintDefaults()
 	}
 
@@ -35,16 +30,15 @@ func main() {
 }
 
 func run() error {
-	var domainName string
 
-	for _, arg := range flag.Args() {
-		domainName = arg
-		break
+	args := flag.Args()
+
+	if len(args) != 2 {
+		return errors.New("Not enough args")
 	}
 
-	if len(domainName) == 0 {
-		return errors.New("no domain passed")
-	}
+	email := args[0]
+	domainName := args[1]
 
 	db, err := setupDatabase()
 	if err != nil {
@@ -52,9 +46,9 @@ func run() error {
 	}
 	defer db.Close()
 
-	usr, err := ensureUser(db)
+	usr, err := user.GetUser(db, email)
 	if err != nil {
-		return errors.Wrap(err, "ensureUser")
+		return errors.Wrap(err, "GetUser")
 	}
 
 	dom := domain.NewDomain(domainName, usr)
@@ -64,22 +58,6 @@ func run() error {
 	}
 
 	return nil
-}
-
-func ensureUser(db *pg.DB) (user.User, error) {
-	u, err := user.GetUser(db, DefaultEmail)
-	if err != nil {
-		u, err = user.NewUser(DefaultEmail, DefaultPassword)
-		if err != nil {
-			return user.User{}, errors.Wrap(err, "NewUser")
-		}
-
-		if err := u.Insert(db); err != nil {
-			return user.User{}, errors.Wrap(err, "Insert")
-		}
-	}
-
-	return u, nil
 }
 
 func setupDatabase() (*pg.DB, error) {
