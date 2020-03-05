@@ -15,7 +15,7 @@ func (s Server) handleGetDomains() HandlerFunc {
 
 		err := s.db.Model(&domains).Where("owner_id = ?", u.ID).Select()
 		if err != nil {
-			return errors.Wrap(err, "Select")
+			return newApiError(http.StatusNotFound, "Not found", errors.Wrap(err, "Select"))
 		}
 
 		c.JSON(http.StatusOK, &domains)
@@ -38,11 +38,11 @@ func (s Server) handleDomain(fn DomainHandlerFunc) gin.HandlerFunc {
 			).
 			Select()
 		if err != nil {
-			return errors.Wrap(err, "Select Domain")
+			return newApiError(http.StatusNotFound, "Not found", errors.Wrap(err, "Select Domain"))
 		}
 
 		if d.OwnerID != u.ID {
-			return errors.New("Not allowed")
+			return newApiError(http.StatusNotFound, "Not found", errors.New("Not allowed"))
 		}
 
 		return fn(d, u, c)
@@ -69,7 +69,8 @@ func (s Server) handleGetDomain() DomainHandlerFunc {
 			Order("added_at DESC").
 			Select()
 		if err != nil {
-			return errors.Wrap(err, "Select Records")
+			// do we want to abort
+			return newApiError(http.StatusNotFound, "No records found", errors.Wrap(err, "Select Records"))
 		}
 
 		err = s.db.Model(&response.Whois).
@@ -78,7 +79,8 @@ func (s Server) handleGetDomain() DomainHandlerFunc {
 			Limit(1).
 			Select()
 		if err != nil {
-			return errors.Wrap(err, "Select Records")
+			// do we want to abort
+			return newApiError(http.StatusNotFound, "No whois found", errors.Wrap(err, "Select Whois"))
 		}
 
 		c.JSON(http.StatusOK, &response)
@@ -92,7 +94,7 @@ func (s Server) handleGetDomainRecords() DomainHandlerFunc {
 		var records []domain.Record
 		err := s.db.Model(&records).Where("domain_id = ?", d.ID).Order("added_at DESC").Select()
 		if err != nil {
-			return errors.Wrap(err, "Select Records")
+			return newApiError(http.StatusNotFound, "Not found", errors.Wrap(err, "Select"))
 		}
 		c.JSON(http.StatusOK, &records)
 		return nil
@@ -104,7 +106,7 @@ func (s Server) handleGetDomainWhois() DomainHandlerFunc {
 		var whois []domain.Whois
 		err := s.db.Model(&whois).Where("domain_id = ?", d.ID).Order("added_at DESC").Select()
 		if err != nil {
-			return errors.Wrap(err, "Select Whois")
+			return newApiError(http.StatusNotFound, "Not found", errors.Wrap(err, "Select"))
 		}
 		c.JSON(http.StatusOK, &whois)
 		return nil
@@ -119,13 +121,13 @@ func (s Server) handlePostDomain() HandlerFunc {
 	return func(u user.User, c *gin.Context) error {
 		var request Request
 		if c.ShouldBind(&request) != nil {
-			return errors.New("Invalid request")
+			return newApiError(http.StatusBadRequest, "Bad Request", errors.New("ShouldBind"))
 		}
 
 		d := domain.NewDomain(request.Domain, u)
 
 		if err := d.Insert(s.db); err != nil {
-			return errors.Wrap(err, "Insert")
+			return newApiError(http.StatusInternalServerError, "Inserting Domain", errors.Wrap(err, "Insert"))
 		}
 
 		c.JSON(http.StatusCreated, &d)
