@@ -44,8 +44,12 @@ func NewWorker() (*Worker, error) {
 		return nil, errors.Wrap(err, "NewSubscriber")
 	}
 
+	routerConfig := message.RouterConfig{
+		CloseTimeout: time.Second * 30,
+	}
+
 	// setup router
-	router, err := message.NewRouter(message.RouterConfig{}, logger)
+	router, err := message.NewRouter(routerConfig, logger)
 	if err != nil {
 		return nil, errors.Wrap(err, "NewRouter")
 	}
@@ -136,13 +140,19 @@ func (w *Worker) jobHandler() message.NoPublishHandlerFunc {
 			return
 		}
 
-		additions, removals, err := job.Domain.CheckDelta(&client, records)
+		additions, removals, err := job.Domain.CheckDelta(&client, job.CurrentRecords)
 		if err != nil {
 			response.Error = errors.Wrap(err, "CheckDelta").Error()
 			return
 		}
 
-		response.RecordAdditions = additions
+		// if we have no additions and currentRecords is = 0
+		if len(additions) == 0 && len(job.CurrentRecords) == 0 {
+			response.RecordAdditions = records
+		} else {
+			response.RecordAdditions = additions
+		}
+
 		response.RecordRemovals = removals
 
 		w, err := domain.NewWhois(job.Domain)

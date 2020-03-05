@@ -46,8 +46,12 @@ func NewManager(db *pg.DB) (*Manager, error) {
 		return nil, errors.Wrap(err, "NewSubscriber")
 	}
 
+	routerConfig := message.RouterConfig{
+		CloseTimeout: time.Second * 30,
+	}
+
 	// setup router
-	router, err := message.NewRouter(message.RouterConfig{}, logger)
+	router, err := message.NewRouter(routerConfig, logger)
 	if err != nil {
 		return nil, errors.Wrap(err, "NewRouter")
 	}
@@ -84,16 +88,19 @@ func NewManager(db *pg.DB) (*Manager, error) {
 }
 
 func (m *Manager) Run(ctx context.Context) error {
-	// maybe add a cancel; if create fails router should fail also
+	ctx, cancel := context.WithCancel(ctx)
+
 	eg, ctx := errgroup.WithContext(ctx)
 
 	// handle creation of jobs
 	eg.Go(func() error {
+		defer cancel()
 		return m.createJobs(ctx)
 	})
 
 	// run router
 	eg.Go(func() error {
+		defer cancel()
 		return m.router.Run(ctx)
 	})
 
@@ -131,6 +138,24 @@ func (m *Manager) createJobs(ctx context.Context) error {
 			if err := j.Insert(m.db); err != nil {
 				return errors.Wrap(err, "Insert job")
 			}
+
+			currentRecords, err := j.Domain.GetRecords(m.db)
+			if err != nil {
+				return errors.Wrap(err, "GetRecords")
+			}
+			j.CurrentRecords = currentRecords
+
+			b, err := json.Marshal(&j)
+			if err != nil {
+				return errors.Wrap(err, "Marhsal")
+			}
+
+			msg := message.NewMessage(watermill.NewUUID(), b)
+
+			if err := m.publisher.Publish("monere.job.queue", msg); err != nil {
+				return errors.Wrap(err, "Publish")
+			}
+
 		}
 	}
 	return nil

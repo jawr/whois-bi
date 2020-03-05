@@ -23,6 +23,9 @@ type Job struct {
 	CreatedAt  time.Time `sql:",notnull,default:now()"`
 	StartedAt  time.Time
 	FinishedAt time.Time
+
+	// dont persist
+	CurrentRecords domain.Records `sql:"-"`
 }
 
 type JobResponse struct {
@@ -55,7 +58,7 @@ func (j *Job) Insert(db *pg.DB) error {
 	// update domain
 	_, err = db.Model(&j.Domain).
 		Set("last_job_at = now()").
-		Where("domain_id = ?", j.DomainID).
+		Where("id = ?", j.DomainID).
 		Update()
 	if err != nil {
 		return errors.Wrap(err, "Update Domain")

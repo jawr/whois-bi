@@ -52,7 +52,7 @@ func GetDomain(db *pg.DB, domain string) (Domain, error) {
 func GetDomainsWhereLastJobBefore(db *pg.DB, d time.Duration) ([]Domain, error) {
 	var domains []Domain
 	before := time.Now().Add(d * -1)
-	if err := db.Model(&domains).Where("last_job_at > ?", before).Select(); err != nil {
+	if err := db.Model(&domains).Where("last_job_at IS NULL OR last_job_at < ?", before).Select(); err != nil {
 		return nil, err
 	}
 	return domains, nil
@@ -174,6 +174,8 @@ func (d Domain) CheckDelta(client *dns.Client, records Records) (Records, Record
 			removals = append(removals, original[key])
 		}
 	}
+
+	log.Printf("Additions: %d Removals: %d", len(additions), len(removals))
 
 	return additions, removals, nil
 }
