@@ -47,8 +47,8 @@ func (s Server) handleGetLogout() gin.HandlerFunc {
 
 func (s Server) handlePostLogin() gin.HandlerFunc {
 	type Request struct {
-		Email    string `form:"email" binding:"required"`
-		Password string `form:"password" binding:"required"`
+		Email    string
+		Password string
 	}
 
 	return func(c *gin.Context) {

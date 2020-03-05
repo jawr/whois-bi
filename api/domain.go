@@ -110,3 +110,26 @@ func (s Server) handleGetDomainWhois() DomainHandlerFunc {
 		return nil
 	}
 }
+
+func (s Server) handlePostDomain() HandlerFunc {
+	type Request struct {
+		Domain string
+	}
+
+	return func(u user.User, c *gin.Context) error {
+		var request Request
+		if c.ShouldBind(&request) != nil {
+			return errors.New("Invalid request")
+		}
+
+		d := domain.NewDomain(request.Domain, u)
+
+		if err := d.Insert(s.db); err != nil {
+			return errors.Wrap(err, "Insert")
+		}
+
+		c.JSON(http.StatusCreated, &d)
+
+		return nil
+	}
+}

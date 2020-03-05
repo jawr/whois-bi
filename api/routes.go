@@ -17,8 +17,13 @@ func (s Server) setupRoutes() {
 	user.Use(handleAuth)
 
 	user.GET("/status", s.handleGetStatus())
+
+	// domain read
 	user.GET("/domains", s.handleUser(s.handleGetDomains()))
 	user.GET("/domain/:domain", s.handleDomain(s.handleGetDomain()))
 	user.GET("/domain/:domain/records", s.handleDomain(s.handleGetDomainRecords()))
 	user.GET("/domain/:domain/whois", s.handleDomain(s.handleGetDomainWhois()))
+
+	// domain create
+	user.POST("/domain", s.handleUser(s.handlePostDomain()))
 }
