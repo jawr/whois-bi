@@ -17,6 +17,8 @@ func (s Server) setupRoutes() {
 	user.Use(handleAuth)
 
 	user.GET("/status", s.handleGetStatus())
-	user.GET("/domains", s.handleUser(handleError(s.handleGetDomains())))
-	user.GET("/domain/:domain", s.handleUser(handleError(s.handleGetDomain())))
+	user.GET("/domains", s.handleUser(s.handleGetDomains()))
+	user.GET("/domain/:domain", s.handleDomain(s.handleGetDomain()))
+	user.GET("/domain/:domain/records", s.handleDomain(s.handleGetDomainRecords()))
+	user.GET("/domain/:domain/whois", s.handleDomain(s.handleGetDomainWhois()))
 }

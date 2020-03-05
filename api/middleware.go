@@ -38,7 +38,7 @@ func (s Server) handleUser(fn HandlerFunc) gin.HandlerFunc {
 			return
 		}
 
-		fn(u, c)
+		handleError(fn)(u, c)
 	}
 }
 
