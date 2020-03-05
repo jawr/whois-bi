@@ -12,10 +12,11 @@ func (s Server) setupRoutes() {
 	s.router.POST("/login", s.handlePostLogin())
 	s.router.GET("/logout", s.handleGetLogout())
 
-	auth := s.router.Group("/auth/")
-	auth.Use(handleAuth)
+	// user routes
+	user := s.router.Group("/user/")
+	user.Use(handleAuth)
 
-	// authentication required
-	auth.GET("/status", s.handleGetStatus())
-	auth.GET("/domains", s.handleUser(handleError(s.handleGetDomains())))
+	user.GET("/status", s.handleGetStatus())
+	user.GET("/domains", s.handleUser(handleError(s.handleGetDomains())))
+	user.GET("/domain/:domain", s.handleUser(handleError(s.handleGetDomain())))
 }

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/contrib/sessions"
@@ -61,10 +62,12 @@ func (s Server) handlePostLogin() gin.HandlerFunc {
 			return
 		}
 
+		log.Printf("%+v", request)
+
 		// validate user
 		var u user.User
 
-		if err := s.db.Model(&u).Where("email = ?", u).Select(); err != nil {
+		if err := s.db.Model(&u).Where("email = ?", request.Email).Select(); err != nil {
 			c.JSON(
 				http.StatusUnauthorized,
 				gin.H{"Error": "Not Authorized"},
@@ -84,7 +87,7 @@ func (s Server) handlePostLogin() gin.HandlerFunc {
 		// successful login! run database updates
 		go func(u user.User) {
 			// can handle ip logging if we want
-			_, err := s.db.Model(u).Set("last_login_at == now()").WherePK().Update()
+			_, err := s.db.Model(&u).Set("last_login_at = now()").WherePK().Update()
 			if err != nil {
 				panic(err)
 			}

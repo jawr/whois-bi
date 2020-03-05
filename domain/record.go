@@ -23,7 +23,7 @@ type Record struct {
 
 	// parent data
 	DomainID int    `sql:",notnull"`
-	Domain   Domain `pg:"fk:domain_id"`
+	Domain   Domain `pg:"fk:domain_id" json:"-"`
 
 	// how was this record generated
 	RecordSource RecordSource `sql:",notnull"`

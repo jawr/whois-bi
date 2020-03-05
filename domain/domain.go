@@ -17,7 +17,7 @@ type Domain struct {
 	Domain string `sql:",notnull,unique"`
 
 	OwnerID int       `sql:",notnull"`
-	Owner   user.User `sql:"fk:owner_id"`
+	Owner   user.User `sql:"fk:owner_id" json:"-"`
 
 	// meta data
 	AddedAt   time.Time `sql:",notnull,default:now()"`

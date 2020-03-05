@@ -1,6 +1,7 @@
 package user
 
 import (
+	"log"
 	"time"
 
 	"github.com/go-pg/pg"
@@ -23,6 +24,9 @@ type User struct {
 
 // create a new user and bcrypt the password
 func NewUser(email, password string) (User, error) {
+
+	log.Printf("create user '%s' '%s'", email, password)
+
 	passwordHash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return User{}, errors.Wrap(err, "bcrypt")

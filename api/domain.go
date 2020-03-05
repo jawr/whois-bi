@@ -23,3 +23,42 @@ func (s Server) handleGetDomains() HandlerFunc {
 		return nil
 	}
 }
+
+func (s Server) handleGetDomain() HandlerFunc {
+	type Response struct {
+		domain.Domain
+
+		Records []domain.Record
+
+		Whois domain.Whois
+	}
+
+	return func(u user.User, c *gin.Context) error {
+		domainName := c.Param("domain")
+
+		var response Response
+
+		err := s.db.Model(&response.Domain).Where("domain = ? AND owner_id = ?", domainName, u.ID).Select()
+		if err != nil {
+			return errors.Wrap(err, "Select Domain")
+		}
+
+		if response.OwnerID != u.ID {
+			return errors.New("Not allowed")
+		}
+
+		err = s.db.Model(&response.Records).Where("domain_id = ?", response.ID).Select()
+		if err != nil {
+			return errors.Wrap(err, "Select Records")
+		}
+
+		err = s.db.Model(&response.Whois).Where("domain_id = ?", response.ID).Order("updated_date DESC").Limit(1).Select()
+		if err != nil {
+			return errors.Wrap(err, "Select Records")
+		}
+
+		c.JSON(http.StatusOK, &response)
+
+		return nil
+	}
+}

@@ -15,7 +15,7 @@ type Whois struct {
 
 	// parent data
 	DomainID int    `sql:",notnull"`
-	Domain   Domain `pg:"fk:domain_id"`
+	Domain   Domain `pg:"fk:domain_id" json:"-"`
 
 	Raw []byte `sql:",notnull"`
 
