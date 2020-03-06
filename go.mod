@@ -7,11 +7,13 @@ require (
 	github.com/ThreeDotsLabs/watermill-amqp v1.0.3
 	github.com/appleboy/gin-jwt v2.5.0+incompatible
 	github.com/boj/redistore v0.0.0-20180917114910-cd5dcc76aeff // indirect
+	github.com/dchest/uniuri v0.0.0-20200228104902-7aecb25e1fe5
 	github.com/gin-gonic/contrib v0.0.0-20191209060500-d6e26eeaa607
 	github.com/gin-gonic/gin v1.5.0
 	github.com/go-pg/pg v8.0.6+incompatible
 	github.com/gorilla/sessions v1.2.0 // indirect
 	github.com/jawr/whois-parser-go v1.10.3-0.20200304105754-53779df06755
+	github.com/jhillyerd/enmime v0.8.0
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/likexian/gokit v0.22.1 // indirect
 	github.com/likexian/whois-go v1.3.1

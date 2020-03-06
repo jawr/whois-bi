@@ -9,8 +9,10 @@ type HandlerFunc func(user.User, *gin.Context) error
 
 func (s Server) setupRoutes() {
 	// authentication
+	s.router.POST("/register", s.handlePostRegister())
 	s.router.POST("/login", s.handlePostLogin())
 	s.router.GET("/logout", s.handleGetLogout())
+	s.router.POST("verify/:code", s.handlePostVerify())
 
 	// user routes
 	user := s.router.Group("/user/")
@@ -26,4 +28,5 @@ func (s Server) setupRoutes() {
 
 	// domain create
 	user.POST("/domain", s.handleUser(s.handlePostDomain()))
+	user.POST("/domain/:domain/record", s.handleDomain(s.handlePostRecord()))
 }

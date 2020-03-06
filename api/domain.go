@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jawr/monere/domain"
 	"github.com/jawr/monere/user"
+	"github.com/miekg/dns"
 	"github.com/pkg/errors"
 )
 
@@ -131,6 +132,35 @@ func (s Server) handlePostDomain() HandlerFunc {
 		}
 
 		c.JSON(http.StatusCreated, &d)
+
+		return nil
+	}
+}
+
+func (s Server) handlePostRecord() DomainHandlerFunc {
+	type Request struct {
+		Raw string
+	}
+
+	return func(d domain.Domain, u user.User, c *gin.Context) error {
+		var request Request
+		if c.ShouldBind(&request) != nil {
+			return newApiError(http.StatusBadRequest, "Bad Request", errors.New("ShouldBind"))
+		}
+
+		// parse to record
+		rr, err := dns.NewRR(request.Raw)
+		if err != nil {
+			return newApiError(http.StatusBadRequest, "Unable to parse record", errors.Wrap(err, "NewRR"))
+		}
+
+		record := domain.NewRecord(d, rr, domain.RecordSourceManual)
+
+		if err := record.Insert(s.db); err != nil {
+			return newApiError(http.StatusInternalServerError, "Unable to save record", errors.Wrap(err, "Insert"))
+		}
+
+		c.JSON(http.StatusCreated, &record)
 
 		return nil
 	}

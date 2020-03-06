@@ -30,10 +30,18 @@ func (s Server) handleUser(fn HandlerFunc) gin.HandlerFunc {
 
 		// use a pool for user objects
 		var u user.User
-		if err := s.db.Model(&u).Where("id = ?", userID).Select(); err != nil {
+		if err := s.db.Model(&u).Where("id = ? AND verified_at IS NOT NULL", userID).Select(); err != nil {
 			c.AbortWithStatusJSON(
 				http.StatusUnauthorized,
 				gin.H{"Error": "Not Authorized"},
+			)
+			return
+		}
+
+		if u.VerifiedAt.IsZero() {
+			c.AbortWithStatusJSON(
+				http.StatusUnauthorized,
+				gin.H{"Error": "Not Verified"},
 			)
 			return
 		}

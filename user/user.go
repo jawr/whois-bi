@@ -1,9 +1,9 @@
 package user
 
 import (
-	"log"
 	"time"
 
+	"github.com/dchest/uniuri"
 	"github.com/go-pg/pg"
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
@@ -19,22 +19,26 @@ type User struct {
 	AddedAt   time.Time `sql:",notnull,default:now()"`
 	DeletedAt time.Time `pg:",soft_delete"`
 
+	VerifiedAt   time.Time
+	VerifiedCode string `sql:",notnull"`
+
 	LastLoginAt time.Time
 }
 
 // create a new user and bcrypt the password
 func NewUser(email, password string) (User, error) {
 
-	log.Printf("create user '%s' '%s'", email, password)
-
 	passwordHash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return User{}, errors.Wrap(err, "bcrypt")
 	}
 
+	verifiedCode := uniuri.NewLen(32)
+
 	user := User{
-		Email:    email,
-		Password: passwordHash,
+		Email:        email,
+		Password:     passwordHash,
+		VerifiedCode: verifiedCode,
 	}
 
 	return user, nil
@@ -55,4 +59,22 @@ func GetUser(db *pg.DB, email string) (User, error) {
 	}
 
 	return user, nil
+}
+
+func VerifyUser(db *pg.DB, code string) error {
+	var user User
+	count, err := db.Model(&user).Where("verified_code = ? AND verified_at IS NULL").Count()
+	if err != nil {
+		return errors.Wrap(err, "Count")
+	}
+
+	if count != 1 {
+		return errors.New("Not found")
+	}
+
+	if _, err := db.Model(&user).Set("verified_at = now()").WherePK().Update(); err != nil {
+		return errors.Wrap(err, "Update")
+	}
+
+	return nil
 }

@@ -4,14 +4,16 @@ import (
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/go-pg/pg"
+	"github.com/jawr/monere/sender"
 )
 
 type Server struct {
-	db     *pg.DB
-	router *gin.Engine
+	db      *pg.DB
+	router  *gin.Engine
+	emailer *sender.Sender
 }
 
-func NewServer(db *pg.DB) *Server {
+func NewServer(db *pg.DB, emailer *sender.Sender) *Server {
 	router := gin.Default()
 
 	router.Use(
@@ -24,8 +26,9 @@ func NewServer(db *pg.DB) *Server {
 	)
 
 	server := Server{
-		db:     db,
-		router: router,
+		db:      db,
+		router:  router,
+		emailer: emailer,
 	}
 
 	return &server

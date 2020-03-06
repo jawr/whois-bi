@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-pg/pg"
 	"github.com/jawr/monere/api"
+	"github.com/jawr/monere/sender"
 	"github.com/pkg/errors"
 )
 
@@ -22,7 +23,9 @@ func run() error {
 		return errors.Wrap(err, "setupDatabase")
 	}
 
-	server := api.NewServer(db)
+	emailer := sender.NewSender()
+
+	server := api.NewServer(db, emailer)
 
 	if err := server.Run("localhost:8444"); err != nil {
 		return errors.Wrap(err, "Run")
