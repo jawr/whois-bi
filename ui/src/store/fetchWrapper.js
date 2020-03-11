@@ -16,7 +16,7 @@ const fetchWrapper = (url, options={}) => fetch(
 		}
 	})
 	.then(r => {
-		if (r.hasOwnProperty('Error')) return Promise.reject(r.Error)
+		if (Object.keys(r).length === 1 && r.hasOwnProperty('Error')) return Promise.reject(r.Error)
 		return Promise.resolve(r)
 	})
 

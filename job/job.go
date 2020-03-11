@@ -68,6 +68,15 @@ func (j *Job) Insert(db *pg.DB) error {
 	return nil
 }
 
+func GetUnstarted(db *pg.DB) ([]Job, error) {
+	var jobs []Job
+	err := db.Model(&jobs).Relation("Domain").Where("started_at IS NULL").Select()
+	if err != nil {
+		return nil, err
+	}
+	return jobs, nil
+}
+
 // custom marshaller
 func (j *Job) MarshalJSON() ([]byte, error) {
 	type Alias Job

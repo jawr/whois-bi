@@ -140,8 +140,20 @@ func (m *Manager) createJobs(ctx context.Context) error {
 			log.Printf("CREATE JOB FOR %s", d.Domain)
 			j := NewJob(d)
 			if err := j.Insert(m.db); err != nil {
+				continue
 				return errors.Wrap(err, "Insert job")
 			}
+		}
+
+		// get all jobs without a started_at
+
+		jobs, err := GetUnstarted(m.db)
+		if err != nil {
+			return errors.Wrap(err, "GetUnstarted")
+		}
+
+		for _, j := range jobs {
+			log.Printf("job: %+v", j)
 
 			currentRecords, err := j.Domain.GetRecords(m.db)
 			if err != nil {
@@ -159,7 +171,12 @@ func (m *Manager) createJobs(ctx context.Context) error {
 			if err := m.publisher.Publish("monere.job.queue", msg); err != nil {
 				return errors.Wrap(err, "Publish")
 			}
+		}
 
+		if len(jobs) > 0 {
+			if _, err := m.db.Model(&jobs).Set("started_at = now()").WherePK().Update(); err != nil {
+				return errors.Wrap(err, "Update started_at")
+			}
 		}
 	}
 	return nil

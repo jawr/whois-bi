@@ -19,7 +19,42 @@ export const Jobs = ({ domain }) => {
 	return (
 		<div className="min-vh-100">
 			{loading && <Loader />}
-			{!loading && <Table jobs={jobs} />}
+			{!loading && 
+				<>
+					<Table jobs={jobs} />
+
+					<Add domain={domain} />
+				</>
+			}
+		</div>
+	)
+}
+
+const Add = ({ domain }) => {
+	const [idle, setIdle] = useState(true)
+	const [error, setError] = useState('')
+
+	const dispatch = useDispatch()
+
+	const handleClick = (e) => {
+		e.preventDefault()
+
+			setIdle(false)
+			setError('')
+			dispatch(actions.create(domain))
+				.catch(error => {
+					setTimeout(() => setError(error), 1000)
+				})
+				.finally(() => {
+					setTimeout(() => setIdle(true), 1000)
+				})
+	}
+
+	return (
+		<div className="tr mt5">
+			{ idle && <button className="pointer input-reset f4 dim br1 ph3 pv2 bn mb2 dib green bg-washed-green grow" onClick={handleClick}>Request Update</button> }
+			{ !idle && <p>Requesting...</p> }
+			{ idle && error.length > 0 && <p>{error}</p> }
 		</div>
 	)
 }

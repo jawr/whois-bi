@@ -40,4 +40,5 @@ func (s Server) setupRoutes() {
 
 	// job read
 	user.GET("/jobs", s.handleUser(s.handleGetJobs()))
+	user.POST("/jobs/:domain", s.handleUser(s.handlePostJob()))
 }
