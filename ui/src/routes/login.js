@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { actions } from '../store/login'
 import { Link } from 'react-router-dom'
+import { Page } from '../components/wrapper'
 
 export default () => {
 	const [email, setEmail] = useState('')
@@ -30,7 +31,7 @@ export default () => {
 	}
 
 	return (
-		<section className="pa4">
+		<Page>
 			<h1 className="f3 f2-m f1-l fw2 mv3">
 				Login
 			</h1>
@@ -73,6 +74,6 @@ export default () => {
 					{ !idle && <p>Logging in...</p> }
 				</div>
 			</form>
-		</section>
+		</Page>
 	)
 }

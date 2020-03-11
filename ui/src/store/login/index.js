@@ -1,21 +1,43 @@
-import fetchWrapper from '../fetchWrapper'
+import { post, get } from '../fetchWrapper'
 import { push } from 'connected-react-router'
+import createReducer from '../createReducer'
+
+const SET = 'login.SET'
 
 export const actions = {
 	login: (email, password) => (dispatch) => (
-		fetchWrapper(
-			'/login',
+		post(
+			'/api/login',
 			{
-				method: 'POST', 
-				headers: { 'content-type': 'application/json' },
-				body: JSON.stringify({
-					Email: email,
-					Password: password,
-				})
+				Email: email,
+				Password: password,
 			}
 		)
 		.then((result) => {
 			dispatch(push('/dashboard'))
+			dispatch({type: SET, LoggedIn: true})
+		})
+		.catch(error => {
+			dispatch({type: SET, LoggedIn: false})
 		})
 	),
+
+	check: () => (dispatch) => (
+		get('/api/user/status')
+		.then(r => dispatch({type: SET, LoggedIn: true}))
+		.catch(error => dispatch({type: SET, LoggedIn: false}))
+	),
+
+	logout: () => (dispatch) => {
+		dispatch({type: SET, LoggedIn: false})
+		return get('/api/logout')
+	}
 }
+
+const initialState = {
+	LoggedIn: false,
+}
+
+export const reducer = createReducer(initialState, {
+	[SET]: (state, action) => ({...state, LoggedIn: action.LoggedIn}),
+})

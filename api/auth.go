@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gin-gonic/contrib/sessions"
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/jawr/monere/user"
 	"golang.org/x/crypto/bcrypt"
@@ -83,7 +83,7 @@ func (s Server) handlePostRegister() gin.HandlerFunc {
 		}
 
 		body := fmt.Sprintf(
-			`Thank you for registering with us. Please complete your registration by clicking <a href="http://whois.bi/verify/%s">here<a/>`,
+			`Thank you for registering with us. Please complete your registration by clicking <a href="https://whois.bi/#/verify/%s">here<a/>`,
 			u.VerifiedCode,
 		)
 
@@ -164,6 +164,7 @@ func (s Server) handlePostLogin() gin.HandlerFunc {
 func (s Server) handlePostVerify() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if err := user.VerifyUser(s.db, c.Param("code")); err != nil {
+			log.Printf("Verify error: %s", err)
 			c.JSON(
 				http.StatusBadRequest,
 				gin.H{"Error": "Failed to verify using that code"},

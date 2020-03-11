@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"log"
+	"os"
 	"time"
 
 	"github.com/ThreeDotsLabs/watermill"
@@ -28,9 +29,12 @@ type Manager struct {
 func NewManager(db *pg.DB) (*Manager, error) {
 	logger := watermill.NewStdLogger(false, false)
 
-	amqpConfig := amqp.NewDurableQueueConfig(
-		"amqp://172.17.0.2:5672/",
-	)
+	addr := os.Getenv("MONERE_MQ_ADDR")
+	if len(addr) == 0 {
+		return nil, errors.New("Please specify an mq addr using MONERE_MQ_ADDR")
+	}
+
+	amqpConfig := amqp.NewDurableQueueConfig(addr)
 
 	amqpConfig.Consume.NoRequeueOnNack = true
 
@@ -175,7 +179,7 @@ func (m *Manager) jobResponseHandler() message.NoPublishHandlerFunc {
 
 			_, err := m.db.Model(&response.Job).
 				Set(
-					"started_at = ? AND finished_at = ? AND error = ?",
+					"started_at = ?, finished_at = ?, error = ?",
 					response.Job.StartedAt,
 					response.Job.FinishedAt,
 					response.Error,

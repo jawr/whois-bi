@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"time"
@@ -14,9 +15,9 @@ import (
 type Domain struct {
 	ID int `sql:",pk"`
 
-	Domain string `sql:",notnull,unique"`
+	Domain string `sql:",notnull,unique:domain_owner_id"`
 
-	OwnerID int       `sql:",notnull"`
+	OwnerID int       `sql:",notnull,unique:domain_owner_id"`
 	Owner   user.User `sql:"fk:owner_id" json:"-"`
 
 	// meta data
@@ -84,12 +85,10 @@ func (d Domain) QueryANY(client *dns.Client, fqdn string) (Records, error) {
 		dns.TypeANY,
 	)
 
-	reply, _, err := client.Exchange(&msg, ns+":53")
+	reply, err := query(client, &msg, ns)
 	if err != nil {
-		return nil, errors.Wrap(err, "Exchange")
+		return nil, errors.Wrap(err, "query")
 	}
-
-	log.Println(reply.String())
 
 	records := make(Records, 0, len(reply.Answer))
 
@@ -135,10 +134,6 @@ func (d Domain) CheckDelta(client *dns.Client, records Records) (Records, Record
 	// loop through records and do a query against the current
 	for _, record := range records {
 
-		// set map
-		original[record.Hash] = record
-
-		// could perhaps use a buffer for these
 		var msg dns.Msg
 
 		msg.SetQuestion(
@@ -146,9 +141,9 @@ func (d Domain) CheckDelta(client *dns.Client, records Records) (Records, Record
 			record.RRType,
 		)
 
-		reply, _, err := client.Exchange(&msg, ns+":53")
+		reply, err := query(client, &msg, ns)
 		if err != nil {
-			return nil, nil, errors.Wrap(err, "Exchange")
+			return nil, nil, errors.Wrap(err, "query")
 		}
 
 		for idx := range reply.Answer {
@@ -187,4 +182,81 @@ func (d Domain) String() string {
 		d.Owner.Email,
 		d.Domain,
 	)
+}
+
+// custom marshaller
+func (d *Domain) MarshalJSON() ([]byte, error) {
+	type Alias Domain
+
+	// can be null
+	var deletedAt, lastJobAt, lastUpdatedAt string
+	if !d.DeletedAt.IsZero() {
+		deletedAt = d.DeletedAt.Format("2006/01/02 15:04")
+	}
+	if !d.LastJobAt.IsZero() {
+		lastJobAt = d.LastJobAt.Format("2006/01/02 15:04")
+	}
+	if !d.LastUpdatedAt.IsZero() {
+		lastUpdatedAt = d.LastUpdatedAt.Format("2006/01/02 15:04")
+	}
+
+	return json.Marshal(&struct {
+		AddedAt       string
+		DeletedAt     string
+		LastJobAt     string
+		LastUpdatedAt string
+		*Alias
+	}{
+		AddedAt:       d.AddedAt.Format("2006/01/02 15:04"),
+		DeletedAt:     deletedAt,
+		LastJobAt:     lastJobAt,
+		LastUpdatedAt: lastUpdatedAt,
+		Alias:         (*Alias)(d),
+	})
+}
+
+func (d *Domain) UnmarshalJSON(data []byte) error {
+	type Alias Domain
+
+	aux := &struct {
+		AddedAt       string
+		DeletedAt     string
+		LastJobAt     string
+		LastUpdatedAt string
+		*Alias
+	}{
+		Alias: (*Alias)(d),
+	}
+
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	var err error
+
+	d.AddedAt, err = time.Parse("2006/01/02 15:04", aux.AddedAt)
+	if err != nil {
+		return err
+	}
+	if len(aux.DeletedAt) > 0 {
+		d.DeletedAt, err = time.Parse("2006/01/02 15:04", aux.DeletedAt)
+		if err != nil {
+			return err
+		}
+	}
+	if len(aux.LastJobAt) > 0 {
+		d.LastJobAt, err = time.Parse("2006/01/02 15:04", aux.LastJobAt)
+		if err != nil {
+			return err
+		}
+	}
+	if len(aux.LastUpdatedAt) > 0 {
+		d.LastUpdatedAt, err = time.Parse("2006/01/02 15:04", aux.LastUpdatedAt)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+
 }

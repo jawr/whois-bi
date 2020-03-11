@@ -63,12 +63,12 @@ func GetUser(db *pg.DB, email string) (User, error) {
 
 func VerifyUser(db *pg.DB, code string) error {
 	var user User
-	count, err := db.Model(&user).Where("verified_code = ? AND verified_at IS NULL").Count()
+	err := db.Model(&user).Where("verified_code = ? AND verified_at IS NULL", code).Select()
 	if err != nil {
 		return errors.Wrap(err, "Count")
 	}
 
-	if count != 1 {
+	if user.ID == 0 {
 		return errors.New("Not found")
 	}
 

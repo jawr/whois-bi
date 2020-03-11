@@ -1,6 +1,8 @@
 package api
 
 import (
+	"os"
+
 	"github.com/gin-gonic/gin"
 	"github.com/jawr/monere/user"
 )
@@ -8,14 +10,20 @@ import (
 type HandlerFunc func(user.User, *gin.Context) error
 
 func (s Server) setupRoutes() {
+
+	base := s.router.Group("/")
+	if os.Getenv("MONERE_ENV") == "dev" {
+		base = s.router.Group("/api")
+	}
+
 	// authentication
-	s.router.POST("/register", s.handlePostRegister())
-	s.router.POST("/login", s.handlePostLogin())
-	s.router.GET("/logout", s.handleGetLogout())
-	s.router.POST("verify/:code", s.handlePostVerify())
+	base.POST("/register", s.handlePostRegister())
+	base.POST("/login", s.handlePostLogin())
+	base.GET("/logout", s.handleGetLogout())
+	base.POST("verify/:code", s.handlePostVerify())
 
 	// user routes
-	user := s.router.Group("/user/")
+	user := base.Group("/user/")
 	user.Use(handleAuth)
 
 	user.GET("/status", s.handleGetStatus())
@@ -29,4 +37,7 @@ func (s Server) setupRoutes() {
 	// domain create
 	user.POST("/domain", s.handleUser(s.handlePostDomain()))
 	user.POST("/domain/:domain/record", s.handleDomain(s.handlePostRecord()))
+
+	// job read
+	user.GET("/jobs", s.handleUser(s.handleGetJobs()))
 }

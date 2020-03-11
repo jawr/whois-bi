@@ -7,10 +7,12 @@ import {
 } from 'react-router-dom'
 import * as serviceWorker from './serviceWorker'
 import configureStore, { history } from './store'
-
+import {actions as loginActions} from './store/login'
 import Root from './routes/root'
 
 const store = configureStore()
+
+store.dispatch(loginActions.check())
 
 ReactDOM.render(
 	<Provider store={store}>

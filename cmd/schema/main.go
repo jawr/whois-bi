@@ -9,6 +9,7 @@ import (
 	"github.com/go-pg/pg/orm"
 	"github.com/jawr/monere/domain"
 	"github.com/jawr/monere/job"
+	"github.com/jawr/monere/shared"
 	"github.com/jawr/monere/user"
 	"github.com/pkg/errors"
 )
@@ -21,7 +22,7 @@ func main() {
 }
 
 func run() error {
-	db, err := setupDatabase()
+	db, err := shared.SetupDatabase()
 	if err != nil {
 		return errors.Wrap(err, "setupDatabase")
 	}
@@ -31,22 +32,6 @@ func run() error {
 	}
 
 	return nil
-}
-
-func setupDatabase() (*pg.DB, error) {
-	options, err := pg.ParseURL("postgresql://jawr@/monere")
-	if err != nil {
-		return nil, errors.Wrap(err, "ParseURL")
-	}
-
-	options.Network = "unix"
-	options.Addr = "/tmp/.s.PGSQL.5432"
-	options.ApplicationName = "monere-schema"
-	options.TLSConfig = nil
-
-	db := pg.Connect(options)
-
-	return db, nil
 }
 
 func setupSchema(db *pg.DB) error {

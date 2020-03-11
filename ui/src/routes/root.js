@@ -11,10 +11,10 @@ import Footer from '../components/footer'
 
 // routes
 import Hero from './hero'
-import Register from './register'
+import Register, { Verify, Success } from './register'
 import Login from './login'
-import Success from './success'
 import Dashboard from './dashboard'
+import Domain from './domain'
 
 export default () => (
 	<>
@@ -35,8 +35,14 @@ export default () => (
 					<Route path="/success">
 						<Success />
 					</Route>
-					<Route path="/dashboard">
+					<Route exact path="/dashboard">
 						<Dashboard />
+					</Route>
+					<Route path="/dashboard/:name">
+						<Domain />
+					</Route>
+					<Route path="/verify/:code">
+						<Verify />
 					</Route>
 				</Switch>
 			</section>

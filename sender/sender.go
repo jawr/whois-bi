@@ -2,6 +2,7 @@ package sender
 
 import (
 	"net/smtp"
+	"os"
 
 	"github.com/jhillyerd/enmime"
 )
@@ -9,7 +10,6 @@ import (
 const (
 	SmtpName     string = "Whois.bi"
 	SmtpUsername string = "hi@whois.bi"
-	SmtpPassword string = "LwS7HaUek4EFB2rt"
 	SmtpAddr     string = "arrow.mxrouting.net"
 	SmtpPort     string = "25"
 )
@@ -22,7 +22,7 @@ func NewSender() *Sender {
 	auth := smtp.PlainAuth(
 		"",
 		SmtpUsername,
-		SmtpPassword,
+		os.Getenv("MONERE_SMTP_PASSWORD"),
 		SmtpAddr,
 	)
 
@@ -40,6 +40,7 @@ func (s Sender) Send(to, subject, body string) error {
 		Subject(subject).
 		HTML([]byte(body))
 
+		// can convert this to use tls
 	if err := message.Send(SmtpAddr+":"+SmtpPort, s.auth); err != nil {
 		return err
 	}

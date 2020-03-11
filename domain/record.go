@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"encoding/json"
 	"fmt"
 	"hash/fnv"
 	"strings"
@@ -157,4 +158,73 @@ func (r Record) String() string {
 		r.TTL,
 		r.Hash,
 	)
+}
+
+// custom marshaller
+func (r *Record) MarshalJSON() ([]byte, error) {
+	type Alias Record
+
+	// can be null
+	var removedAt, deletedAt string
+	if !r.RemovedAt.IsZero() {
+		removedAt = r.RemovedAt.Format("2006/01/02 15:04")
+	}
+	if !r.DeletedAt.IsZero() {
+		deletedAt = r.DeletedAt.Format("2006/01/02 15:04")
+	}
+
+	return json.Marshal(&struct {
+		RRType    string
+		AddedAt   string
+		RemovedAt string
+		DeletedAt string
+		*Alias
+	}{
+		RRType:    dns.TypeToString[r.RRType],
+		AddedAt:   r.AddedAt.Format("2006/01/02 15:04"),
+		RemovedAt: removedAt,
+		DeletedAt: deletedAt,
+		Alias:     (*Alias)(r),
+	})
+}
+
+func (r *Record) UnmarshalJSON(data []byte) error {
+	type Alias Record
+
+	aux := &struct {
+		RRType    string
+		AddedAt   string
+		RemovedAt string
+		DeletedAt string
+		*Alias
+	}{
+		Alias: (*Alias)(r),
+	}
+
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	var err error
+
+	r.AddedAt, err = time.Parse("2006/01/02 15:04", aux.AddedAt)
+	if err != nil {
+		return err
+	}
+	if len(aux.RemovedAt) > 0 {
+		r.RemovedAt, err = time.Parse("2006/01/02 15:04", aux.RemovedAt)
+		if err != nil {
+			return err
+		}
+	}
+	if len(aux.DeletedAt) > 0 {
+		r.DeletedAt, err = time.Parse("2006/01/02 15:04", aux.DeletedAt)
+		if err != nil {
+			return err
+		}
+	}
+
+	r.RRType = dns.StringToType[aux.RRType]
+
+	return nil
 }

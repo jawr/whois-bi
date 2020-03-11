@@ -25,6 +25,12 @@ chrome-user-data
 
 *.tar.gz
 
+build/
+
+secrets.txt
+
+.cookie
+
 packages/react-devtools-core/dist
 packages/react-devtools-extensions/chrome/build
 packages/react-devtools-extensions/chrome/*.crx

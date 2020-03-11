@@ -1,7 +1,10 @@
 package api
 
 import (
-	"github.com/gin-gonic/contrib/sessions"
+	"os"
+
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"github.com/go-pg/pg"
 	"github.com/jawr/monere/sender"
@@ -16,14 +19,16 @@ type Server struct {
 func NewServer(db *pg.DB, emailer *sender.Sender) *Server {
 	router := gin.Default()
 
-	router.Use(
-		sessions.Sessions(
-			"monere",
-			sessions.NewCookieStore(
-				[]byte("1kEetoDbop4$%3lSF,xvmBpekREK3#$"),
-			),
-		),
-	)
+	store := cookie.NewStore([]byte("1kEetoDbop4$%3lSF,xvmBpekREK3#$"))
+
+	if os.Getenv("MONERE_ENV") == "dev" {
+		opts := sessions.Options{
+			Secure: false,
+		}
+		store.Options(opts)
+	}
+
+	router.Use(sessions.Sessions("monere", store))
 
 	server := Server{
 		db:      db,

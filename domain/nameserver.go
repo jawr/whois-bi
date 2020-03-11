@@ -2,6 +2,7 @@ package domain
 
 import (
 	"log"
+	"strings"
 
 	"github.com/miekg/dns"
 	"github.com/pkg/errors"
@@ -39,6 +40,5 @@ func getNameserverAddr(client *dns.Client, domain string) (string, error) {
 
 	log.Printf("found nameserver %s for %s", nameserver, domain)
 
-	return "216.66.1.2", nil
-	// strings.TrimSuffix(nameserver, "."), nil
+	return strings.TrimSuffix(nameserver, "."), nil
 }

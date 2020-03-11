@@ -1,4 +1,4 @@
-export default (url, options={}) => fetch(
+const fetchWrapper = (url, options={}) => fetch(
 	url,
 	options,
 )
@@ -12,12 +12,22 @@ export default (url, options={}) => fetch(
 				return r.json()
 			}
 
-			let error = new Error(r.statusText || r.status)
-			error.response = r
-			return Promise.reject(error)
+			return Promise.reject(r.statusText || r.status)
 		}
 	})
 	.then(r => {
-		if (r.hasOwnProperty('Error')) throw r.Error
+		if (r.hasOwnProperty('Error')) return Promise.reject(r.Error)
 		return Promise.resolve(r)
 	})
+
+export const get = (url, options={}) => fetchWrapper(url, options)
+export const post = (url, body) => fetchWrapper(url, {
+	method: 'POST', 
+	headers: { 
+		'content-type': 'application/json',
+	}, 
+	body: JSON.stringify(body),
+})
+
+export default fetchWrapper
+

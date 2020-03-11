@@ -12,9 +12,9 @@ import (
 
 func (s Server) handleGetDomains() HandlerFunc {
 	return func(u user.User, c *gin.Context) error {
-		var domains []domain.Domain
+		domains := make([]domain.Domain, 0)
 
-		err := s.db.Model(&domains).Where("owner_id = ?", u.ID).Select()
+		err := s.db.Model(&domains).Where("owner_id = ?", u.ID).Order("domain").Select()
 		if err != nil {
 			return newApiError(http.StatusNotFound, "Not found", errors.Wrap(err, "Select"))
 		}
@@ -52,7 +52,7 @@ func (s Server) handleDomain(fn DomainHandlerFunc) gin.HandlerFunc {
 
 func (s Server) handleGetDomain() DomainHandlerFunc {
 	type Response struct {
-		domain.Domain
+		Domain domain.Domain
 
 		Records []domain.Record
 
@@ -62,26 +62,27 @@ func (s Server) handleGetDomain() DomainHandlerFunc {
 	return func(d domain.Domain, u user.User, c *gin.Context) error {
 
 		response := Response{
-			Domain: d,
+			Domain:  d,
+			Records: make([]domain.Record, 0),
 		}
 
 		err := s.db.Model(&response.Records).
-			Where("domain_id = ? AND removed_at IS NULL", response.ID).
-			Order("added_at DESC").
+			Where("domain_id = ? AND removed_at IS NULL", d.ID).
+			Order("added_at").
 			Select()
 		if err != nil {
 			// do we want to abort
-			return newApiError(http.StatusNotFound, "No records found", errors.Wrap(err, "Select Records"))
+			// return newApiError(http.StatusNotFound, "No records found", errors.Wrap(err, "Select Records"))
 		}
 
 		err = s.db.Model(&response.Whois).
-			Where("domain_id = ?", response.ID).
+			Where("domain_id = ?", d.ID).
 			Order("updated_date DESC").
 			Limit(1).
 			Select()
 		if err != nil {
 			// do we want to abort
-			return newApiError(http.StatusNotFound, "No whois found", errors.Wrap(err, "Select Whois"))
+			// return newApiError(http.StatusNotFound, "No whois found", errors.Wrap(err, "Select Whois"))
 		}
 
 		c.JSON(http.StatusOK, &response)
@@ -92,7 +93,7 @@ func (s Server) handleGetDomain() DomainHandlerFunc {
 
 func (s Server) handleGetDomainRecords() DomainHandlerFunc {
 	return func(d domain.Domain, u user.User, c *gin.Context) error {
-		var records []domain.Record
+		records := make([]domain.Record, 0)
 		err := s.db.Model(&records).Where("domain_id = ?", d.ID).Order("added_at DESC").Select()
 		if err != nil {
 			return newApiError(http.StatusNotFound, "Not found", errors.Wrap(err, "Select"))
@@ -104,7 +105,7 @@ func (s Server) handleGetDomainRecords() DomainHandlerFunc {
 
 func (s Server) handleGetDomainWhois() DomainHandlerFunc {
 	return func(d domain.Domain, u user.User, c *gin.Context) error {
-		var whois []domain.Whois
+		whois := make([]domain.Whois, 0)
 		err := s.db.Model(&whois).Where("domain_id = ?", d.ID).Order("added_at DESC").Select()
 		if err != nil {
 			return newApiError(http.StatusNotFound, "Not found", errors.Wrap(err, "Select"))

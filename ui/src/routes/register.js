@@ -1,5 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { Page } from '../components/wrapper'
 import { push } from 'connected-react-router'
+import { useParams } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { actions } from '../store/register'
 
@@ -38,7 +40,7 @@ export default () => {
 	}
 
 	return (
-		<article className="pa4">
+		<Page>
 			<h1 className="f3 f2-m f1-l fw2 mv3">
 				Register
 			</h1>
@@ -83,9 +85,9 @@ export default () => {
 
 				{
 					error.length > 0 && 
-					<div className="mt3">
-						<p className="red">{error}</p>
-					</div>
+						<div className="mt3">
+							<p className="red">{error}</p>
+						</div>
 				}
 
 				<div className="mt3">
@@ -93,6 +95,44 @@ export default () => {
 					{ !idle && <p>Pigeon enroute...</p> }
 				</div>
 			</form>
-		</article>
+		</Page>
+	)
+}
+
+export const Success = () => (
+	<Page>
+		<h1 className="f3 f2-m f1-l fw2 mv3">Success</h1>
+		<p>Registration complete, please check your inbox (or spambox!) to complete the registration proccess</p>
+	</Page>
+)
+
+export const Verify = () => {
+	const { code } = useParams()
+	const dispatch = useDispatch()
+
+	const [title, setTitle] = useState('Verifying')
+	const [text, setText] = useState('Please bare with us whilst we discombobulate and rejig your account')
+
+	useEffect(() => {
+		dispatch(actions.verify(code))
+			.then((result) => {
+				setTimeout(() => {
+				setTitle('Excellent!')
+				setText('Your email has been verified. Please login to explore your new account!')
+				}, 1000)
+			})
+			.catch((error) => {
+				setTimeout(() => {
+				setTitle('Woops!')
+				setText(error)
+				}, 1000)
+			})
+	}, [code, dispatch])
+
+	return (
+	<Page>
+		<h1 className="f3 f2-m f1-l fw2 mv3">{title}</h1>
+		<p>{text}</p>
+	</Page>
 	)
 }

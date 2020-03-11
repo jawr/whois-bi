@@ -1,8 +1,9 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import { Page } from '../components/wrapper'
 
 export default () => (
-		<div className="dtc v-mid tc white ph3 ph4-l">
+	<Page>
 			<h1 className="f3 f2-m f1-l fw2 black-90 mv3">
 				Simple.
 			</h1>
@@ -15,6 +16,6 @@ export default () => (
 
 			<br />
 			<Link className="f4 link dim br1 ph3 pv2 mb2 dib white bg-green grow" to="/register">Start Monitoring</Link>
-		</div>
+	</Page>
 )
 

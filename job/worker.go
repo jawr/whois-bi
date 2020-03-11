@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"log"
+	"os"
 	"time"
 
 	"github.com/ThreeDotsLabs/watermill"
@@ -26,9 +27,12 @@ type Worker struct {
 func NewWorker() (*Worker, error) {
 	logger := watermill.NewStdLogger(false, false)
 
-	amqpConfig := amqp.NewDurableQueueConfig(
-		"amqp://172.17.0.2:5672/",
-	)
+	addr := os.Getenv("MONERE_MQ_ADDR")
+	if len(addr) == 0 {
+		return nil, errors.New("Please specify an mq addr using MONERE_MQ_ADDR")
+	}
+
+	amqpConfig := amqp.NewDurableQueueConfig(addr)
 
 	amqpConfig.Consume.NoRequeueOnNack = true
 
@@ -93,9 +97,7 @@ func (w *Worker) Close() error {
 
 func (w *Worker) jobHandler() message.NoPublishHandlerFunc {
 	// make further upstream?
-	client := dns.Client{
-		Net: "tcp",
-	}
+	client := dns.Client{}
 
 	return func(msg *message.Message) (finalErr error) {
 		var job Job

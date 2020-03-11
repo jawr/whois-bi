@@ -1,17 +1,17 @@
-import fetchWrapper from '../fetchWrapper'
+import { post } from '../fetchWrapper'
 
 export const actions = {
 	register: (email, password) => (dispatch) => (
-		fetchWrapper(
-			'/register',
+		post(
+			'/api/register',
 			{
-				method: 'POST', 
-				headers: { 'content-type': 'application/json' },
-				body: JSON.stringify({
 					Email: email,
 					Password: password,
-				})
 			}
 		)
 	),
+
+	verify: (code) => (dispatch) => (
+		post('/api/verify/' + code, {})
+	)
 }

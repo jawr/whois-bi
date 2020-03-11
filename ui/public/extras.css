@@ -1,0 +1,4 @@
+.overflow-content {
+  word-wrap: break-word; /*old browsers*/
+  overflow-wrap: break-word;
+}

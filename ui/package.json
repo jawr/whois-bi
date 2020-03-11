@@ -2,9 +2,10 @@
   "name": "monere",
   "version": "0.1.0",
   "private": true,
-  "homepage": "http://input.0.mw/build/",
+  "homepage": "https://whois.bi",
   "proxy": "http://localhost:8444",
   "dependencies": {
+    "@bumaga/tabs": "^0.2.0",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
