@@ -12,7 +12,7 @@ export const Jobs = ({ domain }) => {
 	useEffect(() => {
 		if (domain.Domain !== undefined) {
 			setLoading(true)
-			dispatch(actions.getAll(domain)).finally(() => setLoading(false))
+			dispatch(actions.get(domain)).finally(() => setLoading(false))
 		}
 	}, [dispatch, domain]);
 
@@ -32,9 +32,20 @@ export const Jobs = ({ domain }) => {
 
 const Add = ({ domain }) => {
 	const [idle, setIdle] = useState(true)
+	const [success, setSuccess] = useState('')
 	const [error, setError] = useState('')
 
+	const unfinishedJobs = useSelector(selectors.UnfinishedByDomainID(domain.ID))
+
 	const dispatch = useDispatch()
+
+	useEffect(() => {
+		if (unfinishedJobs.length > 0) {
+					setSuccess('Job queued. This page will auto update when the job is complete. Please grab a cup of tea.')
+		} else {
+					setSuccess('')
+		}
+	}, [unfinishedJobs])
 
 	const handleClick = (e) => {
 		e.preventDefault()
@@ -52,8 +63,9 @@ const Add = ({ domain }) => {
 
 	return (
 		<div className="tr mt5">
-			{ idle && <button className="pointer input-reset f4 dim br1 ph3 pv2 bn mb2 dib green bg-washed-green grow" onClick={handleClick}>Request Update</button> }
-			{ !idle && <p>Requesting...</p> }
+			{ idle && success.length === 0 && <button className="pointer input-reset f4 dim br1 ph3 pv2 bn mb2 dib green bg-washed-green grow" onClick={handleClick}>Request Update</button> }
+			{ !idle && <p></p> }
+			{ success.length > 0 && <p>{success}</p> }
 			{ idle && error.length > 0 && <p>{error}</p> }
 		</div>
 	)

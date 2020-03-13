@@ -134,7 +134,7 @@ func (w *Worker) jobHandler() message.NoPublishHandlerFunc {
 
 		}()
 
-		log.Printf("JOB / %+v", job)
+		log.Printf("JOB / %d / %d", job.ID, job.Domain)
 
 		records, err := job.Domain.QueryANY(&client, job.Domain.Domain)
 		if err != nil {
@@ -142,19 +142,27 @@ func (w *Worker) jobHandler() message.NoPublishHandlerFunc {
 			return
 		}
 
-		additions, removals, err := job.Domain.CheckDelta(&client, job.CurrentRecords)
+		enumRecords, err := job.Domain.QueryEnumerate(&client, []string{
+			"", "www", "mx", "media", "assets", "dashboard", "api",
+			"cdn", "download", "downloads", "mail", "applytics", "email", "app",
+			"img", "default._domainkey",
+		})
+		if err != nil {
+			response.Error = errors.Wrap(err, "QueryEnumerate").Error()
+			return
+		}
+
+		log.Printf("Found %d enumRecords", len(enumRecords))
+
+		records = append(records, enumRecords...)
+
+		additions, removals, err := job.Domain.CheckDelta(&client, job.CurrentRecords, records)
 		if err != nil {
 			response.Error = errors.Wrap(err, "CheckDelta").Error()
 			return
 		}
 
-		// if we have no additions and currentRecords is = 0
-		if len(additions) == 0 && len(job.CurrentRecords) == 0 {
-			response.RecordAdditions = records
-		} else {
-			response.RecordAdditions = additions
-		}
-
+		response.RecordAdditions = additions
 		response.RecordRemovals = removals
 
 		w, err := domain.NewWhois(job.Domain)

@@ -7,15 +7,32 @@ const GET_ALL = 'domains.GET_ALL'
 const CREATE = 'domains.CREATE'
 const GET_RECORDS = 'domains.GET_RECORDS'
 const ADD_RECORD = 'domains.ADD_RECORD'
+const SEARCH_RECORDS = 'domain.SEARCH_RECORDS'
+const RESET_RECORDS = 'domain.RESET_RECORDS'
 
 export const selectors = {
+	filterRecords: (records) => (state) => {
+		const query = selectors.query()(state).toLowerCase()
+		if (query.length > 0) {
+			return records.filter(i => (
+				i.Name.toLowerCase().indexOf(query) > -1 
+					|| i.Fields.toLowerCase().indexOf(query) > -1 
+					|| i.TTL.toString() === query 
+					|| i.RRType.toLowerCase() === query
+			))
+		}
+		return records
+	},
 	domainByName: (name) => (state) => state.domains.ByName[name] || {},
-	recordsByID: (id) => (state) => (state.domains.RecordsByID[id] || []).filter(i => i.RemovedAt.length === 0),
-	historicalRecordsByID: (id) => (state) => state.domains.RecordsByID[id] || [],
+	recordsByID: (id) => (state) => (selectors.filterRecords((state.domains.RecordsByID[id] || []).filter(i => i.RemovedAt.length === 0))(state)),
+	historicalRecordsByID: (id) => (state) => (selectors.filterRecords(state.domains.RecordsByID[id] || [])(state)),
 	whoisByID: (id) => (state) => state.domains.WhoisByID[id] || {},
+	query: () => (state) => state.domains.Query,
 }
 
 export const actions = {
+	search: (query) => ({type: SEARCH_RECORDS, query}),
+	resetSearch: (query) => ({type: RESET_RECORDS}),
 	getAll: () => (dispatch) => (
 		get('/api/user/domains')
 		.then(Domains => dispatch({type: GET_ALL, Domains}))
@@ -66,6 +83,7 @@ const initialState = {
 	ByName: {},
 	RecordsByID: {},
 	WhoisByID: {},
+	Query: '',
 }
 
 const buildDomainsState = (state, Domains) => {
@@ -132,6 +150,9 @@ export const reducer = createReducer(initialState, {
 			RecordsByID,
 		}
 	},
+
+	[SEARCH_RECORDS]: (state, action) => ({...state, Query: action.query}),
+	[RESET_RECORDS]: (state, action) => ({...state, Query: ''}),
 
 })
 

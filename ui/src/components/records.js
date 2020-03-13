@@ -1,21 +1,92 @@
-import React, { useState, useEffect } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { useTable, useSortBy } from 'react-table'
+
 import { actions, selectors } from '../store/domains'
 import { Tabs, Menu, Tab, Panels, Panel } from '../components/tabs'
 
 export const Records = ({ domain }) => {
 	const records = useSelector(selectors.recordsByID(domain.ID))
 	const historical = useSelector(selectors.historicalRecordsByID(domain.ID))
+
 	const [loadingHistorical, setLoadingHistorical] = useState(false)
 
 	const dispatch = useDispatch()
+
+	const columns = useMemo(() => [
+		{
+			Header: 'Name', accessor: 'Name', 
+			headerClassName: 'fw6 bb b--black-20 tl pb3 pr3 bg-white w-20',
+			cellClassName: 'pv2 ph3 bb b--black-20',
+		},
+		{
+			Header: 'Type', accessor: 'RRType', 
+			headerClassName: 'fw6 bb b--black-20 tl pb3 pr3 bg-white w-10',
+			cellClassName: 'pv2 ph3 bb b--black-20',
+		},
+		{
+			Header: 'Fields', accessor: 'Fields', 
+			headerClassName: 'fw6 bb b--black-20 tl pb3 pr3 bg-white w-40 dn dtc-ns',
+			cellClassName: 'pv2 ph3 bb b--black-20 dn dtc-ns mw1',
+			// cell wrapper needed
+			Cell: ({ cell: { value } }) => <div className="word-wrap">{value}</div>,
+		},
+		{
+			Header: 'TTL', accessor: 'TTL',
+			headerClassName: 'fw6 bb b--black-20 tl pb3 pr3 bg-white w-10',
+			cellClassName: 'pv2 ph3 bb b--black-20',
+		},
+		{
+			Header: 'Added', accessor: 'AddedAt',
+			headerClassName: 'fw6 bb b--black-20 tl pb3 pr3 bg-white w-15 dn dtc-ns',
+			cellClassName: 'pv2 ph3 bb b--black-20 dn dtc-ns',
+		},
+	], [])
+
+	const historicalColumns = useMemo(() => [
+		{
+			Header: 'Name', accessor: 'Name', 
+			headerClassName: 'fw6 bb b--black-20 tl pb3 pr3 bg-white w-15',
+			cellClassName: 'pv2 ph3 bb b--black-20',
+		},
+		{
+			Header: 'Type', accessor: 'RRType', 
+			headerClassName: 'fw6 bb b--black-20 tl pb3 pr3 bg-white w-10',
+			cellClassName: 'pv2 ph3 bb b--black-20',
+		},
+		{
+			Header: 'Fields', accessor: 'Fields', 
+			headerClassName: 'fw6 bb b--black-20 tl pb3 pr3 bg-white w-35 dn dtc-ns',
+			cellClassName: 'pv2 ph3 bb b--black-20 dn dtc-ns mw1',
+			// cell wrapper needed
+			Cell: ({ cell: { value } }) => <div className="word-wrap">{value}</div>,
+		},
+		{
+			Header: 'TTL', accessor: 'TTL',
+			headerClassName: 'fw6 bb b--black-20 tl pb3 pr3 bg-white w-10',
+			cellClassName: 'pv2 ph3 bb b--black-20',
+		},
+		{
+			Header: 'Added', accessor: 'AddedAt',
+			headerClassName: 'fw6 bb b--black-20 tl pb3 pr3 bg-white w-15 dn dtc-ns',
+			cellClassName: 'pv2 ph3 bb b--black-20 dn dtc-ns',
+		},
+		{
+			Header: 'Removed', accessor: 'RemovedAt',
+			headerClassName: 'fw6 bb b--black-20 tl pb3 pr3 bg-white dn dtc-ns w-15',
+			cellClassName: 'pv2 ph3 bb b--black-20 dn dtc-ns',
+		},
+	], [])
 
 	useEffect(() => {
 		if (domain.Domain !== undefined) {
 			setLoadingHistorical(true)
 			dispatch(actions.getRecords(domain)).finally(() => setLoadingHistorical(false))
+			dispatch(actions.resetSearch())
 		}
 	}, [dispatch, domain]);
+
+
 
 	return (
 		<Tabs sub={true}>
@@ -26,55 +97,89 @@ export const Records = ({ domain }) => {
 
 			<Panels small={true}>
 				<Panel>
-					<Table lastUpdatedAt={domain.LastUpdatedAt} records={records} />
+
+					<Table columns={columns} data={records} />
 					<Add domain={domain} />
 				</Panel>
 				<Panel loading={loadingHistorical}>
-					<Table lastUpdatedAt={domain.LastUpdatedAt} records={historical} historical />
+					<Table columns={historicalColumns} data={historical} />
 				</Panel>
 			</Panels>
 		</Tabs>
 	)
 }
 
-const Table = ({ lastUpdatedAt, records, historical }) => {
-	if (records.length === 0) return <p>No records found</p>
+// expose more getters
+// https://codesandbox.io/s/github/tannerlinsley/react-table/tree/master/examples/data-driven-classes-and-styles
+const Table = ({ columns, data }) => {
+	const dispatch = useDispatch()
 
-		return (
-			<>
-				<table className="f6 mw8 center dt--fixed" cellSpacing="0">
-					<thead>
-						<tr>
-							<th className="fw6 bb b--black-20 tl pb3 pr3 bg-white w-20">Name</th>
-							<th className="fw6 bb b--black-20 tl pb3 pr3 bg-white w-10">Type</th>
-							<th className="fw6 bb b--black-20 tl pb3 pr3 bg-white w-40 dn dtc-ns">Fields</th>
-							<th className="fw6 bb b--black-20 tl pb3 pr3 bg-white w-10">TTL</th>
-							<th className="fw6 bb b--black-20 tl pb3 pr3 bg-white w-10 dn dtc-ns">Added</th>
-							{historical && <th className="fw6 bb b--black-20 tl pb3 pr3 bg-white w-10 dn dtc-ns">Removed</th>}
-						</tr>
-					</thead>
-					<tbody className="lh-copy tl">
-						{records.map(record => <Row key={record.ID} record={record} historical={historical} />)}
-					</tbody>
-				</table>
-				<p className="mt5">Records last updated: {lastUpdatedAt}</p>
-			</>
-		)
-}
+	useEffect(() => {
+			dispatch(actions.resetSearch())
+	}, [dispatch]);
 
-const Row = ({ record, historical }) => {
-	const classes = (historical && record.RemovedAt.length > 0) ? "bg-washed-red" : ""
+	const {
+		getTableProps,
+		getTableBodyProps,
+		headerGroups,
+		rows,
+		prepareRow,
+	} = useTable(
+		{
+			columns,
+			data,
+		},
+		useSortBy
+	)
+
+	if (data.length === 0) {
+		return <p>No records found</p>
+	}
+
 	return (
-		<tr className={classes}>
-			<td className="pv3 ph3 bb b--black-20">{record.Name}</td>
-			<td className="pv3 ph3 bb b--black-20">{record.RRType}</td>
-			<td className="pv3 ph3 bb b--black-20 dn dtc-ns">
-				<div className="overflow-content">{record.Fields}</div>
-			</td>
-			<td className="pv3 ph3 bb b--black-20">{record.TTL}</td>
-			<td className="pv3 ph3 bb b--black-20 dn dtc-ns">{record.AddedAt}</td>
-			{historical && <td className="pv3 ph3 bb b--black-20 dn dtc-ns">{record.RemovedAt}</td>}
-		</tr>
+		<>
+			<Search />
+
+			<table {...getTableProps()} className="f6 mw8 center dt--fixed" cellSpacing="0">
+				<thead>
+					{headerGroups.map(headerGroup => (
+						<tr {...headerGroup.getHeaderGroupProps()}>
+							{headerGroup.headers.map(column => (
+								<th {...column.getHeaderProps({
+									...column.getSortByToggleProps(),
+									className: column.headerClassName,
+								})}
+								>
+										{column.isSorted
+											? column.isSortedDesc
+												? <span className="sort-by desc"></span>
+												: <span className="sort-by asc"></span>
+												: <span className="sort-by"></span>}
+									{column.render('Header')}
+								</th>
+							))}
+						</tr>
+					))}
+				</thead>
+				<tbody {...getTableBodyProps()} className="lh-copy tl">
+					{rows.map(
+						(row, i) => {
+							prepareRow(row);
+							return (
+								<tr {...row.getRowProps()}>
+									{row.cells.map(cell => {
+										return (
+											<td {...cell.getCellProps({
+												className: cell.column.cellClassName,
+											})}>{cell.render('Cell')}</td>
+										)
+									})}
+								</tr>
+							)}
+					)}
+				</tbody>
+			</table>
+		</>
 	)
 }
 
@@ -136,4 +241,20 @@ const Add = ({ domain }) => {
 	)
 }
 
-
+const Search = () => {
+	const dispatch = useDispatch()
+	const query = useSelector(selectors.query())
+	return (
+		<div className="w-100 mb5 center">
+		<form className="black-80">
+				<small className="f6 black-60 db mb2">Filter records results</small>
+				<input 
+					className="input-reset ba b--black-20 pa2 mb2 db w-100" 
+					type="text" 
+					value={query}
+					onChange={(e) => dispatch(actions.search(e.target.value))}
+				/>
+		</form>
+			</div>
+	)
+}

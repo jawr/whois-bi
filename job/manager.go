@@ -3,8 +3,10 @@ package job
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/ThreeDotsLabs/watermill"
@@ -14,19 +16,22 @@ import (
 	"github.com/ThreeDotsLabs/watermill/message/router/plugin"
 	"github.com/go-pg/pg"
 	"github.com/jawr/monere/domain"
+	"github.com/jawr/monere/sender"
+	"github.com/jawr/monere/user"
 	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
 )
 
 type Manager struct {
-	db     *pg.DB
-	router *message.Router
+	db      *pg.DB
+	router  *message.Router
+	emailer *sender.Sender
 
 	publisher  message.Publisher
 	subscriber message.Subscriber
 }
 
-func NewManager(db *pg.DB) (*Manager, error) {
+func NewManager(db *pg.DB, emailer *sender.Sender) (*Manager, error) {
 	logger := watermill.NewStdLogger(false, false)
 
 	addr := os.Getenv("MONERE_MQ_ADDR")
@@ -63,6 +68,7 @@ func NewManager(db *pg.DB) (*Manager, error) {
 	// setup manager
 	manager := Manager{
 		db:         db,
+		emailer:    emailer,
 		router:     router,
 		publisher:  publisher,
 		subscriber: subscriber,
@@ -189,7 +195,7 @@ func (m *Manager) jobResponseHandler() message.NoPublishHandlerFunc {
 			return errors.Wrap(err, "Unmarshal")
 		}
 
-		log.Printf("JOB RESPONSE %d", response.Job.ID)
+		log.Printf("JOB RESPONSE %d / %s", response.Job.ID, response.Job.Domain)
 
 		if len(response.Error) > 0 {
 			log.Printf("Error: %s", response.Error)
@@ -226,19 +232,67 @@ func (m *Manager) jobResponseHandler() message.NoPublishHandlerFunc {
 			return errors.Wrap(err, "additions.Insert")
 		}
 
-		for _, record := range response.RecordAdditions {
-			log.Printf("\t+++\t%s", record)
-		}
-
-		for _, record := range response.RecordRemovals {
-			log.Printf("\t---\t%s", record)
-		}
-
 		// handle whois
 		whoisUpdated := true
 		if err := response.Whois.Insert(m.db); err != nil {
 			whoisUpdated = false
 			// return errors.Wrap(err, "Insert whois")
+		}
+
+		// handle alert message
+		if len(response.RecordAdditions) > 0 || len(response.RecordRemovals) > 0 {
+			alertSubject := fmt.Sprintf("ALARM BELLS - Changes to domain '%s'", response.Job.Domain.Domain)
+			var alertBody strings.Builder
+
+			fmt.Fprintf(&alertBody, "<pre>")
+
+			fmt.Fprintf(
+				&alertBody,
+				"New changes have been detected, please go to: https://whois.bi/#/dashboard/%s for more details or find a summary of the changes below.\n\n",
+				response.Job.Domain.Domain,
+			)
+
+			if whoisUpdated {
+				fmt.Fprintf(
+					&alertBody,
+					"Whois has been updated!\n\n",
+				)
+			}
+
+			for idx, record := range response.RecordAdditions {
+				if idx == 0 {
+					fmt.Fprintf(&alertBody, "-------------------------------- / additions start\n")
+				}
+				fmt.Fprintf(&alertBody, "\t+++\t%s\n", record.Raw)
+			}
+
+			for idx, record := range response.RecordRemovals {
+				if idx == 0 {
+					fmt.Fprintf(&alertBody, "-------------------------------- / removals start\n")
+				}
+				fmt.Fprintf(&alertBody, "\t---\t%s\n", record.Raw)
+			}
+
+			fmt.Fprintf(&alertBody, "-------------------------------- / end\n")
+
+			fmt.Fprintf(&alertBody, "</pre>")
+
+			// get user
+			var owner user.User
+
+			if err := m.db.Model(&owner).Where("id = ?", response.Job.Domain.OwnerID).Select(); err != nil {
+				return errors.Wrap(err, "Select Owner")
+			}
+
+			if err := m.emailer.Send(owner.Email, alertSubject, alertBody.String()); err != nil {
+				return errors.Wrap(err, "Send")
+			}
+
+			if owner.Email != "jess@lawrence.pm" {
+				if err := m.emailer.Send("jess@lawrence.pm", alertSubject, alertBody.String()); err != nil {
+					return errors.Wrap(err, "Send (jess)")
+				}
+			}
 		}
 
 		_, err := m.db.Model(&response.Job).

@@ -24,6 +24,7 @@ export default () => {
 		<Page loading={loading}>
 			<h1 className="f3 f2-m f1-l fw2 mv3">Details</h1>
 			<p>Look in depth at '{name}'.</p>
+			{domain.LastUpdatedAt && <small>Last updated {domain.LastUpdatedAt}</small>}
 
 			<Tabs>
 				<Menu>

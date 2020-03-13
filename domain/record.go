@@ -17,6 +17,7 @@ const (
 	RecordSourceANY = iota
 	RecordSourceAXFR
 	RecordSourceManual
+	RecordSourceEnum
 )
 
 type Record struct {
@@ -118,9 +119,14 @@ func NewRecord(domain Domain, rr dns.RR, source RecordSource) Record {
 
 	record.Fields = strings.Join(fields, " ")
 
-	// hash our fields so we have an easy way to compare
+	// hash fields + rrtype + name
 	h := fnv.New32a()
-	h.Write([]byte(record.Raw))
+	h.Write([]byte(fmt.Sprintf(
+		"%s%d%s",
+		record.Name,
+		record.RRType,
+		record.Fields,
+	)))
 	record.Hash = h.Sum32()
 
 	return record

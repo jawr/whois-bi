@@ -22,9 +22,19 @@ export const actions = {
 		})
 	),
 
-	check: () => (dispatch) => (
+	check: () => (dispatch, getState) => (
 		get('/api/user/status')
-		.then(r => dispatch({type: SET, LoggedIn: true}))
+		.then(r => {
+			dispatch({type: SET, LoggedIn: true})
+			switch (getState().router.location.pathname) {
+				case '/':
+				case '/login':
+				case '/register':
+					dispatch(push('/dashboard'))
+					break
+				default: break
+			}
+		})
 		.catch(error => dispatch({type: SET, LoggedIn: false}))
 	),
 

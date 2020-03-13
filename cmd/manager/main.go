@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/jawr/monere/job"
+	"github.com/jawr/monere/sender"
 	"github.com/jawr/monere/shared"
 	"github.com/pkg/errors"
 )
@@ -23,7 +24,9 @@ func run() error {
 		return errors.Wrap(err, "setupDatabase")
 	}
 
-	manager, err := job.NewManager(db)
+	emailer := sender.NewSender()
+
+	manager, err := job.NewManager(db, emailer)
 	if err != nil {
 		return errors.Wrap(err, "NewManager")
 	}

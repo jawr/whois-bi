@@ -1,4 +1,52 @@
-.overflow-content {
-  word-wrap: break-word; /*old browsers*/
-  overflow-wrap: break-word;
+.word-wrap {
+	word-wrap: break-word; /*old browsers*/
+	overflow-wrap: break-word;
+	word-break: break-all;
+}
+
+.w-5 {
+	width: 5%;
+}
+
+.w-15 {
+	width: 15%;
+}
+
+.w-35 {
+	width: 35%;
+}
+
+.w-55 {
+	width: 55%;
+}
+
+th span.sort-by { 
+	padding-right: 2rem;
+	position: relative;
+}
+
+span.sort-by:before,
+span.sort-by:after {
+	border: 3px solid transparent;
+	content: "";
+	display: block;
+	height: 0;
+	right: 10px;
+	top: 50%;
+	position: absolute;
+	width: 0;
+}
+span.sort-by:before {
+	border-bottom-color: #CCC;
+	margin-top: -6px;
+}
+span.sort-by.desc:before {
+	border-bottom-color:#19a974;
+}
+span.sort-by:after {
+	border-top-color: #CCC;
+	margin-top: 3px;
+}
+span.sort-by.asc:after {
+	border-top-color:#19a974;
 }

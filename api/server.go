@@ -2,7 +2,9 @@ package api
 
 import (
 	"os"
+	"time"
 
+	"github.com/fvbock/endless"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
@@ -41,5 +43,6 @@ func NewServer(db *pg.DB, emailer *sender.Sender) *Server {
 
 func (s *Server) Run(addr string) error {
 	s.setupRoutes()
-	return s.router.Run(addr)
+	endless.DefaultHammerTime = time.Second * 20
+	return endless.ListenAndServe(addr, s.router)
 }

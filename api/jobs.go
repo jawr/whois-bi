@@ -16,7 +16,7 @@ func (s Server) handleGetJobs() HandlerFunc {
 
 		err := s.db.Model(&jobs).
 			Relation("Domain").
-			Where("domain.owner_id = ?", u.ID).
+			Where("domain.owner_id = ? AND domain.domain = ?", u.ID, c.Param("domain")).
 			Order("job.created_at DESC").
 			Select()
 		if err != nil {

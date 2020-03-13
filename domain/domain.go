@@ -2,13 +2,10 @@ package domain
 
 import (
 	"encoding/json"
-	"fmt"
-	"log"
 	"time"
 
 	"github.com/go-pg/pg"
 	"github.com/jawr/monere/user"
-	"github.com/miekg/dns"
 	"github.com/pkg/errors"
 )
 
@@ -68,41 +65,6 @@ func (d *Domain) Insert(db *pg.DB) error {
 	return nil
 }
 
-// perform an any query
-func (d Domain) QueryANY(client *dns.Client, fqdn string) (Records, error) {
-
-	// get authority server for our call
-	ns, err := getNameserverAddr(client, d.Domain)
-	if err != nil {
-		return nil, errors.Wrap(err, "getNameserver")
-	}
-
-	var msg dns.Msg
-
-	// set our any query
-	msg.SetQuestion(
-		dns.Fqdn(fqdn),
-		dns.TypeANY,
-	)
-
-	reply, err := query(client, &msg, ns)
-	if err != nil {
-		return nil, errors.Wrap(err, "query")
-	}
-
-	records := make(Records, 0, len(reply.Answer))
-
-	for idx := range reply.Answer {
-		records = append(records, NewRecord(d, reply.Answer[idx], RecordSourceANY))
-	}
-
-	for idx := range reply.Extra {
-		records = append(records, NewRecord(d, reply.Extra[idx], RecordSourceANY))
-	}
-
-	return records, nil
-}
-
 // get most recent records for a domain
 func (d Domain) GetRecords(db *pg.DB) (Records, error) {
 	var records Records
@@ -119,69 +81,8 @@ func (d Domain) GetRecords(db *pg.DB) (Records, error) {
 	return records, nil
 }
 
-// look at existing records and check for any deltas
-func (d Domain) CheckDelta(client *dns.Client, records Records) (Records, Records, error) {
-
-	// get authority server for our call
-	ns, err := getNameserverAddr(client, d.Domain)
-	if err != nil {
-		return nil, nil, errors.Wrap(err, "getNameserver")
-	}
-
-	original := make(map[uint32]Record, len(records))
-	current := make(map[uint32]Record, 0)
-
-	// loop through records and do a query against the current
-	for _, record := range records {
-
-		var msg dns.Msg
-
-		msg.SetQuestion(
-			record.Name,
-			record.RRType,
-		)
-
-		reply, err := query(client, &msg, ns)
-		if err != nil {
-			return nil, nil, errors.Wrap(err, "query")
-		}
-
-		for idx := range reply.Answer {
-			delta := NewRecord(d, reply.Answer[idx], RecordSourceANY)
-			current[delta.Hash] = delta
-		}
-	}
-
-	log.Printf("Current: %d Original: %d", len(current), len(original))
-
-	additions := make(Records, 0)
-	for key := range current {
-		if _, ok := original[key]; !ok {
-			// does not exist means it was added!
-			additions = append(additions, current[key])
-		}
-	}
-
-	removals := make(Records, 0)
-	for key := range original {
-		if _, ok := current[key]; !ok {
-			// does not exist means it was removed!
-			removals = append(removals, original[key])
-		}
-	}
-
-	log.Printf("Additions: %d Removals: %d", len(additions), len(removals))
-
-	return additions, removals, nil
-}
-
-// string representation
 func (d Domain) String() string {
-	return fmt.Sprintf(
-		"%s / %s",
-		d.Owner.Email,
-		d.Domain,
-	)
+	return d.Domain
 }
 
 // custom marshaller
