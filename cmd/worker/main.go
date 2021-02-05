@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/jawr/monere/job"
+	"github.com/jawr/whois.bi/internal/cmdutil"
+	"github.com/jawr/whois.bi/internal/job"
 	"github.com/pkg/errors"
 )
 
@@ -17,14 +18,20 @@ func main() {
 }
 
 func run() error {
+	if err := cmdutil.LoadDotEnv(); err != nil {
+		return errors.WithMessage(err, "LoadDotEnv")
+	}
+
 	worker, err := job.NewWorker()
 	if err != nil {
-		return errors.Wrap(err, "NewWorker")
+		return errors.WithMessage(err, "NewWorker")
 	}
 	defer worker.Close()
 
-	if err := worker.Run(context.TODO()); err != nil {
-		return errors.Wrap(err, "Run")
+	ctx := context.Background()
+
+	if err := worker.Run(ctx); err != nil {
+		return errors.WithMessage(err, "Run")
 	}
 
 	return nil

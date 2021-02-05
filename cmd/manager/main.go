@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/jawr/monere/job"
-	"github.com/jawr/monere/sender"
-	"github.com/jawr/monere/shared"
+	"github.com/jawr/whois.bi/internal/cmdutil"
+	"github.com/jawr/whois.bi/internal/job"
+	"github.com/jawr/whois.bi/internal/sender"
 	"github.com/pkg/errors"
 )
 
@@ -19,21 +19,28 @@ func main() {
 }
 
 func run() error {
-	db, err := shared.SetupDatabase()
-	if err != nil {
-		return errors.Wrap(err, "setupDatabase")
+	if err := cmdutil.LoadDotEnv(); err != nil {
+		return errors.WithMessage(err, "LoadDotEnv")
 	}
+
+	db, err := cmdutil.SetupDatabase()
+	if err != nil {
+		return errors.WithMessage(err, "SetupDatabase")
+	}
+	defer db.Close()
 
 	emailer := sender.NewSender()
 
 	manager, err := job.NewManager(db, emailer)
 	if err != nil {
-		return errors.Wrap(err, "NewManager")
+		return errors.WithMessage(err, "NewManager")
 	}
 	defer manager.Close()
 
-	if err := manager.Run(context.TODO()); err != nil {
-		return errors.Wrap(err, "Run")
+	ctx := context.Background()
+
+	if err := manager.Run(ctx); err != nil {
+		return errors.WithMessage(err, "Run")
 	}
 
 	return nil

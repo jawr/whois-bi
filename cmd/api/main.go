@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/jawr/monere/api"
-	"github.com/jawr/monere/sender"
-	"github.com/jawr/monere/shared"
+	"github.com/jawr/whois.bi/internal/api"
+	"github.com/jawr/whois.bi/internal/cmdutil"
+	"github.com/jawr/whois.bi/internal/sender"
 	"github.com/pkg/errors"
 )
 
@@ -18,16 +18,21 @@ func main() {
 }
 
 func run() error {
-	db, err := shared.SetupDatabase()
-	if err != nil {
-		return errors.Wrap(err, "setupDatabase")
+	if err := cmdutil.LoadDotEnv(); err != nil {
+		return errors.WithMessage(err, "LoadDotEnv")
 	}
+
+	db, err := cmdutil.SetupDatabase()
+	if err != nil {
+		return errors.WithMessage(err, "SetupDatabase")
+	}
+	defer db.Close()
 
 	emailer := sender.NewSender()
 
 	server := api.NewServer(db, emailer)
 
-	if err := server.Run("localhost:8444"); err != nil {
+	if err := server.Run(os.Getenv("HTTP_API_ADDR")); err != nil {
 		return errors.Wrap(err, "Run")
 	}
 
