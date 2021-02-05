@@ -25,7 +25,10 @@ chrome-user-data
 
 *.tar.gz
 
+.env
+
 build/
+scripts/
 
 secrets.txt
 

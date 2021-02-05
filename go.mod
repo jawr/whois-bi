@@ -1,4 +1,4 @@
-module github.com/jawr/monere
+module github.com/jawr/whois.bi
 
 go 1.13
 
@@ -17,8 +17,10 @@ require (
 	github.com/jawr/whois-parser-go v1.10.3-0.20200304105754-53779df06755
 	github.com/jhillyerd/enmime v0.8.0
 	github.com/jinzhu/inflection v1.0.0 // indirect
+	github.com/joho/godotenv v1.3.0
 	github.com/likexian/gokit v0.22.1 // indirect
 	github.com/likexian/whois-go v1.3.1
+	github.com/marcsauter/single v0.0.0-20191217065835-82e78df7afac
 	github.com/miekg/dns v1.1.27
 	github.com/pkg/errors v0.9.1
 	golang.org/x/crypto v0.0.0-20200302210943-78000ba7a073
