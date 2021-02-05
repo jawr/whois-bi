@@ -17,7 +17,7 @@ func (s Server) handleGetDomains() HandlerFunc {
 		domains := make([]domain.DisplayDomain, 0)
 
 		err := s.db.Model(&domains).
-			ColumnExpr("domain.*, coalesce(count(record.*), 0) as records, coalesce(count(whois.*), 0) as whois").
+			ColumnExpr("domain.*, coalesce(count(distinct record.id), 0) as records, coalesce(count(distinct whois.id), 0) as whois").
 			Join("left join records as record on domain.id = record.domain_id left join whois on domain.id = whois.domain_id").
 			Where("domain.owner_id = ?", u.ID).
 			Group("domain.id").

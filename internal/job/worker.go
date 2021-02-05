@@ -133,7 +133,7 @@ func (w *Worker) jobHandler() message.NoPublishHandlerFunc {
 
 		}()
 
-		log.Printf("JOB / %d / %d", job.ID, job.Domain)
+		log.Printf("JOB / %d / %s", job.ID, job.Domain.Domain)
 
 		records, err := job.Domain.QueryANY(&client, job.Domain.Domain)
 		if err != nil {
