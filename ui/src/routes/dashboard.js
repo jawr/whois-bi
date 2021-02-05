@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { Page } from '../components/wrapper'
-import { actions } from '../store/domains'
+import { actions, selectors } from '../store/domains'
+import { Table } from '../components/table'
 
 export default () => {
 	const [loading, setLoading] = useState(true)
-	const domains = useSelector(state => state.domains.Domains)
+	const domains = useSelector(selectors.filterDomains())
 
 	const dispatch = useDispatch()
 
@@ -14,12 +15,45 @@ export default () => {
 		dispatch(actions.getAll()).finally(() => setLoading(false))
 	}, [dispatch]);
 
+	const columns = useMemo(() => [
+		{
+			Header: 'Domain', accessor: 'Domain', 
+			headerClassName: 'fw6 bb b--black-20 tl pb3 pr3 bg-white w-60',
+			cellClassName: 'pv2 ph3 bb b--black-20',
+		},
+		{
+			Header: 'Records', accessor: 'Records', 
+			headerClassName: 'fw6 bb b--black-20 tl pb3 pr3 bg-white w-10',
+			cellClassName: 'pv2 ph3 bb b--black-20',
+		},
+		{
+			Header: 'Whois', accessor: 'Whois', 
+			headerClassName: 'fw6 bb b--black-20 tl pb3 pr3 bg-white w-10',
+			cellClassName: 'pv2 ph3 bb b--black-20',
+		},
+		{
+			Header: 'Updated', accessor: 'LastUpdatedAt',
+			headerClassName: 'fw6 bb b--black-20 tl pb3 pr3 bg-white w-10',
+			cellClassName: 'pv2 ph3 bb b--black-20 dn dtc-ns',
+		},
+		{
+			Header: '', id: 'Options',
+			headerClassName: 'fw6 bb b--black-20 tl pb3 pr3 bg-white w-10',
+			cellClassName: 'pv2 ph3 bb b--black-20 dn dtc-ns',
+			dontSort: true,
+			Cell: ({ cell }) => <Link to={`/dashboard/${cell.row.original.Domain}`} className="f6 link blue hover-dark-gray">details</Link>
+		}
+	], [])
+
 	return (
 		<Page loading={loading}>
 			<h1 className="f3 f2-m f1-l fw2 mv3">Dashboard</h1>
 			<p>Currently monitoring {domains.length} domains.</p>
 
-			{domains.length > 0 && <List domains={domains} />}
+			<div className="mv5">
+				<Search />
+				<Table data={domains} columns={columns} />
+			</div>
 
 			<Create />
 
@@ -52,7 +86,7 @@ const Create = () => {
 
 	return (
 		<div className="pa4-l">
-			<form className="bg-washed-green mw7 center pa4 br2-ns ba b--black-10" onSubmit={handleSubmit}>
+			<form className="bg-washed-green mw8 center pa4 br2-ns ba b--black-10" onSubmit={handleSubmit}>
 				<fieldset className="cf bn ma0 pa0">
 
 					{status.length > 0 && <p className="pa0 f5 f4-ns mb3 black-80">{status}</p>}
@@ -84,21 +118,22 @@ const Create = () => {
 	)
 }
 
-const List = ({ domains }) => (
-	<ul className="list pl0 mt6 mb6 center mw7">
-		{domains.map(d => <Item key={d.ID} domain={d} />)}
-	</ul>
-)
 
-const Item = ({ domain }) => (
-	<li
-		className="flex items-center lh-copy pa3 ph0-l bb b--black-10 mw7"
-	>
-		<div className="pl3 flex-auto">
-			<span className="f6 db black-70">{domain.Domain}</span>
+const Search = () => {
+	const dispatch = useDispatch()
+	const query = useSelector(selectors.query())
+	return (
+		<div className="mw8 mb5 center">
+			<form className="black-80">
+				<small className="f6 black-60 db mb2">Filter records results</small>
+				<input 
+					className="input-reset ba b--black-20 pa2 mb2 db w-100" 
+					type="text" 
+					value={query}
+					onChange={(e) => dispatch(actions.search(e.target.value))}
+				/>
+			</form>
 		</div>
-		<div>
-			<Link to={`/dashboard/${domain.Domain}`} className="f6 link blue hover-dark-gray">details</Link>
-		</div>
-	</li>
-)
+	)
+}
+

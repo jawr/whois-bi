@@ -9,10 +9,12 @@ const GET_RECORDS = 'domains.GET_RECORDS'
 const ADD_RECORD = 'domains.ADD_RECORD'
 const SEARCH_RECORDS = 'domain.SEARCH_RECORDS'
 const RESET_RECORDS = 'domain.RESET_RECORDS'
+const SEARCH = 'domain.SEARCH'
+const RESET = 'domain.RESET'
 
 export const selectors = {
 	filterRecords: (records) => (state) => {
-		const query = selectors.query()(state).toLowerCase()
+		const query = selectors.recordsQuery()(state).toLowerCase()
 		if (query.length > 0) {
 			return records.filter(i => (
 				i.Name.toLowerCase().indexOf(query) > -1 
@@ -23,16 +25,32 @@ export const selectors = {
 		}
 		return records
 	},
+
+	filterDomains: () => (state) => {
+		const query = selectors.query()(state).toLowerCase()
+		if (query.length > 0) {
+			return state.domains.Domains.filter(i => (
+				i.Domain.toLowerCase().indexOf(query) > -1 
+			))
+		}
+		return [...state.domains.Domains]
+	},
+
 	domainByName: (name) => (state) => state.domains.ByName[name] || {},
 	recordsByID: (id) => (state) => (selectors.filterRecords((state.domains.RecordsByID[id] || []).filter(i => i.RemovedAt.length === 0))(state)),
 	historicalRecordsByID: (id) => (state) => (selectors.filterRecords(state.domains.RecordsByID[id] || [])(state)),
 	whoisByID: (id) => (state) => state.domains.WhoisByID[id] || {},
+	recordsQuery: () => (state) => state.domains.RecordsQuery,
 	query: () => (state) => state.domains.Query,
 }
 
 export const actions = {
-	search: (query) => ({type: SEARCH_RECORDS, query}),
-	resetSearch: (query) => ({type: RESET_RECORDS}),
+	searchRecords: (query) => ({type: SEARCH_RECORDS, query}),
+	resetSearchRecords: (query) => ({type: RESET_RECORDS}),
+
+	search: (query) => ({type: SEARCH, query}),
+	resetSearch: (query) => ({type: RESET}),
+
 	getAll: () => (dispatch) => (
 		get('/api/user/domains')
 		.then(Domains => dispatch({type: GET_ALL, Domains}))
@@ -71,8 +89,12 @@ export const actions = {
 				Raw: rawRecord,
 			},
 		)
-		.then(Record => {
-			dispatch({type: ADD_RECORD, DomainID: domain.ID, Record})
+		.then(data => {
+			data.Records.forEach(Record => {
+				dispatch({type: ADD_RECORD, DomainID: domain.ID, Record})
+			})
+			// handle data.Errors
+			return Promise.resolve(data)
 		})
 	),
 
@@ -84,6 +106,7 @@ const initialState = {
 	RecordsByID: {},
 	WhoisByID: {},
 	Query: '',
+	RecordsQuery: '',
 }
 
 const buildDomainsState = (state, Domains) => {
@@ -151,8 +174,11 @@ export const reducer = createReducer(initialState, {
 		}
 	},
 
-	[SEARCH_RECORDS]: (state, action) => ({...state, Query: action.query}),
-	[RESET_RECORDS]: (state, action) => ({...state, Query: ''}),
+	[SEARCH_RECORDS]: (state, action) => ({...state, RecordsQuery: action.query}),
+	[RESET_RECORDS]: (state, action) => ({...state, RecordsQuery: ''}),
+
+	[SEARCH]: (state, action) => ({...state, Query: action.query}),
+	[RESET]: (state, action) => ({...state, Query: ''}),
 
 })
 
