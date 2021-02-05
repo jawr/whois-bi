@@ -33,7 +33,6 @@ func NewWorker() (*Worker, error) {
 	}
 
 	amqpConfig := amqp.NewDurableQueueConfig(addr)
-
 	amqpConfig.Consume.NoRequeueOnNack = true
 
 	// setup publisher
@@ -78,8 +77,8 @@ func NewWorker() (*Worker, error) {
 	)
 
 	router.AddNoPublisherHandler(
-		"monere.job.queue",
-		"monere.job.queue",
+		"job.queue",
+		"job.queue",
 		subscriber,
 		worker.jobHandler(),
 	)
@@ -122,7 +121,7 @@ func (w *Worker) jobHandler() message.NoPublishHandlerFunc {
 
 			msg := message.NewMessage(watermill.NewUUID(), b)
 
-			if err := w.publisher.Publish("monere.job.response", msg); err != nil {
+			if err := w.publisher.Publish("job.response", msg); err != nil {
 				finalErr = errors.Wrap(err, "Publish")
 				return
 			}

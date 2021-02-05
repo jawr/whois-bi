@@ -28,7 +28,6 @@ chrome-user-data
 .env
 
 build/
-scripts/
 
 secrets.txt
 

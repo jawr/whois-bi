@@ -48,9 +48,9 @@ type Record struct {
 	Hash uint32 `sql:",notnull,unique"`
 
 	// meta data
-	AddedAt   JsonDateTime `sql:",notnull,default:now()"`
-	RemovedAt JsonDateTime
-	DeletedAt time.Time `pg:",soft_delete"`
+	AddedAt   JsonDateTime `sql:",type:timestamptz,notnull,default:now()"`
+	RemovedAt JsonDateTime `sql:",type:timestamptz"`
+	DeletedAt time.Time    `pg:",soft_delete"`
 }
 
 // helper type

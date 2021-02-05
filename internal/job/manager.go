@@ -40,7 +40,6 @@ func NewManager(db *pg.DB, emailer *sender.Sender) (*Manager, error) {
 	}
 
 	amqpConfig := amqp.NewDurableQueueConfig(addr)
-
 	amqpConfig.Consume.NoRequeueOnNack = true
 
 	// setup publisher
@@ -88,8 +87,8 @@ func NewManager(db *pg.DB, emailer *sender.Sender) (*Manager, error) {
 	)
 
 	router.AddNoPublisherHandler(
-		"monere.job.response",
-		"monere.job.response",
+		"job.response",
+		"job.response",
 		subscriber,
 		manager.jobResponseHandler(),
 	)
@@ -174,7 +173,7 @@ func (m *Manager) createJobs(ctx context.Context) error {
 
 			msg := message.NewMessage(watermill.NewUUID(), b)
 
-			if err := m.publisher.Publish("monere.job.queue", msg); err != nil {
+			if err := m.publisher.Publish("job.queue", msg); err != nil {
 				return errors.Wrap(err, "Publish")
 			}
 		}

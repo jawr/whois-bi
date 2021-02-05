@@ -1,9 +1,9 @@
 {
-  "name": "monere",
+  "name": "whois.bi",
   "version": "0.1.0",
   "private": true,
   "homepage": "https://whois.bi",
-  "proxy": "http://localhost:8444",
+  "proxy": "http://localhost:8888",
   "dependencies": {
     "@bumaga/tabs": "^0.2.0",
     "@testing-library/jest-dom": "^4.2.4",

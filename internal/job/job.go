@@ -39,7 +39,6 @@ type JobResponse struct {
 	Whois           domain.Whois
 }
 
-// create a new job from a domain
 func NewJob(d domain.Domain) Job {
 	j := Job{
 		DomainID: d.ID,
@@ -49,7 +48,6 @@ func NewJob(d domain.Domain) Job {
 	return j
 }
 
-// insert new job
 func (j *Job) Insert(db *pg.DB) error {
 	_, err := db.Model(j).Returning("*").Insert()
 	if err != nil {
@@ -68,6 +66,7 @@ func (j *Job) Insert(db *pg.DB) error {
 	return nil
 }
 
+// find all jobs that have not yet started
 func GetUnstarted(db *pg.DB) ([]Job, error) {
 	var jobs []Job
 	err := db.Model(&jobs).Relation("Domain").Where("started_at IS NULL").Select()
@@ -77,7 +76,7 @@ func GetUnstarted(db *pg.DB) ([]Job, error) {
 	return jobs, nil
 }
 
-// custom marshaller
+// custom marshaller that nicely formats our time.Time to date strings
 func (j *Job) MarshalJSON() ([]byte, error) {
 	type Alias Job
 
@@ -103,6 +102,7 @@ func (j *Job) MarshalJSON() ([]byte, error) {
 	})
 }
 
+// custom unmarshaller that formats our string dates to time.Time
 func (j *Job) UnmarshalJSON(data []byte) error {
 	type Alias Job
 

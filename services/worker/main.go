@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/jawr/whois.bi/internal/cmdutil"
 	"github.com/jawr/whois.bi/internal/job"
 	"github.com/pkg/errors"
 )
@@ -18,10 +17,6 @@ func main() {
 }
 
 func run() error {
-	if err := cmdutil.LoadDotEnv(); err != nil {
-		return errors.WithMessage(err, "LoadDotEnv")
-	}
-
 	worker, err := job.NewWorker()
 	if err != nil {
 		return errors.WithMessage(err, "NewWorker")

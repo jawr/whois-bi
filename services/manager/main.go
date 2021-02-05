@@ -1,11 +1,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 
-	"github.com/jawr/whois.bi/internal/api"
 	"github.com/jawr/whois.bi/internal/cmdutil"
+	"github.com/jawr/whois.bi/internal/job"
 	"github.com/jawr/whois.bi/internal/sender"
 	"github.com/pkg/errors"
 )
@@ -18,10 +19,6 @@ func main() {
 }
 
 func run() error {
-	if err := cmdutil.LoadDotEnv(); err != nil {
-		return errors.WithMessage(err, "LoadDotEnv")
-	}
-
 	db, err := cmdutil.SetupDatabase()
 	if err != nil {
 		return errors.WithMessage(err, "SetupDatabase")
@@ -30,10 +27,16 @@ func run() error {
 
 	emailer := sender.NewSender()
 
-	server := api.NewServer(db, emailer)
+	manager, err := job.NewManager(db, emailer)
+	if err != nil {
+		return errors.WithMessage(err, "NewManager")
+	}
+	defer manager.Close()
 
-	if err := server.Run(os.Getenv("HTTP_API_ADDR")); err != nil {
-		return errors.Wrap(err, "Run")
+	ctx := context.Background()
+
+	if err := manager.Run(ctx); err != nil {
+		return errors.WithMessage(err, "Run")
 	}
 
 	return nil

@@ -17,12 +17,12 @@ type Domain struct {
 	Owner   user.User `sql:"fk:owner_id" json:"-"`
 
 	// meta data
-	AddedAt   JsonDate    `sql:",notnull,default:now()"`
+	AddedAt   JsonDate    `sql:",type:timestamptz,notnull,default:now()"`
 	DeletedAt pg.NullTime `pg:",soft_delete"`
 
 	// when was this domain last updated, useful for starting jobs
-	LastJobAt     JsonDate
-	LastUpdatedAt JsonDate
+	LastJobAt     JsonDate `sql:",type:timestamptz,null"`
+	LastUpdatedAt JsonDate `sql:",type:timestamptz,null"`
 }
 
 // create a new domain attached to an owner
