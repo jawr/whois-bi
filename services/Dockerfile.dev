@@ -1,0 +1,16 @@
+FROM golang:alpine
+
+WORKDIR /build
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
+
+RUN go install github.com/githubnemo/CompileDaemon
+
+ARG service
+ENV build_service=$service
+
+ENTRYPOINT CompileDaemon -log-prefix=false -build="go build -o /bin/service /build/services/${build_service}/main.go" -command="/bin/service"
+

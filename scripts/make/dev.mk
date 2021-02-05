@@ -6,11 +6,17 @@ status: ## Get status of containers
 logs: ## Get logs of containers
 	docker-compose logs -f
 
+update: ## Pull latest images
+	docker-compose pull
+
 start: ## Start docker containers
-	docker-compose up -d
+	DOCKER_FILE="services/Dockerfile.dev" docker-compose -f docker-compose.dev.yml up -d
 
 stop: ## Stop docker containers
 	docker-compose stop
 
 clean:stop ## Stop docker containers, clean data and workspace
 	docker-compose down -v --remove-orphans
+
+prune:stop ## Stop and prune obsolete images
+	docker image prune
