@@ -1,0 +1,54 @@
+# persistent local volumes require to have a binding mode of WaitForFirstConsumer
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: rabbitmq-data
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+---
+apiVersion: v1
+kind: PersistentVolume
+
+metadata:
+  name: rabbitmq-data
+
+spec:
+  capacity:
+    storage: 1Gi
+
+  volumeMode: Filesystem
+
+  accessModes: 
+    - ReadWriteOnce
+
+  persistentVolumeReclaimPolicy: Retain
+
+  storageClassName: rabbitmq-data
+
+  local:
+    path: /data/rabbitmq
+
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/hostname
+            operator: In
+            values:
+              - minikube
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rabbitmq-data-claim
+
+spec:
+  accessModes:
+    - ReadWriteOnce
+
+  storageClassName: rabbitmq-data
+
+  resources:
+    requests:
+      storage: 1Gi
+

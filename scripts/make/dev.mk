@@ -9,9 +9,6 @@ logs: ## Get logs of containers
 update: ## Pull latest images
 	docker-compose pull
 
-start: ## Start docker containers
-	DOCKER_FILE="services/Dockerfile.dev" docker-compose -f docker-compose.dev.yml up -d
-
 stop: ## Stop docker containers
 	docker-compose stop
 

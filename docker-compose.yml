@@ -58,7 +58,7 @@ services:
   schema:
     build:
       context: .
-      dockerfile: ${DOCKER_FILE}
+      dockerfile: services/Dockerfile.dev
       args:
         service: schema
     networks:
@@ -69,7 +69,8 @@ services:
       POSTGRES_URI: ${POSTGRES_URI}
       ADMIN_EMAIL: ${ADMIN_EMAIL}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
-
+    depends_on:
+      - postgres
 
   #
   # whois.bi services
@@ -78,7 +79,7 @@ services:
   api:
     build:
       context: .
-      dockerfile: ${DOCKER_FILE}
+      dockerfile: services/Dockerfile.dev
       args:
         service: api
     ports:
@@ -102,11 +103,16 @@ services:
       MODE: ${MODE}
     volumes:
       - ./:/build
+    depends_on:
+      - schema
+    # DEV MODE
+    volumes:
+      - ./:/build
 
   manager:
     build:
       context: .
-      dockerfile: ${DOCKER_FILE}
+      dockerfile: services/Dockerfile.dev
       args:
         service: manager
     restart: on-failure
@@ -127,11 +133,16 @@ services:
       SMTP_PORT: ${SMTP_PORT}
       RABBITMQ_URI: ${RABBITMQ_URI}
       MODE: ${MODE}
+    depends_on:
+      - schema
+    # DEV MODE
+    volumes:
+      - ./:/build
 
   worker:
     build:
       context: .
-      dockerfile: ${DOCKER_FILE}
+      dockerfile: services/Dockerfile.dev
       args:
         service: worker
     restart: on-failure
@@ -151,6 +162,11 @@ services:
       SMTP_PORT: ${SMTP_PORT}
       RABBITMQ_URI: ${RABBITMQ_URI}
       MODE: ${MODE}
+    depends_on:
+      - schema
+    # DEV MODE
+    volumes:
+      - ./:/build
 
 volumes:
   postgres:
