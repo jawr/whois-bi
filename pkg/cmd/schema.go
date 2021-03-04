@@ -19,9 +19,7 @@ func init() {
 		Use:   "schema",
 		Short: "Add a domain to a user",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := cmdutil.LoadDotEnv(); err != nil {
-				return errors.WithMessage(err, "LoadDotEnv")
-			}
+			cmdutil.LoadDotEnv()
 
 			db, err := cmdutil.SetupDatabase()
 			if err != nil {

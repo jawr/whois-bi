@@ -14,9 +14,7 @@ func init() {
 		Use:   "adduser",
 		Short: "Add a new user",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := cmdutil.LoadDotEnv(); err != nil {
-				return errors.WithMessage(err, "LoadDotEnv")
-			}
+			cmdutil.LoadDotEnv()
 
 			db, err := cmdutil.SetupDatabase()
 			if err != nil {
