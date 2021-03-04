@@ -14,10 +14,9 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: docker.pkg.github.com
-          repository: jawr/whois.bi/api
           file: {context}/services/Dockerfile
           build-args: service=api
-          tags: whoisbi/api
+          tags: whoisbi/api:latest
 
   docker-build-manager:
     runs-on: ubuntu-latest
@@ -28,10 +27,9 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: docker.pkg.github.com
-          repository: jawr/whois.bi/manager
           file: {context}/services/Dockerfile
           build-args: service=manager
-          tags: whoisbi/manager
+          tags: whoisbi/manager:latest
 
   docker-build-worker:
     runs-on: ubuntu-latest
@@ -42,7 +40,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: docker.pkg.github.com
-          repository: jawr/whois.bi/worker
           file: {context}/services/Dockerfile
           build-args: service=worker
-          tags: whoisbi/worker
+          tags: whoisbi/worker:latest
