@@ -102,7 +102,7 @@ services:
       RABBITMQ_URI: ${RABBITMQ_URI}
       MODE: ${MODE}
     volumes:
-      - ./:/build
+      - ../:/build
     depends_on:
       - schema
 
@@ -147,7 +147,7 @@ services:
     depends_on:
       - schema
     volumes:
-      - ./:/build
+      - ../:/build
 
   worker:
     build:
@@ -175,7 +175,7 @@ services:
     depends_on:
       - schema
     volumes:
-      - ./:/build
+      - ../:/build
 
 volumes:
   postgres:
