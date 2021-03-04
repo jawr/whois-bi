@@ -18,7 +18,7 @@ jobs:
         with:
           file: ./build/service.dockerfile
           build-args: service=api
-          tags: whoisbi/api:latest
+          tags: whois-bi/api:latest
 
   docker-build-manager:
     runs-on: ubuntu-latest
@@ -33,7 +33,7 @@ jobs:
         with:
           file: ./build/service.dockerfile
           build-args: service=manager
-          tags: whoisbi/manager:latest
+          tags: whois-bi/manager:latest
 
   docker-build-worker:
     runs-on: ubuntu-latest
@@ -48,4 +48,4 @@ jobs:
         with:
           file: ./build/service.dockerfile
           build-args: service=worker
-          tags: whoisbi/worker:latest
+          tags: whois-bi/worker:latest
