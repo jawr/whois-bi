@@ -17,4 +17,8 @@ FROM busybox:latest
 
 COPY --from=builder /build/toolbox /bin/toolbox
 
-CMD ["bash"]
+# Add Tini
+ENV TINI_VERSION v0.19.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+RUN chmod +x /tini
+ENTRYPOINT ["/tini", "--"]
