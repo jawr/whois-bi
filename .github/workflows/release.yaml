@@ -1,0 +1,48 @@
+name: release whois.bi
+on:
+  push:
+    branches:
+      - release
+
+jobs:
+  docker-build-api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: docker/build-push-action@v2
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: docker.pkg.github.com
+          repository: jawr/whois.bi/api
+          file: {context}/services/Dockerfile
+          build-args: service=api
+          tags: whoisbi/api
+
+  docker-build-manager:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: docker/build-push-action@v2
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: docker.pkg.github.com
+          repository: jawr/whois.bi/manager
+          file: {context}/services/Dockerfile
+          build-args: service=manager
+          tags: whoisbi/manager
+
+  docker-build-worker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: docker/build-push-action@v2
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: docker.pkg.github.com
+          repository: jawr/whois.bi/worker
+          file: {context}/services/Dockerfile
+          build-args: service=worker
+          tags: whoisbi/worker
