@@ -4,7 +4,7 @@ WORKDIR /build
 
 COPY package.json ./
 COPY public/ ./public
-COPY src/ ./public
+COPY src/ ./src
 
 RUN npm install
 RUN npm run-script build
