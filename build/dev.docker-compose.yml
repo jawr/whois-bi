@@ -105,9 +105,20 @@ services:
       - ./:/build
     depends_on:
       - schema
-    # DEV MODE
+
+  ui:
+    build:
+      context: ../ui/
+      dockerfile: ../build/ui.dev.dockerfile
+    ports:
+      - 3000:3000
+    restart: on-failure
+    networks:
+      - whoisbi
+    depends_on:
+      - api
     volumes:
-      - ./:/build
+      - ../ui/:/build
 
   manager:
     build:
@@ -135,7 +146,6 @@ services:
       MODE: ${MODE}
     depends_on:
       - schema
-    # DEV MODE
     volumes:
       - ./:/build
 
@@ -164,7 +174,6 @@ services:
       MODE: ${MODE}
     depends_on:
       - schema
-    # DEV MODE
     volumes:
       - ./:/build
 
