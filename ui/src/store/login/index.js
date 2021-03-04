@@ -19,6 +19,7 @@ export const actions = {
 		})
 		.catch(error => {
 			dispatch({type: SET, LoggedIn: false})
+      throw error
 		})
 	),
 

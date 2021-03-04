@@ -24,6 +24,7 @@ export default () => {
 		dispatch(actions.login(email, password))
 			.catch((error) => {
 				setTimeout(() => {
+          console.log('error', error)
 					setError('' + error)
 					setIdle(true)
 				}, 1000)
