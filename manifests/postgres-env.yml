@@ -1,9 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: postgres-env
-data:
-  POSTGRES_USER: whois.bi
-  POSTGRES_PASSWORD: flipflops
-  POSTGRES_DB: whois.bi
-  POSTGRES_URI: postgres://whois.bi:flipflops@postgres:5432/whois.bi

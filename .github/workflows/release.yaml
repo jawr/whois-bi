@@ -16,7 +16,7 @@ jobs:
           password: ${{ secrets.CR_PAT }}
       - uses: docker/build-push-action@v2
         with:
-          file: ./services/Dockerfile
+          file: ./build/service.dockerfile
           build-args: service=api
           tags: whoisbi/api:latest
 
@@ -31,7 +31,7 @@ jobs:
           password: ${{ secrets.CR_PAT }}
       - uses: docker/build-push-action@v2
         with:
-          file: ./services/Dockerfile
+          file: ./build/service.dockerfile
           build-args: service=manager
           tags: whoisbi/manager:latest
 
@@ -46,6 +46,6 @@ jobs:
           password: ${{ secrets.CR_PAT }}
       - uses: docker/build-push-action@v2
         with:
-          file: ./services/Dockerfile
+          file: ./build/service.dockerfile
           build-args: service=worker
           tags: whoisbi/worker:latest
