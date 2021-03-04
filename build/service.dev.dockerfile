@@ -19,5 +19,5 @@ ENV build_service=$service
 # use CompileDaemon to hot reload 
 ENTRYPOINT CompileDaemon \
 	-log-prefix=false \
-	-build="go build -o /bin/service /build/pkg/services/${build_service}/main.go" \
+	-build="go build -o /bin/service pkg/services/${build_service}/main.go" \
 	-command="/bin/service"
