@@ -1,8 +1,6 @@
 package api
 
 import (
-	"os"
-
 	"github.com/gin-gonic/gin"
 	"github.com/jawr/whois-bi/pkg/internal/user"
 )
@@ -11,11 +9,7 @@ type HandlerFunc func(user.User, *gin.Context) error
 
 func (s Server) setupRoutes() {
 
-	base := s.router.Group("/")
-
-	if os.Getenv("MODE") == "dev" {
-		base = s.router.Group("/api")
-	}
+	base := s.router.Group("/api")
 
 	// authentication
 	base.POST("/register", s.handlePostRegister())
