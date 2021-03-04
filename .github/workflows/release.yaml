@@ -2,7 +2,7 @@ name: release whois.bi
 on:
   push:
     branches:
-      - release
+      - master
 
 jobs:
   docker-build-api:
