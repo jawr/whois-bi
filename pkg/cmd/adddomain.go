@@ -2,13 +2,14 @@ package cmd
 
 import (
 	"github.com/jawr/whois-bi/pkg/internal/cmdutil"
+	"github.com/jawr/whois-bi/pkg/internal/domain"
 	"github.com/jawr/whois-bi/pkg/internal/user"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
 func init() {
-	var email, domain string
+	var email, domainName string
 
 	var adddomainCmd = &cobra.Command{
 		Use:   "adddomain",
@@ -29,7 +30,7 @@ func init() {
 				return errors.WithMessagef(err, "GetUser '%s'", email)
 			}
 
-			dom := domain.NewDomain(domain, usr)
+			dom := domain.NewDomain(domainName, usr)
 
 			if err := dom.Insert(db); err != nil {
 				return errors.WithMessage(err, "Domain.Insert")
@@ -40,7 +41,7 @@ func init() {
 	}
 
 	adddomainCmd.Flags().StringVarP(&email, "email", "u", "", "email of user")
-	adddomainCmd.Flags().StringVarP(&domain, "domain", "p", "", "domain to add to user")
+	adddomainCmd.Flags().StringVarP(&domainName, "domain", "p", "", "domain to add to user")
 
 	adddomainCmd.MarkFlagRequired("email")
 	adddomainCmd.MarkFlagRequired("domain")
