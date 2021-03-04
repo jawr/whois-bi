@@ -2,7 +2,7 @@
   "name": "whois.bi",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://whois.bi",
+  "homepage": "https://www.whois.bi",
   "proxy": "http://api:80",
   "dependencies": {
     "@bumaga/tabs": "^0.2.0",

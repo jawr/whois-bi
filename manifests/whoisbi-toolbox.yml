@@ -7,10 +7,20 @@ metadata:
 spec:
   replicas: 1
 
-  spec:
-    containers:
-      - name: toolbox
-        image: ghcr.io/jawr/whois-bi/toolbox:latest
+  selector:
+    matchLabels:
+      app: toolbox
+
+  template:
+    metadata:
+      labels:
+        app: toolbox
+
+    spec:
+      containers:
+        - name: toolbox
+          image: ghcr.io/jawr/whois-bi/toolbox:latest
+          command: ["sh", "-c", "tail -f /dev/null"]
           envFrom:
             - configMapRef:
                 name: rabbitmq-env

@@ -45,6 +45,7 @@ spec:
       containers:
         - name: api
           image: ghcr.io/jawr/whois-bi/api:latest
+          imagePullPolicy: "Always"
 
           ports:
             - containerPort: 80
@@ -53,6 +54,8 @@ spec:
           envFrom:
             - configMapRef:
                 name: postgres-env
+            - configMapRef:
+                name: whois-bi-env
 ---
 apiVersion: v1
 kind: Service
@@ -101,6 +104,7 @@ spec:
       containers:
         - name: api
           image: ghcr.io/jawr/whois-bi/ui:latest
+          imagePullPolicy: "Always"
 
           ports:
             - containerPort: 80

@@ -12,18 +12,25 @@ spec:
   tls:
     - secretName: whois-bi-tls
       hosts:
-        - api.k3s.jl.lu
+        - www.whois.bi
         - adminer.k3s.jl.lu
         - rabbit.k3s.jl.lu
   rules:
-    - host: api.k3s.jl.lu
+    - host: www.whois.bi
       http:
         paths:
-          - path: /
+          - path: /api
             pathType: Prefix
             backend:
               service:
                 name: api
+                port:
+                  number: 80
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ui
                 port:
                   number: 80
 
