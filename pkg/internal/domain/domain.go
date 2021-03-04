@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/go-pg/pg"
-	"github.com/jawr/whois.bi/pkg/internal/user"
+	"github.com/jawr/whois-bi/pkg/internal/user"
 	"github.com/pkg/errors"
 )
 

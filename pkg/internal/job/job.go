@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/go-pg/pg"
-	"github.com/jawr/whois.bi/pkg/internal/domain"
+	"github.com/jawr/whois-bi/pkg/internal/domain"
 	"github.com/pkg/errors"
 )
 

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/jawr/whois.bi/pkg/internal/job"
+	"github.com/jawr/whois-bi/pkg/internal/job"
 	"github.com/pkg/errors"
 )
 

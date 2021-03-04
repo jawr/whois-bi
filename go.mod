@@ -1,4 +1,4 @@
-module github.com/jawr/whois.bi
+module github.com/jawr/whois-bi
 
 go 1.13
 

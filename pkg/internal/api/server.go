@@ -9,7 +9,7 @@ import (
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"github.com/go-pg/pg"
-	"github.com/jawr/whois.bi/pkg/internal/sender"
+	"github.com/jawr/whois-bi/pkg/internal/sender"
 )
 
 type Server struct {

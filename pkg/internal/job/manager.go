@@ -15,9 +15,9 @@ import (
 	"github.com/ThreeDotsLabs/watermill/message/router/middleware"
 	"github.com/ThreeDotsLabs/watermill/message/router/plugin"
 	"github.com/go-pg/pg"
-	"github.com/jawr/whois.bi/pkg/internal/domain"
-	"github.com/jawr/whois.bi/pkg/internal/sender"
-	"github.com/jawr/whois.bi/pkg/internal/user"
+	"github.com/jawr/whois-bi/pkg/internal/domain"
+	"github.com/jawr/whois-bi/pkg/internal/sender"
+	"github.com/jawr/whois-bi/pkg/internal/user"
 	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
 )

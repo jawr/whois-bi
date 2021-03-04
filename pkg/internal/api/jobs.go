@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jawr/whois.bi/pkg/internal/domain"
-	"github.com/jawr/whois.bi/pkg/internal/job"
-	"github.com/jawr/whois.bi/pkg/internal/user"
+	"github.com/jawr/whois-bi/pkg/internal/domain"
+	"github.com/jawr/whois-bi/pkg/internal/job"
+	"github.com/jawr/whois-bi/pkg/internal/user"
 	"github.com/pkg/errors"
 )
 

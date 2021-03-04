@@ -7,7 +7,7 @@ import (
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"github.com/jawr/whois.bi/pkg/internal/user"
+	"github.com/jawr/whois-bi/pkg/internal/user"
 	"golang.org/x/crypto/bcrypt"
 )
 

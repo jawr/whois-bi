@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/jawr/whois.bi/pkg/internal/cmdutil"
-	"github.com/jawr/whois.bi/pkg/internal/job"
-	"github.com/jawr/whois.bi/pkg/internal/sender"
+	"github.com/jawr/whois-bi/pkg/internal/cmdutil"
+	"github.com/jawr/whois-bi/pkg/internal/job"
+	"github.com/jawr/whois-bi/pkg/internal/sender"
 	"github.com/pkg/errors"
 )
 

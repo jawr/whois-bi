@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jawr/whois.bi/pkg/internal/user"
+	"github.com/jawr/whois-bi/pkg/internal/user"
 )
 
 type HandlerFunc func(user.User, *gin.Context) error
