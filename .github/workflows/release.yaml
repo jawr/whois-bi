@@ -13,7 +13,7 @@ jobs:
         with:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-          file: {context}/services/Dockerfile
+          file: ./services/Dockerfile
           build-args: service=api
           tags: whoisbi/api:latest
 
@@ -25,7 +25,7 @@ jobs:
         with:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-          file: {context}/services/Dockerfile
+          file: ./services/Dockerfile
           build-args: service=manager
           tags: whoisbi/manager:latest
 
@@ -37,6 +37,6 @@ jobs:
         with:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-          file: {context}/services/Dockerfile
+          file: ./services/Dockerfile
           build-args: service=worker
           tags: whoisbi/worker:latest
