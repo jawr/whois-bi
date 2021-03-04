@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: toolbox
+
+spec:
+  replicas: 1
+
+  spec:
+    containers:
+      - name: toolbox
+        image: ghcr.io/jawr/whois-bi/toolbox:latest
+          envFrom:
+            - configMapRef:
+                name: rabbitmq-env
+            - configMapRef:
+                name: postgres-env

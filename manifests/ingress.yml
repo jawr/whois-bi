@@ -1,0 +1,50 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress
+  labels:
+    tier: frontend
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/redirect-entry-point: https
+    cert-manager.io/cluster-issuer: cert-manager-issuer
+spec:
+  tls:
+    - secretName: whois-bi-tls
+      hosts:
+        - api.k3s.jl.lu
+        - adminer.k3s.jl.lu
+        - rabbit.k3s.jl.lu
+  rules:
+    - host: api.k3s.jl.lu
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: api
+                port:
+                  number: 80
+
+    - host: adminer.k3s.jl.lu
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: adminer
+                port:
+                  number: 8080
+
+    - host: rabbit.k3s.jl.lu
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: rabbitmq-manager
+                port:
+                  number: 15672

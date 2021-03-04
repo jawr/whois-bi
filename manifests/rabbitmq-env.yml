@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rabbitmq-env
+data:
+  RABBITMQ_DEFAULT_USER: whois.bi
+  RABBITMQ_DEFAULT_PASS: flipflops
+  RABBITMQ_URI: amqp://whois.bi:flipflops@rabbitmq:5672

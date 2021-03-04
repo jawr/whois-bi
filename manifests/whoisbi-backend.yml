@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: manager-deploy
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: manager
+      tier: workers
+
+  template:
+    metadata:
+      labels:
+        app: manager
+        tier: workers
+
+    spec:
+      restartPolicy: Always
+
+      containers:
+        - name: manager
+          image: ghcr.io/jawr/whois-bi/manager:latest
+
+          envFrom:
+            - configMapRef:
+                name: rabbitmq-env
+            - configMapRef:
+                name: postgres-env
+---
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: worker-deploy
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: worker
+      tier: workers
+
+  template:
+    metadata:
+      labels:
+        app: worker
+        tier: workers
+
+    spec:
+      restartPolicy: Always
+
+      containers:
+        - name: worker
+          image: ghcr.io/jawr/whois-bi/worker:latest
+
+          envFrom:
+            - configMapRef:
+                name: rabbitmq-env
