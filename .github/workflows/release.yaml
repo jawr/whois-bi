@@ -19,6 +19,7 @@ jobs:
           file: ./build/service.dockerfile
           build-args: service=api
           tags: ghcr.io/jawr/whois-bi/api:latest
+          push: true
 
   docker-build-manager:
     runs-on: ubuntu-latest
@@ -34,6 +35,7 @@ jobs:
           file: ./build/service.dockerfile
           build-args: service=manager
           tags: ghcr.io/jawr/whois-bi/manager:latest
+          push: true
 
   docker-build-worker:
     runs-on: ubuntu-latest
@@ -49,3 +51,5 @@ jobs:
           file: ./build/service.dockerfile
           build-args: service=worker
           tags: ghcr.io/jawr/whois-bi/worker:latest
+          push: true
+
