@@ -18,6 +18,9 @@ FROM busybox:latest
 
 WORKDIR /srv
 
+# we need real certs for email
+RUN apk add ca-certificates
+
 COPY --from=builder /build/service .
 
 CMD ["./service"]

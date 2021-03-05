@@ -16,6 +16,9 @@ RUN go install github.com/githubnemo/CompileDaemon
 ARG service
 ENV build_service=$service
 
+# we need real certs for email
+RUN apk add ca-certificates
+
 # use CompileDaemon to hot reload 
 ENTRYPOINT CompileDaemon \
 	-log-prefix=false \
