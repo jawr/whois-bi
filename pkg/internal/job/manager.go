@@ -252,7 +252,8 @@ func (m *Manager) jobResponseHandler() message.NoPublishHandlerFunc {
 
 			fmt.Fprintf(
 				&alertBody,
-				"New changes have been detected, please go to: https://whois.bi/#/dashboard/%s for more details or find a summary of the changes below.\n\n",
+				"New changes have been detected, please go to: https://%s/#/dashboard/%s for more details or find a summary of the changes below.\n\n",
+				os.Getenv("DOMAIN"),
 				response.Job.Domain.Domain,
 			)
 

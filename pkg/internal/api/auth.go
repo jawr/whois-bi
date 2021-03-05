@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -83,7 +84,8 @@ func (s Server) handlePostRegister() gin.HandlerFunc {
 		}
 
 		body := fmt.Sprintf(
-			`Thank you for registering with us. Please complete your registration by clicking <a href="https://whois.bi/#/verify/%s">here<a/>`,
+			`Thank you for registering with us. Please complete your registration by clicking <a href="https://%s/#/verify/%s">here<a/>`,
+			os.Getenv("DOMAIN"),
 			u.VerifiedCode,
 		)
 
