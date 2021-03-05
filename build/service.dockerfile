@@ -14,7 +14,7 @@ RUN GOOS=linux \
 	go build -a -o service pkg/services/${service}/main.go
 
 # actual service image
-FROM busybox:latest
+FROM alpine:latest
 
 WORKDIR /srv
 
