@@ -3,6 +3,7 @@ kind: Service
 
 metadata:
   name: api
+  namespace: whois-bi
   labels:
     app: api
     tier: frontend
@@ -24,6 +25,7 @@ kind: Deployment
 
 metadata:
   name: api-deploy
+  namespace: whois-bi
 
 spec:
   replicas: 1
@@ -62,6 +64,7 @@ kind: Service
 
 metadata:
   name: ui
+  namespace: whois-bi
   labels:
     app: ui
     tier: frontend
@@ -83,6 +86,7 @@ kind: Deployment
 
 metadata:
   name: ui-deploy
+  namespace: whois-bi
 
 spec:
   replicas: 1

@@ -2,7 +2,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: postgres-data-claim
-
+  namespace: whois-bi
 spec:
   accessModes:
     - ReadWriteOnce

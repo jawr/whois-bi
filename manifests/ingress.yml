@@ -2,11 +2,12 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: ingress
+  namespace: whois-bi
   labels:
     tier: frontend
   annotations:
     kubernetes.io/ingress.class: traefik
-    traefik.ingress.kubernetes.io/redirect-entry-point: https
+      # traefik.ingress.kubernetes.io/redirect-entry-point: https
     cert-manager.io/cluster-issuer: cert-manager-issuer
 spec:
   tls:

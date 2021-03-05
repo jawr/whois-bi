@@ -26,6 +26,9 @@ chrome-user-data
 
 .env
 
+*-env.yml
+*-env.yaml
+
 secrets.txt
 
 .cookie

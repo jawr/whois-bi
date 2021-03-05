@@ -3,6 +3,7 @@ kind: Service
 
 metadata:
   name: postgres
+  namespace: whois-bi
   labels:
     app: postgres
     tier: backend
@@ -23,6 +24,7 @@ kind: Deployment
 metadata:
   name: postgres-deploy
 
+  namespace: whois-bi
 spec:
   replicas: 1
 

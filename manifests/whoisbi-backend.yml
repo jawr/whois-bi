@@ -3,7 +3,7 @@ kind: Deployment
 
 metadata:
   name: manager-deploy
-
+  namespace: whois-bi
 spec:
   replicas: 1
 
@@ -36,7 +36,7 @@ kind: Deployment
 
 metadata:
   name: worker-deploy
-
+  namespace: whois-bi
 spec:
   replicas: 2
 

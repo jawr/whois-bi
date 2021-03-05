@@ -3,6 +3,7 @@ kind: Service
 
 metadata:
   name: adminer
+  namespace: whois-bi
   labels:
     app: adminer
     tier: debug
@@ -23,6 +24,7 @@ kind: Deployment
 
 metadata:
   name: adminer
+  namespace: whois-bi
   labels:
     app: adminer
     tier: debug

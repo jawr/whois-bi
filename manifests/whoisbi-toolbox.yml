@@ -3,7 +3,7 @@ kind: Deployment
 
 metadata:
   name: toolbox
-
+  namespace: whois-bi
 spec:
   replicas: 1
 
