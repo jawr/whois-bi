@@ -26,6 +26,7 @@ func (s Server) setupRoutes() {
 	// domain read
 	user.GET("/domains", s.handleUser(s.handleGetDomains()))
 	user.GET("/domain/:domain", s.handleDomain(s.handleGetDomain()))
+	user.DELETE("/domain/:domain", s.handleDomain(s.handleDeleteDomain()))
 	user.GET("/domain/:domain/records", s.handleDomain(s.handleGetDomainRecords()))
 	user.GET("/domain/:domain/whois", s.handleDomain(s.handleGetDomainWhois()))
 
