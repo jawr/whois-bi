@@ -132,7 +132,12 @@ func (s Server) handlePostDomain() HandlerFunc {
 
 		d := domain.NewDomain(request.Domain, u)
 
-		if err := d.Insert(s.db); err != nil {
+		_, err := s.db.Model(&d).
+			OnConflict("(domain, owner_id) DO UPDATE").
+			Set("deleted_at = NULL").
+			Returning("*").
+			Insert()
+		if err != nil {
 			return newApiError(http.StatusInternalServerError, "Inserting Domain", errors.Wrap(err, "Insert"))
 		}
 
