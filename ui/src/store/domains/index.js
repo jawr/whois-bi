@@ -1,4 +1,4 @@
-import { get, post } from '../fetchWrapper'
+import { get, post, del } from '../fetchWrapper'
 import createReducer from '../createReducer'
 
 // overwrite any existing
@@ -11,6 +11,7 @@ const SEARCH_RECORDS = 'domain.SEARCH_RECORDS'
 const RESET_RECORDS = 'domain.RESET_RECORDS'
 const SEARCH = 'domain.SEARCH'
 const RESET = 'domain.RESET'
+const DELETE_DOMAIN = 'domain.DELETE'
 
 export const selectors = {
 	filterRecords: (records) => (state) => {
@@ -37,8 +38,11 @@ export const selectors = {
 	},
 
 	domainByName: (name) => (state) => state.domains.ByName[name] || {},
+
 	recordsByID: (id) => (state) => (selectors.filterRecords((state.domains.RecordsByID[id] || []).filter(i => i.RemovedAt.length === 0))(state)),
+
 	historicalRecordsByID: (id) => (state) => (selectors.filterRecords(state.domains.RecordsByID[id] || [])(state)),
+
 	whoisByID: (id) => (state) => state.domains.WhoisByID[id] || {},
 	recordsQuery: () => (state) => state.domains.RecordsQuery,
 	query: () => (state) => state.domains.Query,
@@ -57,13 +61,13 @@ export const actions = {
 	),
 
 	get: (name) => (dispatch) => (
-		get('/api/user/domain/' + name)
+		get(`/api/user/domain/${name}`)
 		.then(data => dispatch({type: GET, data}))
 		.catch(error => console.log(error))
 	),
 
 	getRecords: (domain) => (dispatch) => (
-		get('/api/user/domain/' + domain.Domain + '/records')
+		get(`/api/user/domain/${domain.Domain}/records`)
 		.then(Records => {
 			if (Records.length > 0) {
 				dispatch({type: GET_RECORDS, DomainID: domain.ID, Records})
@@ -84,7 +88,7 @@ export const actions = {
 
 	addRecord: (domain, rawRecord) => (dispatch) => (
 		post(
-			'/api/user/domain/' + domain.Domain + '/record',
+			`/api/user/domain/${domain.Domain}/record`,
 			{
 				Raw: rawRecord,
 			},
@@ -97,6 +101,10 @@ export const actions = {
 			return Promise.resolve(data)
 		})
 	),
+
+  delete: (domain) => (dispatch) => (
+    del(`/api/user/domain/${domain}`)
+  ),
 
 }
 

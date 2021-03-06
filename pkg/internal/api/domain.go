@@ -186,3 +186,22 @@ func (s Server) handlePostRecord() DomainHandlerFunc {
 		return nil
 	}
 }
+
+func (s Server) handleDeleteDomain() DomainHandlerFunc {
+	type Response struct{}
+	return func(d domain.Domain, u user.User, c *gin.Context) error {
+
+		response := Response{}
+
+		_, err := s.db.Model(&d).
+			Where("domain.id = ?", d.ID).
+			Delete()
+		if err != nil {
+			return newApiError(http.StatusInternalServerError, "Unable to delete domain", errors.Wrap(err, "Select Whois"))
+		}
+
+		c.JSON(http.StatusOK, &response)
+
+		return nil
+	}
+}
