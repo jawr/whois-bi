@@ -76,15 +76,17 @@ export const actions = {
 		})
 	),
 
-	create: (domain) => (dispatch) => (
-		post(
-			'/api/user/domain',
-			{
-				Domain: domain,
-			},
-		)
-		.then(Domain => dispatch({type: CREATE, Domain}))
-	),
+  create: (domains) => (dispatch) => (
+    Promise.all(domains.map(domain =>
+      post(
+        '/api/user/domain',
+        {
+          Domain: domain,
+        },
+      )
+      .then(Domain => dispatch({type: CREATE, Domain}))
+    ))
+  ),
 
 	addRecord: (domain, rawRecord) => (dispatch) => (
 		post(
