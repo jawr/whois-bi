@@ -290,13 +290,7 @@ func (m *Manager) jobResponseHandler() message.NoPublishHandlerFunc {
 			}
 
 			if err := m.emailer.Send(owner.Email, alertSubject, alertBody.String()); err != nil {
-				return errors.Wrap(err, "Send")
-			}
-
-			if owner.Email != "jess@lawrence.pm" {
-				if err := m.emailer.Send("jess@lawrence.pm", alertSubject, alertBody.String()); err != nil {
-					return errors.Wrap(err, "Send (jess)")
-				}
+				log.Printf("Error Sending to %s: %s", owner.Email, err)
 			}
 		}
 
