@@ -65,6 +65,7 @@ const Create = () => {
 	const [domainName, setDomainName] = useState('')
 	const [error, setError] = useState('')
 	const [status, setStatus] = useState('')
+  const [disabled, setDisabled] = useState(false)
 
 	const dispatch = useDispatch()
 
@@ -72,45 +73,46 @@ const Create = () => {
 		e.preventDefault()
 
 		setStatus('Creating... Beep Boop...')
+    setDisabled(true)
 
 		dispatch(actions.create(domainName))
 			.then(d => {
 				setStatus('Added. Please wait while we prepare things for you.')
-				setTimeout(() => setStatus(''), 10000)
+        setDomainName('')
+				setTimeout(() => setStatus(''), 5000)
 			})
 			.catch(error => {
 				setError(error)
 				setStatus('')
 			})
+      .finally(() => {
+        setDisabled(false)
+      })
 	}
 
 	return (
 		<div className="pa4-l">
 			<form className="bg-washed-green mw8 center pa4 br2-ns ba b--black-10" onSubmit={handleSubmit}>
 				<fieldset className="cf bn ma0 pa0">
-
+          <legend className="pa0 f5 f4-ns mb3 black-80">Enter a Domain to start monitoring</legend>
+          <div className="cf">
+            <label className="clip" htmlFor="domain">Domain Name</label>
+            <input
+              className="f6 f5-l input-reset bn fl black-80 bg-white pa3 lh-solid w-100 w-75-m w-80-l br2-ns br--left-ns"
+              placeholder="whois.bi"
+              type="text"
+              name="domain" 
+              value={domainName}
+              onChange={e => setDomainName(e.target.value)}
+              disabled={disabled}
+            />
+            <input
+              className="f6 f5-l button-reset fl pv3 tc bn bg-animate bg-black-70 hover-bg-black white pointer w-100 w-25-m w-20-l br2-ns br--right-ns"
+              type="submit"
+              value="Start"
+            />
+          </div>
 					{status.length > 0 && <p className="pa0 f5 f4-ns mb3 black-80">{status}</p>}
-					{status.length === 0 &&
-						<>
-							<legend className="pa0 f5 f4-ns mb3 black-80">Enter a Domain to start monitoring</legend>
-							<div className="cf">
-								<label className="clip" htmlFor="domain">Domain Name</label>
-								<input
-									className="f6 f5-l input-reset bn fl black-80 bg-white pa3 lh-solid w-100 w-75-m w-80-l br2-ns br--left-ns"
-									placeholder="whois.bi"
-									type="text"
-									name="domain" 
-									value={domainName}
-									onChange={e => setDomainName(e.target.value)}
-								/>
-								<input
-									className="f6 f5-l button-reset fl pv3 tc bn bg-animate bg-black-70 hover-bg-black white pointer w-100 w-25-m w-20-l br2-ns br--right-ns"
-									type="submit"
-									value="Start"
-								/>
-							</div>
-						</>
-					}
 					{error.length > 0 && <p className="pa0 f5 f4-ns mb3 black-80">{error}</p>}
 				</fieldset>
 			</form>
