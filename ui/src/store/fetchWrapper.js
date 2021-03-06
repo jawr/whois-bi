@@ -20,6 +20,8 @@ const fetchWrapper = (url, options={}) => fetch(
 		return Promise.resolve(r)
 	})
 
+export const del = (url, options={method: 'DELETE'}) => fetchWrapper(url, options)
+
 export const get = (url, options={}) => fetchWrapper(url, options)
 export const post = (url, body) => fetchWrapper(url, {
 	method: 'POST', 
