@@ -11,7 +11,6 @@ const SEARCH_RECORDS = 'domain.SEARCH_RECORDS'
 const RESET_RECORDS = 'domain.RESET_RECORDS'
 const SEARCH = 'domain.SEARCH'
 const RESET = 'domain.RESET'
-const DELETE_DOMAIN = 'domain.DELETE'
 
 export const selectors = {
 	filterRecords: (records) => (state) => {
