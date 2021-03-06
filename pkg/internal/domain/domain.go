@@ -18,7 +18,7 @@ type Domain struct {
 
 	// meta data
 	AddedAt   JsonDate    `sql:",type:timestamptz,notnull,default:now()"`
-	DeletedAt pg.NullTime `pg:",type:timestamptz,soft_delete"`
+	DeletedAt pg.NullTime `pg:",soft_delete"`
 
 	// when was this domain last updated, useful for starting jobs
 	LastJobAt     JsonDate `sql:",type:timestamptz,null"`
