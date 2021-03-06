@@ -97,7 +97,7 @@ const Create = () => {
     <div className="pa4-l">
       <form className="bg-washed-green mw8 center pa4 br2-ns ba b--black-10" onSubmit={handleSubmit}>
         <fieldset className="cf bn ma0 pa0">
-          <legend className="pa0 f5 f4-ns mb3 black-80">Enter a Domain to start monitoring</legend>
+          <legend className="pa0 f5 f4-ns mb3 black-80">Enter a Domain per line to start monitoring</legend>
           <div className="cf">
             <label className="clip" htmlFor="domain">Domain Name</label>
 						<textarea
