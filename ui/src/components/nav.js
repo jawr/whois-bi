@@ -9,9 +9,9 @@ export default () => {
 
   let nav = <Anonymous />
 
-    if (loggedIn) nav = <User />
+  if (loggedIn) nav = <User />
 
-    return nav
+  return nav
 }
 
 const Anonymous = () => (
