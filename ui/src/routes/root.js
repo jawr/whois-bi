@@ -4,6 +4,8 @@ import {
 	Route,
 } from 'react-router-dom'
 
+import { useSelector } from 'react-redux'
+
 // components
 import Wrapper from '../components/wrapper'
 import Nav from '../components/nav'
@@ -16,38 +18,46 @@ import Login from './login'
 import Dashboard from './dashboard'
 import Domain from './domain'
 
-export default () => (
-	<>
-		<Nav />
+export default () => {
+  const loggedIn = useSelector(state => state.login.LoggedIn)
 
-		<Wrapper>
-			<section className="tc ph4 h5 vh-100 pv5 w-100 dt">
-				<Switch>
-					<Route exact path="/">
-						<Hero />
-					</Route>
-					<Route path="/register">
-						<Register />
-					</Route>
-					<Route path="/login">
-						<Login />
-					</Route>
-					<Route path="/success">
-						<Success />
-					</Route>
-					<Route exact path="/dashboard">
-						<Dashboard />
-					</Route>
-					<Route path="/dashboard/:name">
-						<Domain />
-					</Route>
-					<Route path="/verify/:code">
-						<Verify />
-					</Route>
-				</Switch>
-			</section>
-		</Wrapper>
+  return (
+    <>
+      <Nav />
 
-		<Footer />
-	</>
-)
+      <Wrapper>
+        <section className="tc ph4 h5 vh-100 pv5 w-100 dt">
+          <Switch>
+            <Route 
+              exact 
+              path="/"
+              render={() => {
+                return loggedIn ? <Dashboard /> : <Hero />
+              }}
+            />
+            <Route path="/register">
+              <Register />
+            </Route>
+            <Route path="/login">
+              <Login />
+            </Route>
+            <Route path="/success">
+              <Success />
+            </Route>
+            <Route exact path="/dashboard">
+              <Dashboard />
+            </Route>
+            <Route path="/dashboard/:name">
+              <Domain />
+            </Route>
+            <Route path="/verify/:code">
+              <Verify />
+            </Route>
+          </Switch>
+        </section>
+      </Wrapper>
+
+      <Footer />
+    </>
+  )
+}
