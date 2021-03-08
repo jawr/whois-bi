@@ -6,6 +6,7 @@ require (
 	github.com/ThreeDotsLabs/watermill v1.1.1
 	github.com/ThreeDotsLabs/watermill-amqp v1.1.0
 	github.com/appleboy/gin-jwt v2.5.0+incompatible
+	github.com/araddon/dateparse v0.0.0-20210207001429-0eec95c9db7e
 	github.com/armon/consul-api v0.0.0-20180202201655-eb2c6b5be1b6 // indirect
 	github.com/boj/redistore v0.0.0-20180917114910-cd5dcc76aeff // indirect
 	github.com/cenkalti/backoff/v3 v3.2.2 // indirect
@@ -31,8 +32,8 @@ require (
 	github.com/joho/godotenv v1.3.0
 	github.com/json-iterator/go v1.1.10 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
-	github.com/likexian/gokit v0.24.6 // indirect
 	github.com/likexian/whois-go v1.7.3
+	github.com/likexian/whois-parser v1.20.2
 	github.com/lithammer/shortuuid/v3 v3.0.5 // indirect
 	github.com/marcsauter/single v0.0.0-20191217065835-82e78df7afac
 	github.com/mattn/go-runewidth v0.0.10 // indirect
@@ -45,7 +46,6 @@ require (
 	github.com/ugorji/go v1.2.4 // indirect
 	github.com/xordataexchange/crypt v0.0.3-0.20170626215501-b2862e3d0a77 // indirect
 	golang.org/x/crypto v0.0.0-20201221181555-eec23a3978ad
-	golang.org/x/net v0.0.0-20210119194325-5f4716e94777 // indirect
 	golang.org/x/sync v0.0.0-20201207232520-09787c993a3a
 	golang.org/x/sys v0.0.0-20210124154548-22da62e12c0c // indirect
 	golang.org/x/text v0.3.5 // indirect

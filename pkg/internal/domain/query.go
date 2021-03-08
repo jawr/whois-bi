@@ -39,9 +39,9 @@ var commonRecordTypes = []uint16{
 
 func (d Domain) QueryEnumerate(client *dns.Client, targets []string) (Records, error) {
 	// get authority server for our call
-	ns, err := getNameserverAddr(client, d.Domain)
+	nameservers, err := getNameservers(client, d.Domain)
 	if err != nil {
-		return nil, errors.Wrap(err, "getNameserver")
+		return nil, errors.WithMessage(err, "getNameservers")
 	}
 
 	records := make(Records, 0)
@@ -56,7 +56,7 @@ func (d Domain) QueryEnumerate(client *dns.Client, targets []string) (Records, e
 	for idx := range targets {
 		for _, typ := range commonRecordTypes {
 			if err := sem.Acquire(ctx, 1); err != nil {
-				return nil, errors.Wrap(err, "Acquire")
+				return nil, errors.WithMessage(err, "Acquire")
 			}
 
 			func(target string, typ uint16) {
@@ -78,9 +78,9 @@ func (d Domain) QueryEnumerate(client *dns.Client, targets []string) (Records, e
 
 					log.Printf("\t%s", msg.Question[0].String())
 
-					reply, err := query(client, &msg, ns)
+					reply, err := query(client, &msg, nameservers)
 					if err != nil {
-						return errors.Wrap(err, "query")
+						return errors.WithMessage(err, "query")
 					}
 
 					for idx := range reply.Answer {
@@ -133,7 +133,7 @@ func (d Domain) QueryEnumerate(client *dns.Client, targets []string) (Records, e
 	}
 
 	if err := g.Wait(); err != nil {
-		return nil, errors.Wrap(err, "Wait")
+		return nil, errors.WithMessage(err, "Wait")
 	}
 
 	return records, nil
@@ -142,9 +142,9 @@ func (d Domain) QueryEnumerate(client *dns.Client, targets []string) (Records, e
 // perform an any query
 func (d Domain) QueryANY(client *dns.Client, fqdn string) (Records, error) {
 	// get authority server for our call
-	ns, err := getNameserverAddr(client, d.Domain)
+	nameservers, err := getNameservers(client, d.Domain)
 	if err != nil {
-		return nil, errors.Wrap(err, "getNameserver")
+		return nil, errors.WithMessage(err, "getNameservers")
 	}
 
 	var msg dns.Msg
@@ -155,9 +155,9 @@ func (d Domain) QueryANY(client *dns.Client, fqdn string) (Records, error) {
 		dns.TypeANY,
 	)
 
-	reply, err := query(client, &msg, ns)
+	reply, err := query(client, &msg, nameservers)
 	if err != nil {
-		return nil, errors.Wrap(err, "query")
+		return nil, errors.WithMessage(err, "query")
 	}
 
 	records := make(Records, 0, len(reply.Answer))
@@ -179,7 +179,7 @@ func (d Domain) QueryANY(client *dns.Client, fqdn string) (Records, error) {
 	return records, nil
 }
 
-func query(client *dns.Client, original *dns.Msg, ns string) (*dns.Msg, error) {
+func query(client *dns.Client, original *dns.Msg, nameservers []string) (*dns.Msg, error) {
 
 	// not intrested in recursion?
 	original.RecursionDesired = false
@@ -189,7 +189,7 @@ func query(client *dns.Client, original *dns.Msg, ns string) (*dns.Msg, error) {
 
 	var triedUdp, triedEdns, triedTcp bool
 
-	for {
+	for _, ns := range nameservers {
 		msg := original.Copy()
 
 		if triedUdp && !triedEdns {
@@ -216,7 +216,6 @@ func query(client *dns.Client, original *dns.Msg, ns string) (*dns.Msg, error) {
 		if err != nil {
 			log.Printf("error in Exchange with %s: %s", ns, err)
 			continue
-			return nil, errors.Wrap(err, "Exchange")
 		}
 
 		if reply.Truncated {
@@ -226,4 +225,6 @@ func query(client *dns.Client, original *dns.Msg, ns string) (*dns.Msg, error) {
 
 		return reply, nil
 	}
+
+	return nil, errors.New("no query available")
 }

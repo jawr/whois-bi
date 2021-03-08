@@ -15,7 +15,7 @@ type Job struct {
 	DomainID int           `sql:",notnull"`
 	Domain   domain.Domain `sql:"fk:domain_id"`
 
-	Error string
+	Errors []string `sql:",notnull"`
 
 	Additions    int  `sql:",notnull"`
 	Removals     int  `sql:",notnull"`
@@ -32,7 +32,7 @@ type Job struct {
 type JobResponse struct {
 	Job Job
 
-	Error string
+	Errors []string
 
 	RecordAdditions domain.Records
 	RecordRemovals  domain.Records

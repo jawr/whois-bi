@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"strings"
 	"time"
 
 	"github.com/go-pg/pg"
@@ -27,6 +28,8 @@ type Domain struct {
 
 // create a new domain attached to an owner
 func NewDomain(domain string, owner user.User) Domain {
+	domain = strings.TrimSpace(domain)
+
 	newDomain := Domain{
 		Domain:  domain,
 		OwnerID: owner.ID,

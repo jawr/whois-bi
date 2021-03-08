@@ -45,13 +45,13 @@ func NewManager(db *pg.DB, emailer *sender.Sender) (*Manager, error) {
 	// setup publisher
 	publisher, err := amqp.NewPublisher(amqpConfig, logger)
 	if err != nil {
-		return nil, errors.Wrap(err, "NewPublisher")
+		return nil, errors.WithMessage(err, "NewPublisher")
 	}
 
 	// setup subscriber
 	subscriber, err := amqp.NewSubscriber(amqpConfig, logger)
 	if err != nil {
-		return nil, errors.Wrap(err, "NewSubscriber")
+		return nil, errors.WithMessage(err, "NewSubscriber")
 	}
 
 	routerConfig := message.RouterConfig{
@@ -61,7 +61,7 @@ func NewManager(db *pg.DB, emailer *sender.Sender) (*Manager, error) {
 	// setup router
 	router, err := message.NewRouter(routerConfig, logger)
 	if err != nil {
-		return nil, errors.Wrap(err, "NewRouter")
+		return nil, errors.WithMessage(err, "NewRouter")
 	}
 
 	// setup manager
@@ -138,7 +138,7 @@ func (m *Manager) createJobs(ctx context.Context) error {
 		// search for new jobs and dispatch them
 		domains, err := domain.GetDomainsWhereLastJobBefore(m.db, time.Hour*24)
 		if err != nil {
-			return errors.Wrap(err, "GetdomainsWhereLastJobBefore")
+			return errors.WithMessage(err, "GetdomainsWhereLastJobBefore")
 		}
 
 		for _, d := range domains {
@@ -146,7 +146,7 @@ func (m *Manager) createJobs(ctx context.Context) error {
 			j := NewJob(d)
 			if err := j.Insert(m.db); err != nil {
 				continue
-				return errors.Wrap(err, "Insert job")
+				return errors.WithMessage(err, "Insert job")
 			}
 		}
 
@@ -154,7 +154,7 @@ func (m *Manager) createJobs(ctx context.Context) error {
 
 		jobs, err := GetUnstarted(m.db)
 		if err != nil {
-			return errors.Wrap(err, "GetUnstarted")
+			return errors.WithMessage(err, "GetUnstarted")
 		}
 
 		for _, j := range jobs {
@@ -162,25 +162,25 @@ func (m *Manager) createJobs(ctx context.Context) error {
 
 			currentRecords, err := j.Domain.GetRecords(m.db)
 			if err != nil {
-				return errors.Wrap(err, "GetRecords")
+				return errors.WithMessage(err, "GetRecords")
 			}
 			j.CurrentRecords = currentRecords
 
 			b, err := json.Marshal(&j)
 			if err != nil {
-				return errors.Wrap(err, "Marhsal")
+				return errors.WithMessage(err, "Marhsal")
 			}
 
 			msg := message.NewMessage(watermill.NewUUID(), b)
 
 			if err := m.publisher.Publish("job.queue", msg); err != nil {
-				return errors.Wrap(err, "Publish")
+				return errors.WithMessage(err, "Publish")
 			}
 		}
 
 		if len(jobs) > 0 {
 			if _, err := m.db.Model(&jobs).Set("started_at = now()").WherePK().Update(); err != nil {
-				return errors.Wrap(err, "Update started_at")
+				return errors.WithMessage(err, "Update started_at")
 			}
 		}
 	}
@@ -191,29 +191,10 @@ func (m *Manager) jobResponseHandler() message.NoPublishHandlerFunc {
 	return func(msg *message.Message) error {
 		var response JobResponse
 		if err := json.Unmarshal(msg.Payload, &response); err != nil {
-			return errors.Wrap(err, "Unmarshal")
+			return errors.WithMessage(err, "Unmarshal")
 		}
 
 		log.Printf("JOB RESPONSE %d / %s", response.Job.ID, response.Job.Domain)
-
-		if len(response.Error) > 0 {
-			log.Printf("Error: %s", response.Error)
-
-			_, err := m.db.Model(&response.Job).
-				Set(
-					"started_at = ?, finished_at = ?, error = ?",
-					response.Job.StartedAt,
-					response.Job.FinishedAt,
-					response.Error,
-				).
-				WherePK().
-				Update()
-
-			if err != nil {
-				return errors.Wrap(err, "Update Job Error")
-			}
-			return nil
-		}
 
 		log.Printf(
 			"Found %d additions and %d removals",
@@ -228,19 +209,22 @@ func (m *Manager) jobResponseHandler() message.NoPublishHandlerFunc {
 
 		// handle removals
 		if err := response.RecordRemovals.Remove(m.db); err != nil {
-			return errors.Wrap(err, "removals.Remove")
+			return errors.WithMessage(err, "removals.Remove")
 		}
 
 		// handle additions
 		if err := response.RecordAdditions.Insert(m.db); err != nil {
-			return errors.Wrap(err, "additions.Insert")
+			return errors.WithMessage(err, "additions.Insert")
 		}
 
 		// handle whois
-		whoisUpdated := true
-		if err := response.Whois.Insert(m.db); err != nil {
-			whoisUpdated = false
-			// return errors.Wrap(err, "Insert whois")
+		var whoisUpdated bool
+		if response.Whois.Raw != nil {
+			if err := response.Whois.Insert(m.db); err != nil {
+				return errors.WithMessage(err, "inserting whois")
+			} else {
+				whoisUpdated = true
+			}
 		}
 
 		// handle alert message
@@ -286,7 +270,7 @@ func (m *Manager) jobResponseHandler() message.NoPublishHandlerFunc {
 			var owner user.User
 
 			if err := m.db.Model(&owner).Where("id = ?", response.Job.Domain.OwnerID).Select(); err != nil {
-				return errors.Wrap(err, "Select Owner")
+				return errors.WithMessage(err, "Select Owner")
 			}
 
 			if err := m.emailer.Send(owner.Email, alertSubject, alertBody.String()); err != nil {
@@ -296,7 +280,8 @@ func (m *Manager) jobResponseHandler() message.NoPublishHandlerFunc {
 
 		_, err := m.db.Model(&response.Job).
 			Set(
-				"started_at = ?, finished_at = ?, additions = ?, removals = ?, whois_updated = ?",
+				"errors = ?, started_at = ?, finished_at = ?, additions = ?, removals = ?, whois_updated = ?",
+				response.Job.Errors,
 				response.Job.StartedAt,
 				response.Job.FinishedAt,
 				len(response.RecordAdditions),
@@ -307,12 +292,12 @@ func (m *Manager) jobResponseHandler() message.NoPublishHandlerFunc {
 			Update()
 
 		if err != nil {
-			return errors.Wrap(err, "Update Job")
+			return errors.WithMessage(err, "Update Job")
 		}
 
 		_, err = m.db.Model(&response.Job.Domain).Set("last_updated_at = now()").WherePK().Update()
 		if err != nil {
-			return errors.Wrap(err, "Update Domain")
+			return errors.WithMessage(err, "Update Domain")
 		}
 
 		return nil

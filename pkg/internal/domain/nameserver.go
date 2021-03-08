@@ -7,7 +7,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func getNameserverAddr(client *dns.Client, domain string) (string, error) {
+func getNameservers(client *dns.Client, domain string) ([]string, error) {
 	var msg dns.Msg
 
 	msg.SetQuestion(
@@ -17,25 +17,23 @@ func getNameserverAddr(client *dns.Client, domain string) (string, error) {
 
 	reply, _, err := client.Exchange(&msg, "8.8.8.8:53")
 	if err != nil {
-		return "", errors.Wrap(err, "Exchange")
+		return nil, errors.Wrap(err, "Exchange")
 	}
 
-	var nameserver string
+	var nameservers []string
 
 	for idx := range reply.Answer {
 		ns, ok := reply.Answer[idx].(*dns.NS)
 		if !ok {
-			return "", errors.New("casting ns")
+			return nil, errors.New("casting ns")
 		}
 
-		nameserver = ns.Ns
-
-		break
+		nameservers = append(nameservers, strings.TrimSuffix(ns.Ns, "."))
 	}
 
-	if len(nameserver) == 0 {
-		return "", errors.New("no nameserver found")
+	if len(nameservers) == 0 {
+		return nil, errors.New("no nameserver found")
 	}
 
-	return strings.TrimSuffix(nameserver, "."), nil
+	return nameservers, nil
 }

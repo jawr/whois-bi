@@ -10,7 +10,7 @@ import (
 // look at existing records and check for any deltas
 func (d Domain) CheckDelta(client *dns.Client, existing, queried Records) (Records, Records, error) {
 	// get authority server for our call
-	ns, err := getNameserverAddr(client, d.Domain)
+	ns, err := getNameservers(client, d.Domain)
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "getNameserver")
 	}

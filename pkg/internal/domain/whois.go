@@ -2,11 +2,12 @@ package domain
 
 import (
 	"crypto/sha256"
+	"fmt"
 	"time"
 
 	"github.com/go-pg/pg"
-	whoisparser "github.com/jawr/whois-parser-go"
 	"github.com/likexian/whois-go"
+	whoisparser "github.com/likexian/whois-parser"
 	"github.com/pkg/errors"
 )
 
@@ -24,6 +25,8 @@ type Whois struct {
 	CreatedDate    time.Time `sql:",notnull"`
 	UpdatedDate    time.Time `sql:",notnull"`
 	ExpirationDate time.Time `sql:",notnull"`
+
+	DateErrors []string `sql:",notnull"`
 
 	// meta data
 	AddedAt   time.Time `sql:",notnull,default:now()"`
@@ -47,11 +50,31 @@ func NewWhois(domain Domain) (Whois, error) {
 
 	h.Write([]byte(domain.Domain))
 
-	if parsed.Domain.UpdatedDate.IsZero() {
+	// parse dates
+
+	var dateErrors []string
+
+	createdDate, err := parseWhoisTimestamp(domain.Domain, parsed.Domain.CreatedDate)
+	if err != nil {
+		dateErrors = append(dateErrors, fmt.Sprintf("createdDate: %s", err))
+	}
+
+	updatedDate, err := parseWhoisTimestamp(domain.Domain, parsed.Domain.UpdatedDate)
+	if err != nil {
+		dateErrors = append(dateErrors, fmt.Sprintf("updatedDate: %s", err))
+	}
+
+	expirationDate, err := parseWhoisTimestamp(domain.Domain, parsed.Domain.ExpirationDate)
+	if err != nil {
+		dateErrors = append(dateErrors, fmt.Sprintf("expirationDate: %s", err))
+	}
+
+	// finish writing our hash
+	if updatedDate.IsZero() {
 		// no updated date lets use the entire raw
 		h.Write([]byte(raw))
 	} else {
-		h.Write([]byte(parsed.Domain.UpdatedDate.String()))
+		h.Write([]byte(updatedDate.String()))
 	}
 
 	w := Whois{
@@ -62,9 +85,11 @@ func NewWhois(domain Domain) (Whois, error) {
 
 		Version: h.Sum(nil),
 
-		CreatedDate:    parsed.Domain.CreatedDate,
-		UpdatedDate:    parsed.Domain.UpdatedDate,
-		ExpirationDate: parsed.Domain.ExpirationDate,
+		CreatedDate:    createdDate,
+		UpdatedDate:    updatedDate,
+		ExpirationDate: expirationDate,
+
+		DateErrors: dateErrors,
 	}
 
 	return w, nil
