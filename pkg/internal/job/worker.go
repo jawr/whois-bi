@@ -126,9 +126,8 @@ func (w *Worker) jobHandler() message.NoPublishHandlerFunc {
 				return
 			}
 
-			if len(response.Error) > 0 {
-				finalErr = errors.New(response.Error)
-				return
+			if len(response.Errors) > 0 {
+				finalErr = errors.Errorf("%d errors encountered", len(response.Errors))
 			}
 
 		}()
@@ -137,8 +136,7 @@ func (w *Worker) jobHandler() message.NoPublishHandlerFunc {
 
 		records, err := job.Domain.QueryANY(&client, job.Domain.Domain)
 		if err != nil {
-			response.Error = errors.Wrap(err, "QueryANY").Error()
-			return
+			response.Errors = append(response.Errors, errors.Wrap(err, "QueryANY").Error())
 		}
 
 		enumRecords, err := job.Domain.QueryEnumerate(&client, []string{
@@ -147,8 +145,7 @@ func (w *Worker) jobHandler() message.NoPublishHandlerFunc {
 			"img", "default._domainkey",
 		})
 		if err != nil {
-			response.Error = errors.Wrap(err, "QueryEnumerate").Error()
-			return
+			response.Errors = append(response.Errors, errors.Wrap(err, "QueryEnumerate").Error())
 		}
 
 		log.Printf("Found %d enumRecords", len(enumRecords))
@@ -157,8 +154,7 @@ func (w *Worker) jobHandler() message.NoPublishHandlerFunc {
 
 		additions, removals, err := job.Domain.CheckDelta(&client, job.CurrentRecords, records)
 		if err != nil {
-			response.Error = errors.Wrap(err, "CheckDelta").Error()
-			return
+			response.Errors = append(response.Errors, errors.Wrap(err, "CheckDelta").Error())
 		}
 
 		response.RecordAdditions = additions
@@ -166,11 +162,10 @@ func (w *Worker) jobHandler() message.NoPublishHandlerFunc {
 
 		w, err := domain.NewWhois(job.Domain)
 		if err != nil {
-			response.Error = errors.Wrap(err, "NewWhois").Error()
-			return
+			response.Errors = append(response.Errors, errors.Wrap(err, "NewWhois").Error())
+		} else {
+			response.Whois = w
 		}
-
-		response.Whois = w
 
 		return nil
 	}

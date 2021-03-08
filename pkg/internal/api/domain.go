@@ -132,6 +132,14 @@ func (s Server) handlePostDomain() HandlerFunc {
 
 		d := domain.NewDomain(request.Domain, u)
 
+		if len(d.Domain) == 0 || !strings.Contains(d.Domain, ".") {
+			return newApiError(
+				http.StatusBadRequest,
+				fmt.Sprintf("Invalid Domain: '%s'", d.Domain),
+				errors.Errorf("Invalid Domain: '%s'", d.Domain),
+			)
+		}
+
 		_, err := s.db.Model(&d).
 			OnConflict("(domain, owner_id) DO UPDATE").
 			Set("deleted_at = NULL").
