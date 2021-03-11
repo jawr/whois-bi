@@ -2,7 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { Page } from '../components/wrapper'
 
-export default () => (
+const Hero = () => (
 	<Page>
 			<h1 className="f3 f2-m f1-l fw2 black-90 mv3">
 				Simple.
@@ -19,3 +19,4 @@ export default () => (
 	</Page>
 )
 
+export default Hero

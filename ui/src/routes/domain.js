@@ -8,7 +8,7 @@ import { Records } from '../components/records'
 import { Whois } from '../components/whois'
 import { Jobs } from '../components/jobs'
 
-export default () => {
+const Domain = () => {
 	const [loading, setLoading] = useState(true)
 
   const [confirmDelete, setConfirmDelete] = useState(false)
@@ -92,3 +92,5 @@ export default () => {
 		</Page>
 	)
 }
+
+export default Domain

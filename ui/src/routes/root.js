@@ -18,7 +18,7 @@ import Login from './login'
 import Dashboard from './dashboard'
 import Domain from './domain'
 
-export default () => {
+const Root = () => {
   const loggedIn = useSelector(state => state.login.LoggedIn)
 
   return (
@@ -61,3 +61,5 @@ export default () => {
     </>
   )
 }
+
+export default Root

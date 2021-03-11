@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { actions } from '../store/register'
 
-export default () => {
+const Register = () => {
 	const [email, setEmail] = useState('')
 	const [password, setPassword] = useState('')
 	const [confirmPassword, setConfirmPassword] = useState('')
@@ -136,3 +136,5 @@ export const Verify = () => {
 	</Page>
 	)
 }
+
+export default Register

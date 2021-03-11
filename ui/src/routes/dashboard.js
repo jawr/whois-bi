@@ -5,7 +5,7 @@ import { Page } from '../components/wrapper'
 import { actions, selectors } from '../store/domains'
 import { Table } from '../components/table'
 
-export default () => {
+const Dashboard = () => {
 	const [loading, setLoading] = useState(true)
 	const domains = useSelector(selectors.filterDomains())
 
@@ -142,3 +142,4 @@ const Search = () => {
 	)
 }
 
+export default Dashboard

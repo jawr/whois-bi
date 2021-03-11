@@ -1,6 +1,7 @@
 import React from 'react'
 
-export default ({ children }) => (
+
+const Wrapper = ({ children }) => (
 	<div className="mw9 center db border-box">
 		{children}
 	</div>
@@ -36,4 +37,6 @@ export const Loader = () => (
         </path>
       </svg>
 )
+
+export default Wrapper
 

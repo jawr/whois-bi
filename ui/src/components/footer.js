@@ -1,7 +1,7 @@
 import React from 'react'
 import Wrapper from './wrapper'
 
-export default () => (
+const Footer = () => (
 	<footer className="ph3 ph4-ns pv6 bt tr b--black-10 black-70 bg-light-green">
 		<Wrapper>
 			<a href="mailto:hi@whois.bi" className="link b f3 f2-ns dim black-70 lh-solid">hi@whois.bi</a>
@@ -12,3 +12,5 @@ export default () => (
 		</Wrapper>
 	</footer>
 )
+
+export default Footer

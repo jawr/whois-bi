@@ -4,7 +4,7 @@ import { actions } from '../store/login'
 import { Link } from 'react-router-dom'
 import { Page } from '../components/wrapper'
 
-export default () => {
+const Login = () => {
 	const [email, setEmail] = useState('')
 	const [password, setPassword] = useState('')
 
@@ -78,3 +78,5 @@ export default () => {
 		</Page>
 	)
 }
+
+export default Login

@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { actions as loginActions } from '../store/login'
 
-export default () => {
+const Nav = () => {
   const loggedIn = useSelector(state => state.login.LoggedIn)
 
   let nav = <Anonymous />
@@ -13,6 +13,8 @@ export default () => {
 
   return nav
 }
+
+export default Nav
 
 const Anonymous = () => (
   <div className="w-100 border-box pa3 ph5-l bg-white absolute top-0 left-0 right-0">
