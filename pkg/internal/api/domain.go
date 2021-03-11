@@ -60,24 +60,12 @@ func (s Server) handleDomain(fn DomainHandlerFunc) gin.HandlerFunc {
 
 func (s Server) handleGetDomain() DomainHandlerFunc {
 	type Response struct {
-		Domain  domain.Domain
-		Records []domain.Record
-		Whois   domain.Whois
+		Domain domain.Domain
 	}
 	return func(d domain.Domain, u user.User, c *gin.Context) error {
 
 		response := Response{
-			Domain:  d,
-			Records: make([]domain.Record, 0),
-		}
-
-		err := s.db.Model(&response.Records).
-			Where("domain_id = ? AND removed_at IS NULL", d.ID).
-			Order("added_at").
-			Select()
-		if err != nil {
-			// do we want to abort
-			// return newApiError(http.StatusNotFound, "No records found", errors.Wrap(err, "Select Records"))
+			Domain: d,
 		}
 
 		err = s.db.Model(&response.Whois).

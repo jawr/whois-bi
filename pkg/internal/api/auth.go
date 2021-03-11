@@ -125,7 +125,7 @@ func (s Server) handlePostLogin() gin.HandlerFunc {
 		if err := s.db.Model(&u).Where("email = ? AND verified_at IS NOT NULL", request.Email).Select(); err != nil {
 			c.JSON(
 				http.StatusUnauthorized,
-				gin.H{"Error": "Not Authorized"},
+				gin.H{"Error": "Email or Password is invalid."},
 			)
 			return
 		}
@@ -134,7 +134,7 @@ func (s Server) handlePostLogin() gin.HandlerFunc {
 		if err := bcrypt.CompareHashAndPassword(u.Password, []byte(request.Password)); err != nil {
 			c.JSON(
 				http.StatusUnauthorized,
-				gin.H{"Error": "Not Authorized"},
+				gin.H{"Error": "Email or Password is invalid."},
 			)
 			return
 		}

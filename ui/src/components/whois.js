@@ -1,11 +1,17 @@
 import React from 'react'
-import { useSelector } from 'react-redux'
-import { selectors } from '../store/domains'
+import { useWhois } from '../context/whois'
 
 export const Whois = ({ domain }) => {
-	const whois = useSelector(selectors.whoisByID(domain.ID))
+  const { whois, getWhois } = useWhois ()
 
-	if (!whois.Raw) {
+  React.useEffect(() => {
+    const load = async () => {
+      getWhois(domain)
+    }
+    load()
+  }, [domain, getWhois])
+
+	if (!whois || !whois.Raw) {
 		return <p>No whois records found</p>
 	}
 

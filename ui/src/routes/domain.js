@@ -1,46 +1,26 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { useParams, useHistory } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDomains } from '../context/domains'
 import { Page } from '../components/wrapper'
-import { actions, selectors } from '../store/domains'
 import { Tabs, Menu, Tab, Panels, Panel } from '../components/tabs'
 import { Records } from '../components/records'
 import { Whois } from '../components/whois'
 import { Jobs } from '../components/jobs'
 
 const Domain = () => {
-	const [loading, setLoading] = useState(true)
+  const { name } = useParams()
+  const { domain, getDomain, deleteDomain } = useDomains()
 
-  const [confirmDelete, setConfirmDelete] = useState(false)
-  const [confirmDeleteDomain, setConfirmDeleteDomain] = useState('')
-  const [confirmDeleteErr, setConfirmDeleteErr] = useState('')
+  const [loading, setLoading] = React.useState(true)
 
-	const { name } = useParams()
-	const domain = useSelector(selectors.domainByName(name))
+  React.useEffect(() => {
+    setLoading(true)
+    getDomain(name)
+    setLoading(false)
+  }, [getDomain, name]);
 
-	const dispatch = useDispatch()
-  const history = useHistory()
-
-	useEffect(() => {
-		dispatch(actions.get(name)).finally(() => setLoading(false))
-	}, [dispatch, name]);
-
-  const handleDelete = (e) => {
-    setConfirmDeleteErr('')
-
-    if (confirmDelete) {
-      if (confirmDeleteDomain === name) {
-        dispatch(actions.delete(name))
-          .catch(err => setConfirmDeleteErr(err))
-          .then(() => history.push('/'))
-      }
-    } else {
-      setConfirmDelete(true)
-    }
-  }
-
-	return (
-		<Page loading={loading}>
+  return (
+    <Page loading={loading}>
       <div className="mw8 center">
         <h1 className="f3 f2-m f1-l fw2 mv3">Details</h1>
         <p>Look in depth at '{name}'.</p>
@@ -54,43 +34,70 @@ const Domain = () => {
           </Menu>
 
           <Panels>
-            <Panel classes="">
-              <Records domain={domain} />
+            <Panel>
+              <Records domain={name} />
             </Panel>
 
             <Panel>
-              <Whois domain={domain} />
+              <Whois domain={name} />
             </Panel>
 
             <Panel>
-              <Jobs domain={domain} />
+              <Jobs domain={name} />
             </Panel>
           </Panels>
         </Tabs>
 
-        <div className="cf">
-          <input
-            className="mt6 f6 f5-l button-reset fr pv3 tc dib ba bw1 b--light-red  bg-animate bg-light-red hover-bg-red white pointer w-100 w-25-m w-20-l br--right br2"
-            type="submit"
-            value="Delete"
-            onClick={handleDelete}
-          />
-          {confirmDelete && <input
-            className="mt6 f6 f5-l button-reset fr pv3 dib ba bw1 b--light-red tc w-100 w-40-m w-30-l br--left br2"
-            type="text"
-            placeholder={`please type ${name}`}
-            value={confirmDeleteDomain}
-            onChange={e => setConfirmDeleteDomain(e.target.value)}
-          />}
-        </div>
+        <ConfirmDelete deleteDomain={deleteDomain} name={name} />
+      </div>
+    </Page>
+  )
+}
 
-        <div className="cf">
-          <p className="mt3 pr3 fr light-red">{confirmDeleteErr}</p>
-        </div>
+const ConfirmDelete = ({ deleteDomain, name }) => {
+  const history = useHistory()
+
+  const [confirmDelete, setConfirmDelete] = React.useState(false)
+  const [confirmDeleteDomain, setConfirmDeleteDomain] = React.useState('')
+  const [confirmDeleteErr, setConfirmDeleteErr] = React.useState('')
+
+  const handleDelete = (e) => {
+    setConfirmDeleteErr('')
+
+    if (confirmDelete) {
+      if (confirmDeleteDomain === name) {
+        deleteDomain(name)
+          .catch(err => setConfirmDeleteErr(err))
+          .then(() => history.push('/'))
+      }
+    } else {
+      setConfirmDelete(true)
+    }
+  }
+
+  return (
+    <>
+      <div className="cf">
+        <input
+          className="mt6 f6 f5-l button-reset fr pv3 tc dib ba bw1 b--light-red  bg-animate bg-light-red hover-bg-red white pointer w-100 w-25-m w-20-l br--right br2"
+          type="submit"
+          value="Delete"
+          onClick={handleDelete}
+        />
+        {confirmDelete && <input
+          className="mt6 f6 f5-l button-reset fr pv3 dib ba bw1 b--light-red tc w-100 w-40-m w-30-l br--left br2"
+          type="text"
+          placeholder={`please type ${name}`}
+          value={confirmDeleteDomain}
+          onChange={e => setConfirmDeleteDomain(e.target.value)}
+        />}
       </div>
 
-		</Page>
-	)
+      <div className="cf">
+        <p className="mt3 pr3 fr light-red">{confirmDeleteErr}</p>
+      </div>
+    </>
+  )
 }
 
 export default Domain

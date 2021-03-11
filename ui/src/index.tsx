@@ -1,27 +1,35 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { Provider } from 'react-redux'
-import { ConnectedRouter } from 'connected-react-router'
-import {
-	  HashRouter as Router,
-} from 'react-router-dom'
-import * as serviceWorker from './serviceWorker'
-import configureStore, { history } from './store'
-import {actions as loginActions} from './store/login'
+
+// react context providers
+import Compose from './context/compose'
+import LoginProvider from './context/login'
+import DomainsProvider from './context/domains'
+import RecordsProvider from './context/records'
+import WhoisProvider from './context/whois'
+import JobsProvider from './context/jobs'
+
+// router
+import { HashRouter as Router } from 'react-router-dom'
+
+// routes
 import Root from './routes/root'
 
-const store = configureStore()
+import * as serviceWorker from './serviceWorker'
 
-store.dispatch(loginActions.check())
+const components = [
+	Router,
+	LoginProvider,
+	DomainsProvider,
+	RecordsProvider,
+	WhoisProvider,
+	JobsProvider,
+]
 
 ReactDOM.render(
-	<Provider store={store}>
-		<ConnectedRouter history={history}>
-			<Router>
-			<Root />
-			</Router>
-		</ConnectedRouter>
-	</Provider>,
+	<Compose components={components}>
+		<Root />
+	</Compose>,
 	document.getElementById('root'),
 )
 

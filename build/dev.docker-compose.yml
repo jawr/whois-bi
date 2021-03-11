@@ -52,15 +52,11 @@ services:
     networks:
       - whoisbi
 
-  #
-  # whois.bi init schema
-  #
-  schema:
+  toolbox:
     build:
       context: ../.
-      dockerfile: build/service.dev.dockerfile
-      args:
-        service: schema
+      dockerfile: build/toolbox.dockerfile
+    command: ["sh", "-c", "tail -f /dev/null"]
     networks:
       - whoisbi
     depends_on:
@@ -87,8 +83,6 @@ services:
     restart: on-failure
     networks:
       - whoisbi
-    depends_on:
-      - schema
     environment:
       POSTGRES_URI: ${POSTGRES_URI}
       HTTP_API_ADDR: ${HTTP_API_ADDR}
@@ -103,8 +97,6 @@ services:
       MODE: ${MODE}
     volumes:
       - ../:/build
-    depends_on:
-      - schema
 
   ui:
     build:
@@ -130,7 +122,6 @@ services:
     networks:
       - whoisbi
     depends_on:
-      - schema
       - rabbitmq
     environment:
       POSTGRES_URI: ${POSTGRES_URI}
@@ -144,8 +135,6 @@ services:
       SMTP_PORT: ${SMTP_PORT}
       RABBITMQ_URI: ${RABBITMQ_URI}
       MODE: ${MODE}
-    depends_on:
-      - schema
     volumes:
       - ../:/build
 
@@ -172,8 +161,6 @@ services:
       SMTP_PORT: ${SMTP_PORT}
       RABBITMQ_URI: ${RABBITMQ_URI}
       MODE: ${MODE}
-    depends_on:
-      - schema
     volumes:
       - ../:/build
 

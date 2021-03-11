@@ -55,7 +55,7 @@ export const Table = ({ columns, data }) => {
             (row, i) => {
               prepareRow(row);
               return (
-                <tr {...row.getRowProps()}>
+                <tr key={i} {...row.getRowProps()}>
                   {row.cells.map(cell => {
                     return (
                       <td {...cell.getCellProps({

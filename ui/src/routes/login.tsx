@@ -1,34 +1,34 @@
-import React, { useState } from 'react'
-import { useDispatch } from 'react-redux'
-import { actions } from '../store/login'
+import React from 'react'
 import { Link } from 'react-router-dom'
 import { Page } from '../components/wrapper'
+import { useLogin } from '../context/login'
+import { useHistory } from 'react-router-dom'
 
 const Login = () => {
-	const [email, setEmail] = useState('')
-	const [password, setPassword] = useState('')
+	const { postLogin } = useLogin()
+	const history = useHistory()
 
-	const [idle, setIdle] = useState(true)
+	const [email, setEmail] = React.useState('')
+	const [password, setPassword] = React.useState('')
+	const [idle, setIdle] = React.useState(true)
+	const [error, setError] = React.useState('')
 
-	const [error, setError] = useState('')
-
-	const dispatch = useDispatch()
-
-	const handleSubmit = (e) => {
+	const handleSubmit = async (e) => {
 		setIdle(false)
 
 		e.preventDefault()
 
 		setError('')
 
-		dispatch(actions.login(email, password))
-			.catch((error) => {
-				setTimeout(() => {
-          console.log('error', error)
-					setError('' + error)
-					setIdle(true)
-				}, 1000)
-			})
+		try {
+			await postLogin(email, password)
+			history.push('/')
+		} catch (error) {
+			setError('' + error)
+			setTimeout(() => {
+				setIdle(true)
+			}, 1000)
+		}
 	}
 
 	return (
