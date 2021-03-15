@@ -24,7 +24,6 @@ export const Table = ({ columns, data }) => {
 
   return (
     <>
-
       <table {...getTableProps()} className="f6 mw8 center dt--fixed" cellSpacing="0">
         <thead>
           {headerGroups.map(headerGroup => (

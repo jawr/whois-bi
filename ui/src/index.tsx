@@ -3,11 +3,7 @@ import ReactDOM from 'react-dom'
 
 // react context providers
 import Compose from './context/compose'
-import LoginProvider from './context/login'
-import DomainsProvider from './context/domains'
-import RecordsProvider from './context/records'
-import WhoisProvider from './context/whois'
-import JobsProvider from './context/jobs'
+import APIProvider from './api'
 
 // router
 import { HashRouter as Router } from 'react-router-dom'
@@ -19,11 +15,7 @@ import * as serviceWorker from './serviceWorker'
 
 const components = [
 	Router,
-	LoginProvider,
-	DomainsProvider,
-	RecordsProvider,
-	WhoisProvider,
-	JobsProvider,
+	APIProvider,
 ]
 
 ReactDOM.render(
