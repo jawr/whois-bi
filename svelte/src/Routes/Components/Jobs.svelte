@@ -1,5 +1,5 @@
 <script>
-	import { onMount } from 'svelte'
+	import { onMount, onDestroy } from 'svelte'
 	import { fetchJSON, postJSON } from '../../fetchJSON'
 
 	export let name = ''
@@ -8,6 +8,7 @@
 	let success = ''
 	let error = ''
 	let jobs = []
+	let cancel = null
 
 	const updateJobs = async () => {
 		try {
@@ -20,7 +21,7 @@
 
 		if (running) {
 			success = 'Job queued. This page will auto update when the job is complete. Please grab a cup of tea.'
-			setTimeout(async () => {
+			cancel = setTimeout(async () => {
 				await updateJobs()
 			}, 10000)
 		} else {
@@ -35,6 +36,12 @@
 
 	onMount(async () => {
 		await updateJobs()
+	})
+
+	onDestroy(() => {
+		if (cancel) {
+			clearTimeout(cancel)
+		}
 	})
 </script>
 
