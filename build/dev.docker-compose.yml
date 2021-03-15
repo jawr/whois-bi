@@ -100,17 +100,18 @@ services:
 
   ui:
     build:
-      context: ../ui/
+      context: ../svelte/
       dockerfile: ../build/ui.dev.dockerfile
     ports:
-      - 3000:3000
+      - 5000:5000
+      - 35729:35729
     restart: on-failure
     networks:
       - whoisbi
     depends_on:
       - api
     volumes:
-      - ../ui/:/build
+      - ../svelte/:/build
 
   manager:
     build:

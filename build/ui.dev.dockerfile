@@ -8,4 +8,4 @@ COPY src ./src
 
 RUN npm install
 
-ENTRYPOINT npm start
+ENTRYPOINT npm run dev
