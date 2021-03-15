@@ -115,7 +115,7 @@ type DisplayDomain struct {
 
 	Domain
 
-	Records int
+	Records int `json:"records"`
 
-	Whois int
+	Whois int `json:"whois"`
 }

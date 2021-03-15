@@ -15,7 +15,7 @@ func handleAuth(c *gin.Context) {
 	if userID == nil {
 		c.AbortWithStatusJSON(
 			http.StatusUnauthorized,
-			gin.H{"Error": "Not Authorized"},
+			gin.H{"error": "Not Authorized"},
 		)
 		return
 	}
@@ -33,7 +33,7 @@ func (s Server) handleUser(fn HandlerFunc) gin.HandlerFunc {
 		if err := s.db.Model(&u).Where("id = ? AND verified_at IS NOT NULL", userID).Select(); err != nil {
 			c.AbortWithStatusJSON(
 				http.StatusUnauthorized,
-				gin.H{"Error": "Not Authorized"},
+				gin.H{"error": "Not Authorized"},
 			)
 			return
 		}
@@ -41,7 +41,7 @@ func (s Server) handleUser(fn HandlerFunc) gin.HandlerFunc {
 		if u.VerifiedAt.IsZero() {
 			c.AbortWithStatusJSON(
 				http.StatusUnauthorized,
-				gin.H{"Error": "Not Verified"},
+				gin.H{"error": "Not Verified"},
 			)
 			return
 		}
@@ -78,13 +78,13 @@ func handleError(fn HandlerFunc) HandlerFunc {
 				log.Printf("API Error: %d - %s: %s", aerr.statusCode, aerr.friendly, aerr.err)
 				c.JSON(
 					aerr.statusCode,
-					gin.H{"Error": aerr.friendly},
+					gin.H{"error": aerr.friendly},
 				)
 			} else {
 				log.Printf("Error: %s", err)
 				c.JSON(
 					http.StatusInternalServerError,
-					gin.H{"Error": err.Error()},
+					gin.H{"error": err.Error()},
 				)
 			}
 		}

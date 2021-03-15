@@ -59,25 +59,9 @@ func (s Server) handleDomain(fn DomainHandlerFunc) gin.HandlerFunc {
 }
 
 func (s Server) handleGetDomain() DomainHandlerFunc {
-	type Response struct {
-		Domain domain.Domain
-	}
 	return func(d domain.Domain, u user.User, c *gin.Context) error {
 
-		response := Response{
-			Domain: d,
-		}
-
-		err = s.db.Model(&response.Whois).
-			Where("domain_id = ?", d.ID).
-			Order("updated_date DESC").
-			Select()
-		if err != nil {
-			// do we want to abort
-			// return newApiError(http.StatusNotFound, "No whois found", errors.Wrap(err, "Select Whois"))
-		}
-
-		c.JSON(http.StatusOK, &response)
+		c.JSON(http.StatusOK, &d)
 
 		return nil
 	}
@@ -137,7 +121,8 @@ func (s Server) handlePostDomain() HandlerFunc {
 			return newApiError(http.StatusInternalServerError, "Inserting Domain", errors.Wrap(err, "Insert"))
 		}
 
-		c.JSON(http.StatusCreated, &d)
+		dd := domain.DisplayDomain{Domain: d}
+		c.JSON(http.StatusCreated, &dd)
 
 		return nil
 	}
@@ -149,8 +134,8 @@ func (s Server) handlePostRecord() DomainHandlerFunc {
 	}
 
 	type Response struct {
-		Records []domain.Record
-		Errors  []string
+		Records []domain.Record `json:"records"`
+		Errors  []string        `json:"errors"`
 	}
 
 	return func(d domain.Domain, u user.User, c *gin.Context) error {

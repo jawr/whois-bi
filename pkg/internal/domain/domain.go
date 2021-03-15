@@ -10,20 +10,20 @@ import (
 )
 
 type Domain struct {
-	ID int `sql:",pk"`
+	ID int `sql:",pk" json:"id"`
 
-	Domain string `sql:",notnull,unique:domain_owner_id"`
+	Domain string `sql:",notnull,unique:domain_owner_id" json:"domain"`
 
-	OwnerID int       `sql:",notnull,unique:domain_owner_id"`
+	OwnerID int       `sql:",notnull,unique:domain_owner_id" json:"owner_id"`
 	Owner   user.User `sql:"fk:owner_id" json:"-"`
 
 	// meta data
-	AddedAt   JsonDate    `sql:",type:timestamptz,notnull,default:now()"`
-	DeletedAt pg.NullTime `pg:",type:timestamptz,soft_delete"`
+	AddedAt   JsonDate    `sql:",type:timestamptz,notnull,default:now()" json:"added_at"`
+	DeletedAt pg.NullTime `pg:",type:timestamptz,soft_delete" json:"deleted_at"`
 
 	// when was this domain last updated, useful for starting jobs
-	LastJobAt     JsonDate `sql:",type:timestamptz,null"`
-	LastUpdatedAt JsonDate `sql:",type:timestamptz,null"`
+	LastJobAt     JsonDate `sql:",type:timestamptz,null" json:"last_job_at"`
+	LastUpdatedAt JsonDate `sql:",type:timestamptz,null" json:"last_updated_at"`
 }
 
 // create a new domain attached to an owner

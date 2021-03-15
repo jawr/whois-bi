@@ -12,25 +12,25 @@ import (
 )
 
 type Whois struct {
-	ID int `sql:",pk"`
+	ID int `sql:",pk" json:"id"`
 
 	// parent data
-	DomainID int    `sql:",notnull"`
+	DomainID int    `sql:",notnull" json:"domain_id"`
 	Domain   Domain `pg:"fk:domain_id" json:"-"`
 
-	Raw []byte `sql:",notnull"`
+	Raw []byte `sql:",notnull" json:"raw"`
 
-	Version []byte `sql:",notnull,unique"`
+	Version []byte `sql:",notnull,unique" json:"version"`
 
-	CreatedDate    time.Time `sql:",notnull"`
-	UpdatedDate    time.Time `sql:",notnull"`
-	ExpirationDate time.Time `sql:",notnull"`
+	CreatedDate    time.Time `sql:",notnull" json:"created_date"`
+	UpdatedDate    time.Time `sql:",notnull" json:"updated_date"`
+	ExpirationDate time.Time `sql:",notnull" json:"expiration_date"`
 
-	DateErrors []string `sql:",notnull"`
+	DateErrors []string `sql:",notnull" json:"date_errors"`
 
 	// meta data
-	AddedAt   time.Time `sql:",notnull,default:now()"`
-	DeletedAt time.Time `pg:",soft_delete"`
+	AddedAt   time.Time `sql:",notnull,default:now()" json:"added_at"`
+	DeletedAt time.Time `pg:",soft_delete" json:"deleted_at"`
 }
 
 // do a whois lookup and parse the results

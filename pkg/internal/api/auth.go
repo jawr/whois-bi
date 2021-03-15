@@ -29,7 +29,7 @@ func (s Server) handleGetLogout() gin.HandlerFunc {
 		if userID == nil {
 			c.JSON(
 				http.StatusBadRequest,
-				gin.H{"Error": "Invalid session"},
+				gin.H{"error": "Invalid session"},
 			)
 			return
 		}
@@ -38,7 +38,7 @@ func (s Server) handleGetLogout() gin.HandlerFunc {
 		if err := session.Save(); err != nil {
 			c.JSON(
 				http.StatusBadRequest,
-				gin.H{"Error": "Failed to save sesion"},
+				gin.H{"error": "Failed to save sesion"},
 			)
 			return
 		}
@@ -49,8 +49,8 @@ func (s Server) handleGetLogout() gin.HandlerFunc {
 
 func (s Server) handlePostRegister() gin.HandlerFunc {
 	type Request struct {
-		Email    string
-		Password string
+		Email    string `json:"email"`
+		Password string `json:"password"`
 	}
 
 	return func(c *gin.Context) {
@@ -59,7 +59,7 @@ func (s Server) handlePostRegister() gin.HandlerFunc {
 		if c.ShouldBind(&request) != nil {
 			c.JSON(
 				http.StatusBadRequest,
-				gin.H{"Error": "Missing Email and/or Password"},
+				gin.H{"error": "Missing Email and/or Password"},
 			)
 			return
 		}
@@ -69,7 +69,7 @@ func (s Server) handlePostRegister() gin.HandlerFunc {
 			log.Println(err)
 			c.JSON(
 				http.StatusBadRequest,
-				gin.H{"Error": "Unable to create User"},
+				gin.H{"error": "Unable to create User"},
 			)
 			return
 		}
@@ -78,7 +78,7 @@ func (s Server) handlePostRegister() gin.HandlerFunc {
 			log.Println(err)
 			c.JSON(
 				http.StatusBadRequest,
-				gin.H{"Error": "Unable to create User"},
+				gin.H{"error": "Unable to create User"},
 			)
 			return
 		}
@@ -93,7 +93,7 @@ func (s Server) handlePostRegister() gin.HandlerFunc {
 			log.Println(err)
 			c.JSON(
 				http.StatusInternalServerError,
-				gin.H{"Error": "Unable to send verification email"},
+				gin.H{"error": "Unable to send verification email"},
 			)
 			return
 		}
@@ -104,8 +104,8 @@ func (s Server) handlePostRegister() gin.HandlerFunc {
 
 func (s Server) handlePostLogin() gin.HandlerFunc {
 	type Request struct {
-		Email    string
-		Password string
+		Email    string `json:"email"`
+		Password string `json:"password"`
 	}
 
 	return func(c *gin.Context) {
@@ -114,7 +114,7 @@ func (s Server) handlePostLogin() gin.HandlerFunc {
 		if c.ShouldBind(&request) != nil {
 			c.JSON(
 				http.StatusBadRequest,
-				gin.H{"Error": "Missing Email and/or Password"},
+				gin.H{"error": "Missing Email and/or Password"},
 			)
 			return
 		}
@@ -125,7 +125,7 @@ func (s Server) handlePostLogin() gin.HandlerFunc {
 		if err := s.db.Model(&u).Where("email = ? AND verified_at IS NOT NULL", request.Email).Select(); err != nil {
 			c.JSON(
 				http.StatusUnauthorized,
-				gin.H{"Error": "Email or Password is invalid."},
+				gin.H{"error": "Email or Password is invalid."},
 			)
 			return
 		}
@@ -134,7 +134,7 @@ func (s Server) handlePostLogin() gin.HandlerFunc {
 		if err := bcrypt.CompareHashAndPassword(u.Password, []byte(request.Password)); err != nil {
 			c.JSON(
 				http.StatusUnauthorized,
-				gin.H{"Error": "Email or Password is invalid."},
+				gin.H{"error": "Email or Password is invalid."},
 			)
 			return
 		}
@@ -154,7 +154,7 @@ func (s Server) handlePostLogin() gin.HandlerFunc {
 		if err := session.Save(); err != nil {
 			c.JSON(
 				http.StatusInternalServerError,
-				gin.H{"Error": "Failed to save session"},
+				gin.H{"error": "Failed to save session"},
 			)
 			return
 		}
@@ -169,7 +169,7 @@ func (s Server) handlePostVerify() gin.HandlerFunc {
 			log.Printf("Verify error: %s", err)
 			c.JSON(
 				http.StatusBadRequest,
-				gin.H{"Error": "Failed to verify using that code"},
+				gin.H{"error": "Failed to verify using that code"},
 			)
 			return
 		}
