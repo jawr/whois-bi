@@ -3,6 +3,7 @@ FROM node AS builder
 WORKDIR /build
 
 COPY package.json ./
+COPY rollup.config.js ./
 COPY public/ ./public
 COPY src/ ./src
 
