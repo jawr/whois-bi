@@ -27,7 +27,7 @@
 
 {#if whois.length > 0}
 	<div class="mw8">
-		<pre class="pa2 tl ba bg-light-gray pre overflow-content">{atob(current.raw)}</pre>
+		<pre class="pa2 tl ba bg-light-gray pre overflow-content">{window.atob(current.raw)}</pre>
 	</div>
 	<p class="mt5 f7">last updated: {current.added_at}</p>
 {:else}
