@@ -7,7 +7,7 @@ COPY public/ ./public
 COPY src/ ./src
 
 RUN npm install
-RUN npm run-script build
+RUN npm run build
 
 FROM nginx:1.19.0
 COPY --from=builder /build/build/ /usr/share/nginx/html
