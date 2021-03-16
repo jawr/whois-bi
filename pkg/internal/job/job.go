@@ -67,9 +67,9 @@ func (j *Job) Insert(db *pg.DB) error {
 }
 
 // find all jobs that have not yet started
-func GetUnstarted(db *pg.DB) ([]Job, error) {
+func GetJobs(db *pg.DB) ([]Job, error) {
 	var jobs []Job
-	err := db.Model(&jobs).Relation("Domain").Where("started_at IS NULL").Select()
+	err := db.Model(&jobs).Relation("Domain").Where("started_at IS NULL OR (started_at < NOW() - INTERVAL '1 HOUR' AND finished_at IS NULL)").Select()
 	if err != nil {
 		return nil, err
 	}

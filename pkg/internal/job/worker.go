@@ -47,9 +47,7 @@ func NewWorker() (*Worker, error) {
 		return nil, errors.Wrap(err, "NewSubscriber")
 	}
 
-	routerConfig := message.RouterConfig{
-		CloseTimeout: time.Second * 30,
-	}
+	routerConfig := message.RouterConfig{}
 
 	// setup router
 	router, err := message.NewRouter(routerConfig, logger)
@@ -70,8 +68,6 @@ func NewWorker() (*Worker, error) {
 	)
 
 	router.AddMiddleware(
-		// forward correlation ids to produced messages
-		middleware.CorrelationID,
 		// recover from any panics
 		middleware.Recoverer,
 	)

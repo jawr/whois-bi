@@ -54,9 +54,7 @@ func NewManager(db *pg.DB, emailer *sender.Sender) (*Manager, error) {
 		return nil, errors.WithMessage(err, "NewSubscriber")
 	}
 
-	routerConfig := message.RouterConfig{
-		CloseTimeout: time.Second * 30,
-	}
+	routerConfig := message.RouterConfig{}
 
 	// setup router
 	router, err := message.NewRouter(routerConfig, logger)
@@ -80,8 +78,6 @@ func NewManager(db *pg.DB, emailer *sender.Sender) (*Manager, error) {
 	)
 
 	router.AddMiddleware(
-		// forward correlation ids to produced messages
-		middleware.CorrelationID,
 		// recover from any panics
 		middleware.Recoverer,
 	)
@@ -114,6 +110,7 @@ func (m *Manager) Run(ctx context.Context) error {
 	})
 
 	if err := eg.Wait(); err != nil {
+		log.Printf("Error encountered: %s", err)
 		return err
 	}
 
@@ -141,21 +138,24 @@ func (m *Manager) createJobs(ctx context.Context) error {
 			return errors.WithMessage(err, "GetdomainsWhereLastJobBefore")
 		}
 
+		log.Printf("Found %d domains", len(domains))
+
 		for _, d := range domains {
 			log.Printf("CREATE JOB FOR %s", d.Domain)
 			j := NewJob(d)
 			if err := j.Insert(m.db); err != nil {
 				continue
-				return errors.WithMessage(err, "Insert job")
 			}
 		}
 
 		// get all jobs without a started_at
 
-		jobs, err := GetUnstarted(m.db)
+		jobs, err := GetJobs(m.db)
 		if err != nil {
-			return errors.WithMessage(err, "GetUnstarted")
+			return errors.WithMessage(err, "GetJobs")
 		}
+
+		log.Printf("Found %d jobs", len(jobs))
 
 		for _, j := range jobs {
 			log.Printf("job: %+v", j)
@@ -221,7 +221,7 @@ func (m *Manager) jobResponseHandler() message.NoPublishHandlerFunc {
 		var whoisUpdated bool
 		if response.Whois.Raw != nil {
 			if err := response.Whois.Insert(m.db); err != nil {
-				return errors.WithMessage(err, "inserting whois")
+				log.Println(errors.WithMessagef(err, "inserting whois: %v", response.Whois))
 			} else {
 				whoisUpdated = true
 			}
