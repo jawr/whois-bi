@@ -130,7 +130,7 @@ func (s Server) handlePostDomain() HandlerFunc {
 
 func (s Server) handlePostRecord() DomainHandlerFunc {
 	type Request struct {
-		Raw string
+		Raw string `json:"raw"`
 	}
 
 	type Response struct {
@@ -144,7 +144,7 @@ func (s Server) handlePostRecord() DomainHandlerFunc {
 			return newApiError(http.StatusBadRequest, "Bad Request", errors.New("ShouldBind"))
 		}
 
-		zp := dns.NewZoneParser(strings.NewReader(request.Raw), "", "")
+		zp := dns.NewZoneParser(strings.NewReader(request.Raw), d.Domain, "")
 
 		response := Response{
 			Records: make([]domain.Record, 0),
