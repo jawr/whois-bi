@@ -1,5 +1,6 @@
 <script>
 	import { onMount } from 'svelte'
+	import { fade } from 'svelte/transition'
 	import { fetchJSON } from '../fetchJSON'
 	import { Link } from 'svelte-routing'
 	import Records from './Components/Records.svelte'
@@ -33,13 +34,12 @@
 
 </script>
 
-<div class="mw8 center">
+<div class="mw8 center h-100">
 	{#if error.length > 0}
 		<h1 class="f3 f2- f1-l fw2 mv3 red">Error: {error}</h1>
 	{:else}
 		<h1 class="f3 f2-m f1-l fw2 mv3">Details</h1>
 		<p>Look in depth at '{name}'</p>
-
 
 		{#if domain.last_updated_at}
 			<small>Last updated {domain.last_updated_at}</small>
@@ -61,11 +61,17 @@
 		</div>
 
 		{#if current === 'records'}
-			<Records {name} tab={subtab} />
+			<div in:fade class="vh-100">
+				<Records {name} tab={subtab} />
+			</div>
 		{:else if current === 'whois'}
-			<Whois {name} />
+			<div in:fade class="vh-100">
+				<Whois {name} />
+			</div>
 		{:else if current === 'jobs'}
+			<div in:fade class="vh-100">
 			<Jobs {name} />
+			</div>
 		{/if}
 	{/if}
 </div>

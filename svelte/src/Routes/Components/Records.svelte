@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte'
 	import { Link } from 'svelte-routing'
 	import { fetchJSON } from '../../fetchJSON'
-	import { recordsQuery } from '../../stores'
+	import { records, recordsQuery } from '../../stores'
 
 	import Search from './Search.svelte'
 	import DeleteDomain from './DeleteDomain.svelte'
@@ -11,13 +11,12 @@
 	export let name = ''
 	export let tab = ''
 
-	let records = []
 	let filtered = []
 	let error = ''
 
 	const updateRecords = async () => {
 		try {
-			records = await fetchJSON(`/api/user/domain/${name}/records`)
+			$records = await fetchJSON(`/api/user/domain/${name}/records`)
 		} catch (err) {
 			error = err.message
 			error = error
@@ -30,9 +29,9 @@
 
 	$: {
 		if (tab === 'current') {
-			filtered = records.filter(r => r.removed_at.length === 0)
+			filtered = $records.filter(r => r.removed_at.length === 0)
 		} else {
-			filtered = records.filter(r => r.removed_at.length > 0)
+			filtered = $records.filter(r => r.removed_at.length > 0)
 		}
 
 		const q = $recordsQuery.toLowerCase()
@@ -89,7 +88,7 @@
 </div>
 
 <div class="mw8">
-<CreateRecord {name} />
+	<CreateRecord name={name} />
 </div>
 
 <div class="mw8">

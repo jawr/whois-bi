@@ -1,5 +1,6 @@
 <script>
 	import { onMount } from 'svelte'
+	import { fade } from 'svelte/transition'
 	import { Link } from 'svelte-routing'
 	import { domains, domainsQuery } from '../stores'
 	import { fetchJSON } from '../fetchJSON'
@@ -23,7 +24,7 @@
 	}
 </script>
 
-
+<div in:fade>
 {#if $domains.length > 0}
 	<Search store={domainsQuery} text="Filter domains" />
 
@@ -56,3 +57,4 @@
 {/if}
 
 <CreateDomains />
+</div>
