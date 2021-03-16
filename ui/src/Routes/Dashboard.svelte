@@ -24,7 +24,7 @@
 	}
 </script>
 
-<div in:fade>
+<div in:fade class="vh-100 pt6">
 {#if $domains.length > 0}
 	<Search store={domainsQuery} text="Filter domains" />
 

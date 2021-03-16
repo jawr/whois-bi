@@ -34,7 +34,7 @@
 
 </script>
 
-<div class="mw8 center h-100">
+<div in:fade class="mw8 center h-100">
 	{#if error.length > 0}
 		<h1 class="f3 f2- f1-l fw2 mv3 red">Error: {error}</h1>
 	{:else}
