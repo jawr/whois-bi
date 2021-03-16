@@ -221,7 +221,10 @@ func (m *Manager) jobResponseHandler() message.NoPublishHandlerFunc {
 		var whoisUpdated bool
 		if response.Whois.Raw != nil {
 			if err := response.Whois.Insert(m.db); err != nil {
-				log.Println(errors.WithMessagef(err, "inserting whois: %v", response.Whois))
+				// means we hit a dupe
+				if err != pg.ErrNoRows {
+					log.Println(errors.WithMessage(err, "inserting whois"))
+				}
 			} else {
 				whoisUpdated = true
 			}
