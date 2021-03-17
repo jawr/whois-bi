@@ -41,7 +41,7 @@ export default {
     // https://www.npmjs.com/package/rollup-plugin-serve
 		!production && serve({
       contentBase: 'public',
-      historyApiFallback: true,
+      historyApiFallback: '/index.html',
       proxy: {
         api: 'http://api:80',
       },

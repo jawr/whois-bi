@@ -1,4 +1,4 @@
 <h1 class="f3 f2-m f1-l fw2 mv3">
 	Registered
 </h1>
-<p>Account created, please check and verify your email.</p>
+<p>Registration complete, please check your inbox (or spambox!) to complete the registration proccess.</p>

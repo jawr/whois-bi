@@ -18,7 +18,7 @@ const (
 
 func (s Server) handleGetStatus() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{"Status": "Logged in"})
+		c.JSON(http.StatusOK, gin.H{"status": "Logged in"})
 	}
 }
 
@@ -43,7 +43,7 @@ func (s Server) handleGetLogout() gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{"Status": "Logged out"})
+		c.JSON(http.StatusOK, gin.H{"status": "Logged out"})
 	}
 }
 
@@ -84,7 +84,7 @@ func (s Server) handlePostRegister() gin.HandlerFunc {
 		}
 
 		body := fmt.Sprintf(
-			`Thank you for registering with us. Please complete your registration by clicking <a href="https://%s/#/verify/%s">here<a/>`,
+			`Thank you for registering with us. Please complete your registration by clicking <a href="https://%s/verify/%s">here<a/>`,
 			os.Getenv("DOMAIN"),
 			u.VerifiedCode,
 		)
@@ -98,7 +98,7 @@ func (s Server) handlePostRegister() gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{"Status": "Registration complete. Verification sent. (not really yet)."})
+		c.JSON(http.StatusOK, gin.H{"status": "Registration complete. Verification sent. (not really yet)."})
 	}
 }
 
@@ -159,7 +159,7 @@ func (s Server) handlePostLogin() gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{"Status": "Logged in"})
+		c.JSON(http.StatusOK, gin.H{"status": "Logged in"})
 	}
 }
 
@@ -173,6 +173,6 @@ func (s Server) handlePostVerify() gin.HandlerFunc {
 			)
 			return
 		}
-		c.JSON(http.StatusOK, gin.H{"Status": "Verified. Please login."})
+		c.JSON(http.StatusOK, gin.H{"status": "Verified. Please login."})
 	}
 }

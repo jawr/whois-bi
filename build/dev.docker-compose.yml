@@ -95,6 +95,7 @@ services:
       SMTP_PORT: ${SMTP_PORT}
       RABBITMQ_URI: ${RABBITMQ_URI}
       MODE: ${MODE}
+      DOMAIN: ${DOMAIN}
     volumes:
       - ../:/build
 

@@ -11,6 +11,7 @@
 	import Hero from './Routes/Hero.svelte'
 	import Register from './Routes/Register.svelte'
 	import Registered from './Routes/Registered.svelte'
+	import Verify from './Routes/Verify.svelte'
 	import Login from './Routes/Login.svelte'
 
 	let loading = true
@@ -38,6 +39,7 @@
 				<Route path="domain/:name/*tab" let:params>
 					<Domain name={params.name} tab={params.tab} />
 				</Route>
+				<Route path="verify/:code" component={Verify} />
 				<Route path="register" component={Register} />
 				<Route path="registered" component={Registered} />
 				<Route path="login" component={Login} />
