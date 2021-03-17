@@ -34,7 +34,6 @@ spec:
                 name: ui
                 port:
                   number: 80
-
     - host: adminer.k3s.jl.lu
       http:
         paths:
@@ -45,7 +44,6 @@ spec:
                 name: adminer
                 port:
                   number: 8080
-
     - host: rabbit.k3s.jl.lu
       http:
         paths:

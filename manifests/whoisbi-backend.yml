@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: manager-deploy
+  name: manager
   namespace: whois-bi
 spec:
   replicas: 1
@@ -31,10 +31,10 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: worker-deploy
+  name: worker
   namespace: whois-bi
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: worker

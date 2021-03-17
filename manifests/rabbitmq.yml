@@ -10,7 +10,6 @@ spec:
   selector:
     app: rabbitmq
     tier: backend
-
   ports:
     - port: 5672
       targetPort: 5672
@@ -18,65 +17,51 @@ spec:
 ---
 apiVersion: v1
 kind: Service
-
 metadata:
   name: rabbitmq-manager
   namespace: whois-bi
   labels:
     app: rabbitmq-manager
     tier: backend
-
 spec:
-  type: NodePort
-
   ports:
     - port: 15672
-
   selector:
     app: rabbitmq
     tier: backend
 ---
 apiVersion: apps/v1
 kind: Deployment
-
 metadata:
-  name: rabbitmq-deploy
+  name: rabbitmq
   namespace: whois-bi
 spec:
   replicas: 1
-
   selector:
     matchLabels:
       app: rabbitmq
       tier: backend
-
   template:
     metadata:
       labels:
         app: rabbitmq
         tier: backend
-
     spec:
       containers:
         - name: rabbitmq
           image: rabbitmq:management-alpine
-
           ports:
             - containerPort: 5672
               name: amqp
             - containerPort: 15672
               name: management
-
           volumeMounts:
             - name: rabbitmq-data
               mountPath: /var/lib/rabbitmq
-
           envFrom:
             - configMapRef:
                 name: rabbitmq-env
-
       restartPolicy: Always
-
       volumes:
         - name: rabbitmq-data
           persistentVolumeClaim:

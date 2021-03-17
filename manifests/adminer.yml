@@ -7,21 +7,15 @@ metadata:
   labels:
     app: adminer
     tier: debug
-
 spec:
-  # for development on one node this is fine
-  type: NodePort
-
   ports:
     - port: 8080
-
   selector:
     app: adminer
     tier: debug
 ---
 apiVersion: apps/v1
 kind: Deployment
-
 metadata:
   name: adminer
   namespace: whois-bi
@@ -30,25 +24,20 @@ metadata:
     tier: debug
 spec:
   replicas: 1
-
   selector:
     matchLabels:
       app: adminer
       tier: debug
-
   template:
     metadata:
       labels:
         app: adminer
         tier: debug
-
     spec:
       restartPolicy: Always
-
       containers:
         - name: adminer
           image: adminer
-
           ports:
             - containerPort: 8080
               name: adminer
