@@ -33,7 +33,7 @@
 		<input
 			class="mt6 f5 h2 button-reset fr pv1 dib bl bt bb bw1 b--light-red tc w-40 br--left br2"
 			type="text"
-			placeholder={`please type ${name}`}
+			placeholder={`type ${name} to confirm`}
 			bind:value={confirm}
 		/>
 	{/if}
