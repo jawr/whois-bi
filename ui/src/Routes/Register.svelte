@@ -1,6 +1,6 @@
 <script>
 	import { navigate } from 'svelte-routing'
-	import { fetchJSON } from '../fetchJSON'
+	import { postJSON } from '../fetchJSON'
 
 	let email, password, confirmPassword, error = ''
 	let sending = false
@@ -18,7 +18,7 @@
 
 		const data = {email, password}
 		try {
-			await fetchJSON('/api/register')
+			await postJSON('/api/register', data)
 			navigate('/registered')
 		} catch (err) {
 			error = err
