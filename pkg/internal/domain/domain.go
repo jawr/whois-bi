@@ -4,6 +4,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/bobesa/go-domain-util/domainutil"
 	"github.com/go-pg/pg"
 	"github.com/jawr/whois-bi/pkg/internal/user"
 	"github.com/pkg/errors"
@@ -29,6 +30,9 @@ type Domain struct {
 // create a new domain attached to an owner
 func NewDomain(domain string, owner user.User) Domain {
 	domain = strings.TrimSpace(domain)
+
+	// validation
+	domain = domainutil.Domain(domain)
 
 	newDomain := Domain{
 		Domain:  domain,
