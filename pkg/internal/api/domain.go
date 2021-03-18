@@ -107,6 +107,7 @@ func (s Server) handlePostDomain() HandlerFunc {
 		if len(d.Domain) == 0 || !strings.Contains(d.Domain, ".") {
 			return newApiError(
 				http.StatusBadRequest,
+				"invalid",
 				errors.Errorf("Invalid Domain: '%s'", d.Domain),
 			)
 		}
