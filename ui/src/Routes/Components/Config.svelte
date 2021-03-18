@@ -1,6 +1,8 @@
 <script>
 	import { onMount, onDestroy } from 'svelte'
 	import { fetchJSON, postJSON } from '../../fetchJSON'
+	import { parseISO, format } from 'date-fns'
+	import { CheckIcon } from 'svelte-feather-icons'
 
 	import DeleteDomain from './DeleteDomain.svelte'
 
@@ -45,6 +47,14 @@
 			clearTimeout(cancel)
 		}
 	})
+
+	const formatDateTime = (t) => {
+		if (t === '0001-01-01T00:00:00Z') {
+			return ''
+		}
+		return format(parseISO(t, new Date()), 'yyyy/MM/dd HH:mm')
+
+	}
 </script>
 
 <div class="mw8 mt4">
@@ -61,21 +71,25 @@
 		<table class="collapse bn br2 pv2 ph3 mt4 mb4 mw8 w-100 center">
 			<thead>
 				<tr class="fw3 ttu f7">
-					<th class="pv2 ph3 tl w-10">Created</th>
-					<th class="pv2 ph3 tr w-10">Finished</th>
-					<th class="pv2 ph3 tr w-10">Additions</th>
+					<th class="pv2 ph3 tl w-20">Created</th>
+					<th class="pv2 ph3 tr w-20">Finished</th>
+					<th class="pv2 ph3 tr">Additions</th>
 					<th class="pv2 ph3 tr w-10">Removals</th>
-					<th class="pv2 ph3 tr w-10">Whois Update</th>
+					<th class="pv2 ph3 tc w-10">Whois</th>
 				</tr>
 			</thead>
 			<tbody>
 				{#each jobs as job}
 					<tr class="striped--near-white">
-						<td class="pv3 ph3 tl">{job.created_at}</td>
-						<td class="pv3 ph3 tr">{job.finished_at === '0001-01-01T00:00:00Z' ? '' : job.finished_at}</td>
+						<td class="pv3 ph3 tl">{formatDateTime(job.created_at)}</td>
+						<td class="pv3 ph3 tr">{formatDateTime(job.finished_at)}</td>
 						<td class="pv3 ph3 tr">{job.additions}</td>
 						<td class="pv3 ph3 tr">{job.removals}</td>
-						<td class="pv3 ph3 tr">{job.whois_updated.toString()}</td>
+						<td class="pv3 ph3 tc">
+							{#if job.whois_updated}
+								<CheckIcon size="1x" />
+							{/if}
+						</td>
 					</tr>
 				{/each}
 			</tbody>
