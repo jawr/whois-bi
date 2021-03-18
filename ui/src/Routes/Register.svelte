@@ -75,7 +75,7 @@
 		{#if sending}
 			<p>Pigeon enroute...</p>
 		{:else}
-			<button type="submit" class="f4 bb bt-0 bl-0 br-0 bw2 b--dark-green br2 pointer dim ph3 pv2 mt5 fw3 mb2 dib white bg-green grow">Hit it!</button>
+			<button type="submit" class="f4 bb bt-0 bl-0 br-0 bw2 b--dark-green br2 pointer dim ph3 pv2 mt5 fw3 mb2 dib white bg-green grow">Register</button>
 		{/if}
 	</div>
 </form>
