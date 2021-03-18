@@ -2,6 +2,8 @@
 	import { onMount, onDestroy } from 'svelte'
 	import { fetchJSON, postJSON } from '../../fetchJSON'
 
+	import DeleteDomain from './DeleteDomain.svelte'
+
 	export let name = ''
 
 	let running = true
@@ -45,7 +47,12 @@
 	})
 </script>
 
+<div class="mw8 mt4">
+	<DeleteDomain {name} />
+</div>
+
 <div class="pt2">
+	<h2 class="f4 tl fw3">Jobs</h2>
 	<p class="tl f5 lh-copy">A Job looks for records using names you have supplied or using a common list (i.e. www.{name}). Jobs are created daily, but you can request a job be run now.</p>
 </div>
 
@@ -95,3 +102,5 @@
 		<p class="mt3 pr3 fr light-red">{error}</p>
 	{/if}
 </div>
+
+

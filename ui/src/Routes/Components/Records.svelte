@@ -5,7 +5,6 @@
 	import { records, recordsQuery } from '../../stores'
 
 	import Search from './Search.svelte'
-	import DeleteDomain from './DeleteDomain.svelte'
 	import CreateRecord from './CreateRecord.svelte'
 
 	export let name = ''
@@ -98,10 +97,6 @@
 
 <div class="mw8">
 	<CreateRecord name={name} />
-</div>
-
-<div class="mw8">
-	<DeleteDomain {name} />
 </div>
 
 <style>

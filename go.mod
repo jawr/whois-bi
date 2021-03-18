@@ -8,6 +8,7 @@ require (
 	github.com/appleboy/gin-jwt v2.5.0+incompatible
 	github.com/araddon/dateparse v0.0.0-20210207001429-0eec95c9db7e
 	github.com/armon/consul-api v0.0.0-20180202201655-eb2c6b5be1b6 // indirect
+	github.com/bobesa/go-domain-util v0.0.0-20190911083921-4033b5f7dd89
 	github.com/boj/redistore v0.0.0-20180917114910-cd5dcc76aeff // indirect
 	github.com/cenkalti/backoff/v3 v3.2.2 // indirect
 	github.com/coreos/go-etcd v2.0.0+incompatible // indirect
