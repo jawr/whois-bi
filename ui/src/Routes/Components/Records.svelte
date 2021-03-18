@@ -38,9 +38,9 @@
 		if (q.length > 0) {
 			filtered = filtered.filter(r => (
 				r.name.toLowerCase().indexOf(q) > -1 
-					|| r.fields.toLowerCase().indexOf(q) > -1 
-					|| r.ttl.toString() === q 
-					|| r.rr_type.toLowerCase() === q
+				|| r.fields.toLowerCase().indexOf(q) > -1 
+				|| r.ttl.toString() === q 
+				|| r.rr_type.toLowerCase() === q
 			))
 		}
 	}
@@ -60,11 +60,11 @@
 </div>
 
 <div class="pt2">
-{#if tab === 'current'}
-	<p class="tl f5 lh-copy">Overview of current, active records that we know of.</p>
-{:else if tab === 'historical'}
-	<p class="tl f5 lh-copy">Overview of records that are no longer active.</p>
-{/if}
+	{#if tab === 'current'}
+		<p class="tl f5 lh-copy">Overview of current, active records that we know of.</p>
+	{:else if tab === 'historical'}
+		<p class="tl f5 lh-copy">Overview of records that are no longer active.</p>
+	{/if}
 </div>
 
 <div class="mt4">
@@ -74,21 +74,21 @@
 	<table class="collapse bn br2 pv2 ph3 mt4 mb4 mw8 w-100 center">
 		<thead>
 			<tr class="fw3 ttu f7">
-				<th class="pv2 ph3 tl w-20">Record</th>
-				<th class="pv2 ph3 tr w-10">Type</th>
-				<th class="pv2 ph3 tr w-40">Fields</th>
-				<th class="pv2 ph3 tr w-10">TTL</th>
-				<th class="pv2 ph3 tr w-20">Added</th>
+				<th scope="col" class="pv2 ph3 tl w-20">Record</th>
+				<th scope="col" class="pv2 ph3 tr w-10">Type</th>
+				<th scope="col" class="pv2 ph3 tr w-40">Fields</th>
+				<th scope="col" class="pv2 ph3 tr w-10">TTL</th>
+				<th scope="col" class="pv2 ph3 tr w-20">Added</th>
 			</tr>
 		</thead>
 		<tbody>
 			{#each filtered as record}
 				<tr class="striped--near-white">
-					<td class="pv3 ph3 tl">{record.name}</td>
-					<td class="pv3 ph3 tr">{record.rr_type}</td>
-					<td class="pv3 ph3 tr">{record.fields}</td>
-					<td class="pv3 ph3 tr">{record.ttl}</td>
-					<td class="pv3 ph3 tr">{record.added_at}</td>
+					<td data-label="Record" class="pv3 ph3 tl">{record.name}</td>
+					<td data-label="Type" class="pv3 ph3 tr">{record.rr_type}</td>
+					<td data-label="Fields" class="newline pv3 ph3 tr">{record.fields}</td>
+					<td data-label="TTL" class="pv3 ph3 tr">{record.ttl}</td>
+					<td data-label="Added" class="pv3 ph3 tr">{record.added_at}</td>
 				</tr>
 			{/each}
 		</tbody>
@@ -102,5 +102,44 @@
 <style>
 	td {
 		word-break: break-all;
+	}
+
+	@media screen and (max-width: 800px) {
+		table thead {
+			border: none;
+			clip: rect(0 0 0 0);
+			height: 1px;
+			margin: -1px;
+			overflow: hidden;
+			padding: 0;
+			position: absolute;
+			width: 1px;
+		}
+
+		table tr {
+			border-bottom: 3px solid #ddd;
+			display: block;
+		}
+
+		table td {
+			border-bottom: 1px solid #ddd;
+			display: block;
+			text-align: right;
+		}
+
+		table td.newline::before {
+			content: attr(data-label) '\00000a';
+			text-align: left;
+			display: block;
+			float: none;
+			margin-bottom: 1rem;
+			font-weight: 200;
+		}
+
+		table td::before {
+			font-weight: 200;
+			content: attr(data-label);
+			float: left;
+		}
 	}
 </style>

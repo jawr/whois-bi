@@ -24,37 +24,82 @@
 	}
 </script>
 
-<div in:fade class="vh-100 pt6">
-{#if $domains.length > 0}
-	<Search store={domainsQuery} text="Filter domains" />
+<div in:fade class="pt6">
+	{#if $domains.length > 0}
+		<Search store={domainsQuery} text="Filter domains" />
 
-	<table class="collapse bn br2 pv2 ph3 mt4 mb4 mw8 w-100 center">
-		<thead>
-			<tr class="fw3 ttu f7">
-				<th class="pv2 ph3 tl w-60">Name</th>
-				<th class="pv2 ph3 tr w-10">#Records</th>
-				<th class="pv2 ph3 tr w-10">#Whois</th>
-				<th class="pv2 ph3 tr w-30">Added</th>
-			</tr>
-		</thead>
-		<tbody>
-			{#each filtered as domain}
-				<tr class="striped--near-white">
-					<td class="pv3 ph3 tl"><Link class="link underline green" to={`domain/${domain.domain}/records`}>{domain.domain}</Link></td>
-					<td class="pv3 ph3 tr">{domain.records}</td>
-					<td class="pv3 ph3 tr">{domain.whois}</td>
-					<td class="pv3 ph3 tr">{domain.added_at}</td>
+		<table class="collapse bn br2 pv2 ph3 mt4 mb4 mw8 w-100 center">
+			<thead>
+				<tr class="fw3 ttu f7">
+					<th role="col" class="pv2 ph3 tl w-60">Name</th>
+					<th role="col" class="pv2 ph3 tr w-10">#Records</th>
+					<th role="col" class="pv2 ph3 tr w-10">#Whois</th>
+					<th role="col" class="pv2 ph3 tr w-30">Added</th>
 				</tr>
-			{/each}
-		</tbody>
-	</table>
-{/if}
+			</thead>
+			<tbody>
+				{#each filtered as domain}
+					<tr class="striped--near-white">
+						<td data-label="Name" class="pv3 ph3 tl"><Link class="link underline green" to={`domain/${domain.domain}/records`}>{domain.domain}</Link></td>
+						<td data-label="#Records" class="pv3 ph3 tr">{domain.records}</td>
+						<td data-label="#Whois" class="pv3 ph3 tr">{domain.whois}</td>
+						<td data-label="#Added" class="pv3 ph3 tr">{domain.added_at}</td>
+					</tr>
+				{/each}
+			</tbody>
+		</table>
+	{/if}
 
-{#if error.length > 0}
-	<div class="mt3">
-		<p class="red">{error}</p>
-	</div>
-{/if}
+	{#if error.length > 0}
+		<div class="mt3">
+			<p class="red">{error}</p>
+		</div>
+	{/if}
 
-<CreateDomains />
+	<CreateDomains />
 </div>
+
+	<style>
+	td {
+		word-break: break-all;
+	}
+
+	@media screen and (max-width: 800px) {
+		table thead {
+			border: none;
+			clip: rect(0 0 0 0);
+			height: 1px;
+			margin: -1px;
+			overflow: hidden;
+			padding: 0;
+			position: absolute;
+			width: 1px;
+		}
+
+		table tr {
+			border-bottom: 3px solid #ddd;
+			display: block;
+		}
+
+		table td {
+			border-bottom: 1px solid #ddd;
+			display: block;
+			text-align: right;
+		}
+
+		table td.newline::before {
+			content: attr(data-label) '\00000a';
+			text-align: left;
+			display: block;
+			float: none;
+			margin-bottom: 1rem;
+			font-weight: 200;
+		}
+
+		table td::before {
+			font-weight: 200;
+			content: attr(data-label);
+			float: left;
+		}
+	}
+	</style>
