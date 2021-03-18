@@ -45,6 +45,10 @@
 	})
 </script>
 
+<div class="pt2">
+	<p class="tl f5 lh-copy">A Job looks for records using names you have supplied or using a common list (i.e. www.{name}). Jobs are created daily, but you can request a job be run now.</p>
+</div>
+
 {#if jobs.length > 0}
 	<div class="mt4">
 		<table class="collapse bn br2 pv2 ph3 mt4 mb4 mw8 w-100 center">

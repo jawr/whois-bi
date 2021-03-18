@@ -60,7 +60,16 @@
 	>Historical</Link>
 </div>
 
+<div class="pt2">
+{#if tab === 'current'}
+	<p class="tl f5 lh-copy">Overview of current, active records that we know of.</p>
+{:else if tab === 'historical'}
+	<p class="tl f5 lh-copy">Overview of records that are no longer active.</p>
+{/if}
+</div>
+
 <div class="mt4">
+
 	<Search store={recordsQuery} text="Filter records" />
 
 	<table class="collapse bn br2 pv2 ph3 mt4 mb4 mw8 w-100 center">

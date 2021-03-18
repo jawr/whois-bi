@@ -28,6 +28,10 @@
 	})
 </script>
 
+<div class="pt2">
+	<p class="tl f5 lh-copy">A Whois record shows information regarding the ownership and administration of a domain.
+</div>
+
 {#if whois.length > 0}
 	<div class="mw8">
 		<pre class="pa2 tl ba bg-light-gray pre overflow-content">{window.atob(current.raw)}</pre>
