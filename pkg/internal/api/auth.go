@@ -119,6 +119,8 @@ func (s Server) handlePostLogin() gin.HandlerFunc {
 			return
 		}
 
+		log.Printf("AUTH: %+v", request)
+
 		// validate user
 		var u user.User
 
