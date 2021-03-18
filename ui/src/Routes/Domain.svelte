@@ -61,15 +61,15 @@
 		</div>
 
 		{#if current === 'records'}
-			<div in:fade class="vh-100">
+			<div in:fade>
 				<Records {name} tab={subtab} />
 			</div>
 		{:else if current === 'whois'}
-			<div in:fade class="vh-100">
+			<div in:fade>
 				<Whois {name} />
 			</div>
 		{:else if current === 'jobs'}
-			<div in:fade class="vh-100">
+			<div in:fade>
 			<Jobs {name} />
 			</div>
 		{/if}

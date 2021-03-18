@@ -26,8 +26,8 @@
 <Router>
 	<Header />
 
-	<div class="mw9 center db border-box">
-		<section class="tc ph4 h5 vh-100 pv5 w-100 dt">
+	<div class="mw9 center db border-box min-vh-100 h-auto">
+		<section class="tc ph4 h5 pv5 w-100 dt">
 			<section class="dtc v-mid tc ph3 ph4-l pv5">
 				<Route path="/">
 					{#if $loggedIn}
