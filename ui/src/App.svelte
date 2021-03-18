@@ -5,6 +5,7 @@
 
 	import Header from './Header.svelte'
 	import Footer from './Footer.svelte'
+	import NotFound from './NotFound.svelte'
 
 	import Dashboard from './Routes/Dashboard.svelte'
 	import Domain from './Routes/Domain.svelte'
@@ -43,6 +44,7 @@
 				<Route path="register" component={Register} />
 				<Route path="registered" component={Registered} />
 				<Route path="login" component={Login} />
+				<Route component={NotFound} />
 			</section>
 		</section>
 	</div>
