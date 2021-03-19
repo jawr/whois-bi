@@ -38,7 +38,7 @@
 					{/if}
 				</Route>
 				<Route path="domain/:name/*tab" let:params>
-					<Domain name={params.name} tab={params.tab} />
+					<Domain name={params.name} tab={params.tab || 'records'} />
 				</Route>
 				<Route path="verify/:code" component={Verify} />
 				<Route path="register" component={Register} />

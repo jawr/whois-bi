@@ -3,13 +3,15 @@
 	import { Link } from 'svelte-routing'
 	import { fetchJSON } from '../../fetchJSON'
 	import { records, recordsQuery } from '../../stores'
+	import { parseISO, format } from 'date-fns'
 
 	import Search from './Search.svelte'
+	import RTypeLabel from './RTypeLabel.svelte'
 	import CreateRecord from './CreateRecord.svelte'
 
 	export let name = ''
-	export let tab = ''
 
+	let current = true
 	let filtered = []
 	let error = ''
 
@@ -22,13 +24,28 @@
 		}
 	}
 
+	const parseRecordName = (rname) => {
+		if (rname === name + '.') {
+			return '@'
+		}
+
+		return rname.replace('.' + name + '.', '')
+	}
+
+	const formatDateTime = (t) => {
+		if (t === '0001-01-01T00:00:00Z') {
+			return ''
+		}
+		return format(parseISO(t, new Date()), 'yyyy/MM/dd')
+	}
+
 	onMount(async () => {
 		await updateRecords()
 	})
 
 	$: {
-		if (tab === 'current') {
-			filtered = $records.filter(r => r.removed_at.length === 0)
+		if (current) {
+			filtered = $records.filter(r => r.removed_at === '0001-01-01T00:00:00Z')
 		} else {
 			filtered = $records.filter(r => r.removed_at.length > 0)
 		}
@@ -44,63 +61,60 @@
 			))
 		}
 	}
-
-	const tabClasses = "link w-50 tc bg-animate pointer green hover-bg-near-white pb2 pt2 "
 </script>
 
-<div class="flex bb b--dark-green">
-	<Link 
-		to={`domain/${name}/records/current`} 
-		class={`${tabClasses}` + (tab === 'current' ? 'bg-near-white' : '')}
-	>Current</Link>
-	<Link 
-		to={`domain/${name}/records/historical`} 
-		class={`${tabClasses}` + (tab === 'historical' ? 'bg-near-white' : '')}
-	>Historical</Link>
-</div>
-
-<div class="pt2">
-	{#if tab === 'current'}
-		<p class="tl f5 lh-copy">Overview of current, active records that we know of.</p>
-	{:else if tab === 'historical'}
-		<p class="tl f5 lh-copy">Overview of records that are no longer active.</p>
-	{/if}
-</div>
-
-<div class="mt4">
-
+<div class="mt4 mb4">
 	<Search store={recordsQuery} text="Filter records" />
 
+	<div class="flex items-center mb2 fr">
+		<input class="mr2" type="checkbox" name="current" bind:checked={current}>
+		<label for="current" class="lh-copy">Current</label>
+	</div>
+</div>
+
+<div class="cf">
 	<table class="collapse bn br2 pv2 ph3 mt4 mb4 mw8 w-100 center">
 		<thead>
 			<tr class="fw3 ttu f7">
-				<th scope="col" class="pv2 ph3 tl w-20">Record</th>
-				<th scope="col" class="pv2 ph3 tr w-10">Type</th>
-				<th scope="col" class="pv2 ph3 tr w-40">Fields</th>
-				<th scope="col" class="pv2 ph3 tr w-10">TTL</th>
-				<th scope="col" class="pv2 ph3 tr w-20">Added</th>
+				{#if current}
+					<th scope="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Record</th>
+					<th scope="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Type</th>
+					<th scope="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Fields</th>
+					<th scope="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">TTL</th>
+					<th scope="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Added</th>
+				{:else}
+					<th scope="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Record</th>
+					<th scope="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Type</th>
+					<th scope="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Fields</th>
+					<th scope="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">TTL</th>
+					<th scope="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Added</th>
+					<th scope="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Removed</th>
+				{/if}
 			</tr>
 		</thead>
-		<tbody>
+		<tbody class="tl lh-copy">
 			{#each filtered as record}
-				<tr class="striped--near-white">
-					<td data-label="Record" class="pv3 ph3 tl">{record.name}</td>
-					<td data-label="Type" class="pv3 ph3 tr">{record.rr_type}</td>
-					<td data-label="Fields" class="newline pv3 ph3 tr">{record.fields}</td>
-					<td data-label="TTL" class="pv3 ph3 tr">{record.ttl}</td>
-					<td data-label="Added" class="pv3 ph3 tr">{record.added_at}</td>
+				<tr>
+					<td data-label="Record" class="pv3 pr3 bb b--black-20">{parseRecordName(record.name)}</td>
+					<td data-label="Type"   class="pv3 pr3 bb b--black-20"><RTypeLabel type={record.rr_type} /></td>
+					<td data-label="Fields" class="truncate pv3 pr3 bb b--black-20 newline fields">{record.fields}</td>
+					<td data-label="TTL"    class="pv3 pr3 bb b--black-20">{record.ttl}</td>
+					<td data-label="Added"  class="pv3 pr3 bb b--black-20">{formatDateTime(record.added_at)}</td>
+					{#if !current}
+						<td data-label="Removed" class="pv3 pr3 bb b--black-20">{formatDateTime(record.removed_at)}</td>
+					{/if}
 				</tr>
 			{/each}
 		</tbody>
 	</table>
 </div>
 
-<div class="mw8">
+<div class="mw8 mt4">
 	<CreateRecord name={name} />
 </div>
 
 <style>
-	td {
+	td.fields {
 		word-break: break-all;
 	}
 

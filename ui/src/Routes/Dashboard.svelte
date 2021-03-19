@@ -4,6 +4,8 @@
 	import { Link } from 'svelte-routing'
 	import { domains, domainsQuery } from '../stores'
 	import { fetchJSON } from '../fetchJSON'
+	import { parseISO, format } from 'date-fns'
+
 	import CreateDomains from './Components/CreateDomains.svelte'
 	import Search from './Components/Search.svelte'
 
@@ -22,6 +24,13 @@
 		const q = $domainsQuery.toLowerCase()
 		filtered = $domains.filter(d => d.domain.toLowerCase().indexOf(q) > -1)
 	}
+
+	const formatDateTime = (t) => {
+		if (t === '0001-01-01T00:00:00Z') {
+			return ''
+		}
+		return format(parseISO(t, new Date()), 'yyyy/MM/dd')
+	}
 </script>
 
 <div in:fade class="pt6">
@@ -31,19 +40,21 @@
 		<table class="collapse bn br2 pv2 ph3 mt4 mb4 mw8 w-100 center">
 			<thead>
 				<tr class="fw3 ttu f7">
-					<th role="col" class="pv2 ph3 tl w-60">Name</th>
-					<th role="col" class="pv2 ph3 tr w-10">#Records</th>
-					<th role="col" class="pv2 ph3 tr w-10">#Whois</th>
-					<th role="col" class="pv2 ph3 tr w-30">Added</th>
+					<th role="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Name</th>
+					<th role="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white w-10">#Records</th>
+					<th role="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white w-10">#Whois</th>
+					<th role="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white w-20">Added</th>
 				</tr>
 			</thead>
-			<tbody>
+			<tbody class="tl lh-copy">
 				{#each filtered as domain}
-					<tr class="striped--near-white">
-						<td data-label="Name" class="pv3 ph3 tl"><Link class="link underline green" to={`domain/${domain.domain}/records`}>{domain.domain}</Link></td>
-						<td data-label="#Records" class="pv3 ph3 tr">{domain.records}</td>
-						<td data-label="#Whois" class="pv3 ph3 tr">{domain.whois}</td>
-						<td data-label="#Added" class="pv3 ph3 tr">{domain.added_at}</td>
+					<tr>
+						<td data-label="Name"     class="pv3 pr3 bb b--black-20">
+							<Link class="link underline green" to={`domain/${domain.domain}/records`}>{domain.domain}</Link>
+						</td>
+						<td data-label="#Records" class="pv3 pr3 bb b--black-20">{domain.records}</td>
+						<td data-label="#Whois"   class="pv3 pr3 bb b--black-20">{domain.whois}</td>
+						<td data-label="#Added"   class="pv3 pr3 bb b--black-20">{formatDateTime(domain.added_at)}</td>
 					</tr>
 				{/each}
 			</tbody>

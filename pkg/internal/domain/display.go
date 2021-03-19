@@ -4,58 +4,10 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"time"
 
-	"github.com/go-pg/pg"
 	"github.com/go-pg/pg/types"
 	"github.com/miekg/dns"
 )
-
-type JsonDate struct{ pg.NullTime }
-
-func (t JsonDate) MarshalJSON() ([]byte, error) {
-	if t.IsZero() {
-		return []byte(`""`), nil
-	}
-	return []byte(fmt.Sprintf(`"%s"`, t.Format("2006/01/02"))), nil
-}
-
-func (t *JsonDate) UnmarshalJSON(data []byte) error {
-	s := string(data)
-	s = strings.Trim(s, `"`)
-	if len(s) == 0 {
-		return nil
-	}
-	var err error
-	t.Time, err = time.Parse("2006/01/02", s)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-type JsonDateTime struct{ pg.NullTime }
-
-func (t JsonDateTime) MarshalJSON() ([]byte, error) {
-	if t.IsZero() {
-		return []byte(`""`), nil
-	}
-	return []byte(fmt.Sprintf(`"%s"`, t.Format("2006/01/02 15:04"))), nil
-}
-
-func (t *JsonDateTime) UnmarshalJSON(data []byte) error {
-	s := string(data)
-	s = strings.Trim(s, `"`)
-	if len(s) == 0 {
-		return nil
-	}
-	var err error
-	t.Time, err = time.Parse("2006/01/02 15:04", s)
-	if err != nil {
-		return err
-	}
-	return nil
-}
 
 type JsonRRType struct{ V uint16 }
 

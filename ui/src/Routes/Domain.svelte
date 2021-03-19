@@ -21,15 +21,6 @@
 		}
 	})
 
-	let parts = []
-	let current, subtab = ''
-
-	$: {
-		parts = tab.split('/')
-		current = parts[0]
-		subtab = (parts.length > 1) ? parts[1] : 'current'
-	}
-
 	const tabClasses = "link w-50 tc bg-animate pointer green hover-bg-washed-green pb3 pt3 "
 
 </script>
@@ -47,27 +38,27 @@
 		<div class="mt5 flex bb b--dark-green">
 			<Link 
 				to={`domain/${name}/records`} 
-				class={`${tabClasses}` + (current === 'records' ? 'bg-washed-green' : '')}
+				class={`${tabClasses}` + (tab === 'records' ? 'bg-washed-green' : '')}
 			>Records</Link>
 			<Link 
 				to={`domain/${name}/whois`} 
-				class={`${tabClasses}` + (current === 'whois' ? 'bg-washed-green' : '')}
+				class={`${tabClasses}` + (tab === 'whois' ? 'bg-washed-green' : '')}
 			>Whois</Link>
 			<Link 
 				to={`domain/${name}/config`} 
-				class={`${tabClasses}` + (current === 'config' ? 'bg-washed-green' : '')}
+				class={`${tabClasses}` + (tab === 'config' ? 'bg-washed-green' : '')}
 			>Config</Link>
 		</div>
 
-		{#if current === 'records'}
+		{#if tab === 'records'}
 			<div in:fade>
-				<Records {name} tab={subtab} />
+				<Records {name} />
 			</div>
-		{:else if current === 'whois'}
+		{:else if tab === 'whois'}
 			<div in:fade>
 				<Whois {name} />
 			</div>
-		{:else if current === 'config'}
+		{:else if tab === 'config'}
 			<div in:fade>
 			<Config {name} />
 			</div>

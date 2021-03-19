@@ -53,7 +53,6 @@
 			return ''
 		}
 		return format(parseISO(t, new Date()), 'yyyy/MM/dd HH:mm')
-
 	}
 </script>
 
@@ -71,21 +70,21 @@
 		<table class="collapse bn br2 pv2 ph3 mt4 mb4 mw8 w-100 center">
 			<thead>
 				<tr class="fw3 ttu f7">
-					<th role="col" class="pv2 ph3 tl w-20">Created</th>
-					<th role="col" class="pv2 ph3 tr w-20">Finished</th>
-					<th role="col" class="pv2 ph3 tr">Additions</th>
-					<th role="col" class="pv2 ph3 tr w-10">Removals</th>
-					<th role="col" class="pv2 ph3 tc w-10">Whois</th>
+					<th role="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Created</th>
+					<th role="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Finished</th>
+					<th role="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Additions</th>
+					<th role="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Removals</th>
+					<th role="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Whois</th>
 				</tr>
 			</thead>
-			<tbody>
+			<tbody class="tl lh-copy">
 				{#each jobs as job}
-					<tr class="striped--near-white">
-						<td data-label="Created" class="pv3 ph3 tl">{formatDateTime(job.created_at)}</td>
-						<td data-label="Finished" class="pv3 ph3 tr">{formatDateTime(job.finished_at)}</td>
-						<td data-label="Additions" class="pv3 ph3 tr">{job.additions}</td>
-						<td data-label="Removals" class="pv3 ph3 tr">{job.removals}</td>
-						<td data-label="Whois" class="pv3 ph3 tc">
+					<tr>
+						<td data-label="Created"   class="pv3 pr3 bb b--black-20">{formatDateTime(job.created_at)}</td>
+						<td data-label="Finished"  class="pv3 pr3 bb b--black-20">{formatDateTime(job.finished_at)}</td>
+						<td data-label="Additions" class="pv3 pr3 bb b--black-20">{job.additions}</td>
+						<td data-label="Removals"  class="pv3 pr3 bb b--black-20">{job.removals}</td>
+						<td data-label="Whois"     class="pv3 pr3 bb b--black-20">
 							{#if job.whois_updated}
 								<CheckIcon size="1x" />
 							{:else}
