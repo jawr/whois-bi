@@ -1,7 +1,6 @@
 package job
 
 import (
-	"encoding/json"
 	"time"
 
 	"github.com/go-pg/pg"
@@ -74,69 +73,4 @@ func GetJobs(db *pg.DB) ([]Job, error) {
 		return nil, err
 	}
 	return jobs, nil
-}
-
-// custom marshaller that nicely formats our time.Time to date strings
-func (j *Job) MarshalJSON() ([]byte, error) {
-	type Alias Job
-
-	// can be null
-	var startedAt, finishedAt string
-	if !j.StartedAt.IsZero() {
-		startedAt = j.StartedAt.Format("2006/01/02")
-	}
-	if !j.FinishedAt.IsZero() {
-		finishedAt = j.FinishedAt.Format("2006/01/02")
-	}
-
-	return json.Marshal(&struct {
-		CreatedAt  string
-		StartedAt  string
-		FinishedAt string
-		*Alias
-	}{
-		CreatedAt:  j.CreatedAt.Format("2006/01/02"),
-		StartedAt:  startedAt,
-		FinishedAt: finishedAt,
-		Alias:      (*Alias)(j),
-	})
-}
-
-// custom unmarshaller that formats our string dates to time.Time
-func (j *Job) UnmarshalJSON(data []byte) error {
-	type Alias Job
-
-	aux := &struct {
-		CreatedAt  string
-		StartedAt  string
-		FinishedAt string
-		*Alias
-	}{
-		Alias: (*Alias)(j),
-	}
-
-	if err := json.Unmarshal(data, &aux); err != nil {
-		return err
-	}
-
-	var err error
-
-	j.CreatedAt, err = time.Parse("2006/01/02", aux.CreatedAt)
-	if err != nil {
-		return err
-	}
-	if len(aux.StartedAt) > 0 {
-		j.StartedAt, err = time.Parse("2006/01/02", aux.StartedAt)
-		if err != nil {
-			return err
-		}
-	}
-	if len(aux.FinishedAt) > 0 {
-		j.FinishedAt, err = time.Parse("2006/01/02", aux.FinishedAt)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
 }
