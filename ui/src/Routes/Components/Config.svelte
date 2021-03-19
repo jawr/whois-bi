@@ -70,11 +70,11 @@
 		<table class="collapse bn br2 pv2 ph3 mt4 mb4 mw8 w-100 center">
 			<thead>
 				<tr class="fw3 ttu f7">
-					<th role="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Created</th>
-					<th role="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Finished</th>
-					<th role="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Additions</th>
-					<th role="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Removals</th>
-					<th role="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Whois</th>
+					<th scope="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Created</th>
+					<th scope="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Finished</th>
+					<th scope="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Additions</th>
+					<th scope="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Removals</th>
+					<th scope="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Whois</th>
 				</tr>
 			</thead>
 			<tbody class="tl lh-copy">
@@ -146,15 +146,6 @@
 			border-bottom: 1px solid #ddd;
 			display: block;
 			text-align: right;
-		}
-
-		table td.newline::before {
-			content: attr(data-label) '\00000a';
-			text-align: left;
-			display: block;
-			float: none;
-			margin-bottom: 1rem;
-			font-weight: 200;
 		}
 
 		table td::before {
