@@ -62,7 +62,6 @@
 
 <div class="pt2">
 	<h2 class="f4 tl fw3">Jobs</h2>
-	<p class="tl f5 lh-copy">A Job looks for records using names you have supplied or using a common list (i.e. www.{name}). Jobs are created daily, but you can request a job be run now.</p>
 </div>
 
 {#if jobs.length > 0}
@@ -97,6 +96,7 @@
 		</table>
 	</div>
 {/if}
+	<p class="tl f5 lh-copy">A Job looks for records using names you have supplied or using a common list (i.e. www.{name}). Jobs are created daily, but you can request a job be run now.</p>
 
 <div class="cf">
 	{#if !running}

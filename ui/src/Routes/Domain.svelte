@@ -3,7 +3,7 @@
 	import { fade } from 'svelte/transition'
 	import { parseISO, format } from 'date-fns'
 	import { fetchJSON } from '../fetchJSON'
-	import { Link } from 'svelte-routing'
+	import { link } from 'svelte-routing'
 	import Records from './Components/Records.svelte'
 	import Whois from './Components/Whois.svelte'
 	import Config from './Components/Config.svelte'
@@ -22,8 +22,8 @@
 		}
 	})
 
-	const tabClasses = "link w-50 tc bg-animate pointer green hover-bg-washed-green pb3 pt3 "
-
+	const tabClasses = 'dark-gray link w-50 tc pointer pb3 pt3 active '
+	const activeClasses = 'bw1 bb b--washed-green'
 </script>
 
 <div in:fade class="mw8 center h-100">
@@ -36,19 +36,22 @@
 			<small>Last updated {format(parseISO(domain.last_updated_at, new Date()), 'yyyy/MM/dd HH:mm')}</small>
 		{/if}
 
-		<div class="mt5 flex bb b--dark-green">
-			<Link 
-				to={`domain/${name}/records`} 
-				class={`${tabClasses}` + (tab === 'records' ? 'bg-washed-green' : '')}
-			>Records</Link>
-			<Link 
-				to={`domain/${name}/whois`} 
-				class={`${tabClasses}` + (tab === 'whois' ? 'bg-washed-green' : '')}
-			>Whois</Link>
-			<Link 
-				to={`domain/${name}/config`} 
-				class={`${tabClasses}` + (tab === 'config' ? 'bg-washed-green' : '')}
-			>Config</Link>
+		<div class="mt5 flex bb b--light-gray">
+			<a 
+				use:link
+				href={`/domain/${name}/records`} 
+				class={`${tabClasses}` + (tab === 'records' ? activeClasses : '')}
+			>Records</a>
+			<a
+				use:link
+				href={`/domain/${name}/whois`} 
+				class={`${tabClasses}` + (tab === 'whois' ? activeClasses : '')}
+			>Whois</a>
+			<a
+				use:link
+				href={`/domain/${name}/config`} 
+				class={`${tabClasses}` + (tab === 'config' ? activeClasses : '')}
+			>Config</a>
 		</div>
 
 		{#if tab === 'records'}
@@ -61,7 +64,7 @@
 			</div>
 		{:else if tab === 'config'}
 			<div in:fade>
-			<Config {name} />
+				<Config {name} />
 			</div>
 		{/if}
 	{/if}
