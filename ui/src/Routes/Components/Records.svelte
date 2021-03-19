@@ -97,7 +97,7 @@
 				<tr>
 					<td data-label="Record" class="pv3 pr3 bb b--black-20">{parseRecordName(record.name)}</td>
 					<td data-label="Type"   class="pv3 pr3 bb b--black-20"><RTypeLabel type={record.rr_type} /></td>
-					<td data-label="Fields" class="truncate pv3 pr3 bb b--black-20 newline fields">{record.fields}</td>
+					<td data-label="Fields" class="truncate-xl pv3 pr3 bb b--black-20 newline fields">{record.fields}</td>
 					<td data-label="TTL"    class="pv3 pr3 bb b--black-20">{record.ttl}</td>
 					<td data-label="Added"  class="pv3 pr3 bb b--black-20">{formatDateTime(record.added_at)}</td>
 					{#if !current}
@@ -148,6 +148,10 @@
 			float: none;
 			margin-bottom: 1rem;
 			font-weight: 200;
+		}
+
+		table td.newline {
+			word-break: break-all;
 		}
 
 		table td::before {

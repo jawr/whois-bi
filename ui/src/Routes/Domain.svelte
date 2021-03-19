@@ -1,6 +1,7 @@
 <script>
 	import { onMount } from 'svelte'
 	import { fade } from 'svelte/transition'
+	import { parseISO, format } from 'date-fns'
 	import { fetchJSON } from '../fetchJSON'
 	import { Link } from 'svelte-routing'
 	import Records from './Components/Records.svelte'
@@ -32,7 +33,7 @@
 		<h1 class="f3 f2-m f1-l fw2 mv3">{name}</h1>
 
 		{#if domain.last_updated_at}
-			<small>Last updated {domain.last_updated_at}</small>
+			<small>Last updated {format(parseISO(domain.last_updated_at, new Date()), 'yyyy/MM/dd HH:mm')}</small>
 		{/if}
 
 		<div class="mt5 flex bb b--dark-green">

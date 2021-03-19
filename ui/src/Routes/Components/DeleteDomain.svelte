@@ -24,14 +24,14 @@
 
 <div class="cf">
 	<input
-		class="f5 fr pv1 h2 tc dib bb bt-0 bl-0 br-0 bw2 b--dark-red bg-animate bg-red hover-bg-red white pointer br2 grow w-10"
+		class="f5 fr pv1 h2 tc dib bb bt-0 bl-0 br-0 bw2 b--dark-red bg-animate bg-red hover-bg-red white pointer br2 grow w-10-l w-100"
 		type="submit"
 		value="Delete"
 		on:click|preventDefault={deleteDomain}
 	/>
 	{#if started}
 		<input
-			class="mr4 f5 h2 button-reset fr pv1 dib bl bt bb bw1 b--light-red tc br--left br2 w-30"
+			class="mr4 f5 h2 button-reset fr-l mt2 mt0-l pv1 dib bl bt bb bw1 b--light-red tc br--left br2 w-30-l w-100"
 			type="text"
 			placeholder={`type ${name} to confirm`}
 			bind:value={confirm}
