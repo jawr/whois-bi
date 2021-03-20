@@ -16,6 +16,7 @@ spec:
       containers:
         - name: toolbox
           image: ghcr.io/jawr/whois-bi/toolbox:latest
+          imagePullPolicy: "Always"
           command: ["sh", "-c", "tail -f /dev/null"]
           envFrom:
             - configMapRef:

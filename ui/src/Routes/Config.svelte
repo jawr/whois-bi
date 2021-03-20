@@ -1,19 +1,17 @@
 <script>
 	import { onMount, onDestroy } from 'svelte'
 	import { fetchJSON, postJSON } from '../fetchJSON'
+	import { whitelists, blacklists } from '../stores'
 	import { parseISO, format } from 'date-fns'
 	import CreateList from './Components/CreateList.svelte'
-
-	let whitelists = []
-	let blacklists = []
 
 	let error = ''
 
 	onMount(async () => {
 		try {
 			const response = await fetchJSON(`/api/user/lists`)
-			whitelists = response.whitelists
-			blacklists = response.blacklists
+			$whitelists = response.whitelists
+			$blacklists = response.blacklists
 		} catch (err) {
 			error = err.message
 		}
@@ -32,7 +30,7 @@
 		<p class="tl lh-copy">By default all records trigger an email, create lists to control which records can trigger emails.</p>
 	</div>
 
-{#if whitelists.length > 0}
+{#if $whitelists.length > 0}
 	<h2 class="tl">Whitelists</h2>
 	<div class="mt4">
 		<table class="collapse bn br2 pv2 ph3 mt4 mb4 mw8 w-100 center">
@@ -45,7 +43,7 @@
 				</tr>
 			</thead>
 			<tbody class="tl lh-copy">
-				{#each whitelists as i}
+				{#each $whitelists as i}
 					<tr>
 						<td data-label="Additions" class="pv3 pr3 bb b--black-20">{i.domain}</td>
 						<td data-label="Removals"  class="pv3 pr3 bb b--black-20">{i.rr_type}</td>
@@ -58,7 +56,7 @@
 	</div>
 {/if}
 
-{#if blacklists.length > 0}
+{#if $blacklists.length > 0}
 	<h2 class="tl">Blacklists</h2>
 	<div class="mt4">
 		<table class="collapse bn br2 pv2 ph3 mt4 mb4 mw8 w-100 center">
@@ -71,7 +69,7 @@
 				</tr>
 			</thead>
 			<tbody class="tl lh-copy">
-				{#each blacklists as i}
+				{#each $blacklists as i}
 					<tr>
 						<td data-label="Additions" class="pv3 pr3 bb b--black-20">{i.domain}</td>
 						<td data-label="Removals"  class="pv3 pr3 bb b--black-20">{i.rr_type}</td>

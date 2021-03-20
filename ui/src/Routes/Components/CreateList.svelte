@@ -1,5 +1,6 @@
 <script>
 	import { postJSON } from '../../fetchJSON'
+	import { whitelists, blacklists } from '../../stores'
 
 	let list_type = 'whitelist'
 	let domain = ''
@@ -21,7 +22,11 @@
 
 		try {
 			const response = await postJSON(`/api/user/lists`, data)
-			// push to store
+			if (response.list_type === 'blacklist') {
+				blacklists.update(arr => [...arr, response])
+			} else {
+				whitelists.update(arr => [...arr, response])
+			}
 		} catch (err) {
 			error = err.message
 		}
