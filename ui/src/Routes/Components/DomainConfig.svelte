@@ -20,7 +20,6 @@
 			running = jobs.filter(j => j.finished_at === '0001-01-01T00:00:00Z').length > 0
 		} catch (err) {
 			error = err.message
-			error = error
 		}
 
 		if (running) {

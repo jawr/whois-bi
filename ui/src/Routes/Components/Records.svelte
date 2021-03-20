@@ -67,8 +67,7 @@
 	<Search store={recordsQuery} text="Filter records" />
 
 	<div class="flex items-center mb2 fr">
-		<input class="mr2" type="checkbox" name="current" bind:checked={current}>
-		<label for="current" class="lh-copy">Current</label>
+		<label class="ma0 pa0 lh-copy pointer"><input type="checkbox" bind:checked={current}> Current</label>
 	</div>
 </div>
 

@@ -4,6 +4,7 @@ WORKDIR /build
 
 COPY go.mod go.sum ./
 RUN go mod download
+RUN apk add --no-cache git
 
 COPY . .
 
@@ -19,7 +20,7 @@ COPY --from=builder /build/toolbox /bin/toolbox
 
 # Add Tini
 ENV TINI_VERSION v0.19.0
-ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-static /tini
 RUN chmod +x /tini
 
 ENTRYPOINT ["/tini", "--"]

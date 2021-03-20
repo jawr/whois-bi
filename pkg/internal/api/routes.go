@@ -30,6 +30,10 @@ func (s Server) setupRoutes() {
 	user.GET("/domain/:domain/records", s.handleDomain(s.handleGetDomainRecords()))
 	user.GET("/domain/:domain/whois", s.handleDomain(s.handleGetDomainWhois()))
 
+	// lists
+	user.GET("/lists", s.handleUser(s.handleGetMatches()))
+	user.POST("/lists", s.handleUser(s.handlePostList()))
+
 	// domain create
 	user.POST("/domain", s.handleUser(s.handlePostDomain()))
 	user.POST("/domain/:domain/record", s.handleDomain(s.handlePostRecord()))

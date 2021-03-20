@@ -230,6 +230,11 @@ func (m *Manager) jobResponseHandler() message.NoPublishHandlerFunc {
 			}
 		}
 
+		// parse the record additions and removals through our lists to avoid sending alarm bells
+		if err := m.handleLists(&response); err != nil {
+			log.Printf("Error parsing lists: %s", err)
+		}
+
 		// handle alert message
 		if len(response.RecordAdditions) > 0 || len(response.RecordRemovals) > 0 {
 			alertSubject := fmt.Sprintf("ALARM BELLS - Changes to domain '%s'", response.Job.Domain.Domain)
@@ -284,7 +289,7 @@ func (m *Manager) jobResponseHandler() message.NoPublishHandlerFunc {
 		_, err := m.db.Model(&response.Job).
 			Set(
 				"errors = ?, started_at = ?, finished_at = ?, additions = ?, removals = ?, whois_updated = ?",
-				response.Job.Errors,
+				response.Errors,
 				response.Job.StartedAt,
 				response.Job.FinishedAt,
 				len(response.RecordAdditions),

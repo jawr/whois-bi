@@ -10,6 +10,7 @@
 	import Dashboard from './Routes/Dashboard.svelte'
 	import Domain from './Routes/Domain.svelte'
 	import Hero from './Routes/Hero.svelte'
+	import Config from './Routes/Config.svelte'
 	import Register from './Routes/Register.svelte'
 	import Registered from './Routes/Registered.svelte'
 	import Verify from './Routes/Verify.svelte'
@@ -40,6 +41,7 @@
 				<Route path="domain/:name/*tab" let:params>
 					<Domain name={params.name} tab={params.tab || 'records'} />
 				</Route>
+				<Route path="config" component={Config} />
 				<Route path="verify/:code" component={Verify} />
 				<Route path="register" component={Register} />
 				<Route path="registered" component={Registered} />

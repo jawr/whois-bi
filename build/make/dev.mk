@@ -29,3 +29,5 @@ nuke: ## Stop docker containers, clean data, workspace and volumes
 	docker rm -f $(docker ps -a -q)
 	docker volume rm $(docker volume ls -q)
 
+newtoolbox: ## create a new toolbox
+	docker-compose -f build/dev.docker-compose.yml up -d --no-deps --build  toolbox

@@ -125,7 +125,6 @@ func (w *Worker) jobHandler() message.NoPublishHandlerFunc {
 			if len(response.Errors) > 0 {
 				finalErr = errors.Errorf("%d errors encountered", len(response.Errors))
 			}
-
 		}()
 
 		log.Printf("JOB / %d / %s", job.ID, job.Domain.Domain)

@@ -6,7 +6,7 @@
 	import { link } from 'svelte-routing'
 	import Records from './Components/Records.svelte'
 	import Whois from './Components/Whois.svelte'
-	import Config from './Components/Config.svelte'
+	import DomainConfig from './Components/DomainConfig.svelte'
 
 	export let name = ''
 	export let tab = 'records'
@@ -64,7 +64,7 @@
 			</div>
 		{:else if tab === 'config'}
 			<div in:fade>
-				<Config {name} />
+				<DomainConfig {name} />
 			</div>
 		{/if}
 	{/if}

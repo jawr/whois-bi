@@ -23,6 +23,7 @@
 			<div class="db dtc-l v-mid w-100 w-75-l tc tr-l">
 				{#if $loggedIn }
 					<Link class="link dim dark-gray f6 f5-l dib mr3 mr4-l" to="/" title="Dashboard">Dashboard</Link>
+					<Link class="link dim dark-gray f6 f5-l dib mr3 mr4-l" to="/config" title="Config">Config</Link>
 					<span on:click|preventDefault={logout} class="link pointer dim dark-gray f6 f5-l dib mr3 mr4-l" href="#" title="Logout">Logout</span>
 				{:else }
 					<Link class="link dim dark-gray f6 f5-l dib mr3 mr4-l" to="register" title="Register">Register</Link>

@@ -40,10 +40,10 @@
 		<table class="collapse bn br2 pv2 ph3 mt4 mb4 mw8 w-100 center">
 			<thead>
 				<tr class="fw3 ttu f7">
-					<th role="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Name</th>
-					<th role="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white w-10">#Records</th>
-					<th role="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white w-10">#Whois</th>
-					<th role="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white w-20">Added</th>
+					<th scope="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Name</th>
+					<th scope="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white w-10">#Records</th>
+					<th scope="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white w-10">#Whois</th>
+					<th scope="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white w-20">Added</th>
 				</tr>
 			</thead>
 			<tbody class="tl lh-copy">
@@ -96,15 +96,6 @@
 			border-bottom: 1px solid #ddd;
 			display: block;
 			text-align: right;
-		}
-
-		table td.newline::before {
-			content: attr(data-label) '\00000a';
-			text-align: left;
-			display: block;
-			float: none;
-			margin-bottom: 1rem;
-			font-weight: 200;
 		}
 
 		table td::before {

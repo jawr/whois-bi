@@ -9,6 +9,7 @@ import (
 	"github.com/jawr/whois-bi/pkg/internal/cmdutil"
 	"github.com/jawr/whois-bi/pkg/internal/domain"
 	"github.com/jawr/whois-bi/pkg/internal/job"
+	"github.com/jawr/whois-bi/pkg/internal/list"
 	"github.com/jawr/whois-bi/pkg/internal/user"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -43,6 +44,7 @@ func setupSchema(db *pg.DB) {
 		(*domain.Record)(nil),
 		(*domain.Whois)(nil),
 		(*job.Job)(nil),
+		(*list.List)(nil),
 	}
 
 	for _, model := range models {
