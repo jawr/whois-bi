@@ -33,6 +33,7 @@ func (s Server) setupRoutes() {
 	// lists
 	user.GET("/lists", s.handleUser(s.handleGetMatches()))
 	user.POST("/lists", s.handleUser(s.handlePostList()))
+	user.DELETE("/lists/:id", s.handleUser(s.handleDeleteList()))
 
 	// domain create
 	user.POST("/domain", s.handleUser(s.handlePostDomain()))

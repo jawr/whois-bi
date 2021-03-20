@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -70,6 +71,25 @@ func (s Server) handlePostList() HandlerFunc {
 			http.StatusCreated,
 			&l,
 		)
+
+		return nil
+	}
+}
+
+func (s Server) handleDeleteList() HandlerFunc {
+	return func(u user.User, c *gin.Context) error {
+		id, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			return newApiError(http.StatusBadRequest, "Bad Request", err)
+		}
+
+		var deletedIDs []int
+		_, err = s.db.Model((*list.List)(nil)).Where("id = ? AND owner_id = ?", id, u.ID).Delete(&deletedIDs)
+		if err != nil {
+			return newApiError(http.StatusBadRequest, "Bad Request", err)
+		}
+
+		c.JSON(http.StatusOK, nil)
 
 		return nil
 	}

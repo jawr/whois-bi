@@ -36,7 +36,7 @@ type List struct {
 	once        sync.Once
 
 	AddedAt   time.Time `sql:",type:timestamptz,notnull,default:now()" json:"added_at"`
-	DeletedAt time.Time `pg:",soft_delete" json:"deleted_at"`
+	DeletedAt time.Time `json:"deleted_at"`
 }
 
 func anchor(s string) string {

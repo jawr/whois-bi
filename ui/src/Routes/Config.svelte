@@ -1,5 +1,6 @@
 <script>
 	import { onMount, onDestroy } from 'svelte'
+	import { Trash2Icon } from 'svelte-feather-icons'
 	import { fetchJSON, postJSON } from '../fetchJSON'
 	import { whitelists, blacklists } from '../stores'
 	import { parseISO, format } from 'date-fns'
@@ -23,6 +24,18 @@
 		}
 		return format(parseISO(t, new Date()), 'yyyy/MM/dd')
 	}
+
+	const deleteList = async (id) => {
+		try {
+			await fetchJSON(`/api/user/lists/${id}`, {
+				method: 'DELETE',
+			})
+			whitelists.update(arr => arr.filter(i => i.id !== id))
+			blacklists.update(arr => arr.filter(i => i.id !== id))
+		} catch (err) {
+			error = err.message
+		}
+	}
 </script>
 
 <div class="mw8 center">
@@ -37,9 +50,10 @@
 			<thead>
 				<tr class="fw3 ttu f7">
 					<th scope="col" class="w-30 fw6 bb b--black-20 tl pb3 pr3 bg-white">Domain</th>
-					<th scope="col" class="w-30 fw6 bb b--black-20 tl pb3 pr3 bg-white">RRType</th>
+					<th scope="col" class="w-20 fw6 bb b--black-20 tl pb3 pr3 bg-white">RRType</th>
 					<th scope="col" class="w-30 fw6 bb b--black-20 tl pb3 pr3 bg-white">Record</th>
 					<th scope="col" class="w-10 fw6 bb b--black-20 tl pb3 pr3 bg-white">Added</th>
+					<th scope="col" class="w-10 fw6 bb b--black-20 tl pb3 pr3 bg-white"></th>
 				</tr>
 			</thead>
 			<tbody class="tl lh-copy">
@@ -49,6 +63,9 @@
 						<td data-label="Removals"  class="pv3 pr3 bb b--black-20">{i.rr_type}</td>
 						<td data-label="Removals"  class="pv3 pr3 bb b--black-20">{i.record}</td>
 						<td data-label="Created"   class="pv3 pr3 bb b--black-20">{formatDateTime(i.added_at)}</td>
+						<td data-label=""          class="pv3 pr3 bb b--black-20 tc">
+							<span on:click|preventDefault={() => deleteList(i.id)} class="bg-red washed-red pointer pa1 white br1"><Trash2Icon size="1x" /></span>
+						</td>
 					</tr>
 				{/each}
 			</tbody>
@@ -63,9 +80,10 @@
 			<thead>
 				<tr class="fw3 ttu f7">
 					<th scope="col" class="w-30 fw6 bb b--black-20 tl pb3 pr3 bg-white">Domain</th>
-					<th scope="col" class="w-30 fw6 bb b--black-20 tl pb3 pr3 bg-white">RRType</th>
+					<th scope="col" class="w-20 fw6 bb b--black-20 tl pb3 pr3 bg-white">RRType</th>
 					<th scope="col" class="w-30 fw6 bb b--black-20 tl pb3 pr3 bg-white">Record</th>
 					<th scope="col" class="w-10 fw6 bb b--black-20 tl pb3 pr3 bg-white">Added</th>
+					<th scope="col" class="w-10 fw6 bb b--black-20 tl pb3 pr3 bg-white"></th>
 				</tr>
 			</thead>
 			<tbody class="tl lh-copy">
@@ -75,6 +93,9 @@
 						<td data-label="Removals"  class="pv3 pr3 bb b--black-20">{i.rr_type}</td>
 						<td data-label="Removals"  class="pv3 pr3 bb b--black-20">{i.record}</td>
 						<td data-label="Created"   class="pv3 pr3 bb b--black-20">{formatDateTime(i.added_at)}</td>
+						<td data-label=""          class="pv3 pr3 bb b--black-20 tc">
+							<span on:click|preventDefault={() => deleteList(i.id)} class="bg-red washed-red pointer pa1 white br1"><Trash2Icon size="1x" /></span>
+						</td>
 					</tr>
 				{/each}
 			</tbody>
