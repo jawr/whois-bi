@@ -8,7 +8,7 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
-	"github.com/go-pg/pg"
+	"github.com/go-pg/pg/v10"
 	"github.com/jawr/whois-bi/pkg/internal/sender"
 )
 

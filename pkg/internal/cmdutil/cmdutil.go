@@ -3,7 +3,7 @@ package cmdutil
 import (
 	"os"
 
-	"github.com/go-pg/pg"
+	"github.com/go-pg/pg/v10"
 	"github.com/joho/godotenv"
 )
 

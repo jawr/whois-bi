@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/dchest/uniuri"
-	"github.com/go-pg/pg"
+	"github.com/go-pg/pg/v10"
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
 )
