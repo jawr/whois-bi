@@ -76,7 +76,7 @@ func (d Domain) QueryEnumerate(client *dns.Client, targets []string) (Records, e
 						typ,
 					)
 
-					log.Printf("\t%s", msg.Question[0].String())
+					// log.Printf("\t%s", msg.Question[0].String())
 
 					reply, err := query(client, &msg, nameservers)
 					if err != nil {

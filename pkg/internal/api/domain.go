@@ -191,3 +191,24 @@ func (s Server) handleDeleteDomain() DomainHandlerFunc {
 		return nil
 	}
 }
+
+func (s Server) handlePutDomainBatch() DomainHandlerFunc {
+	type Request struct {
+		DontBatch bool `json:"dont_batch"`
+	}
+	return func(d domain.Domain, u user.User, c *gin.Context) error {
+		var request Request
+
+		if err := c.ShouldBind(&request); err != nil {
+			return newApiError(http.StatusBadRequest, "Bad Request", errors.Wrap(err, "ShouldBind"))
+		}
+
+		if _, err := s.db.Model(&d).Set("dont_batch = ?", request.DontBatch).WherePK().Update(); err != nil {
+			return newApiError(http.StatusBadRequest, "Internal Server Error", errors.Wrap(err, "Update"))
+		}
+
+		c.JSON(http.StatusOK, &d)
+
+		return nil
+	}
+}

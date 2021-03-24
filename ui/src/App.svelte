@@ -41,7 +41,9 @@
 				<Route path="domain/:name/*tab" let:params>
 					<Domain name={params.name} tab={params.tab || 'records'} />
 				</Route>
-				<Route path="config" component={Config} />
+				<Route path="config/*tab" let:params>
+					<Config tab={params.tab || 'lists'} />
+				</Route>
 				<Route path="verify/:code" component={Verify} />
 				<Route path="register" component={Register} />
 				<Route path="registered" component={Registered} />

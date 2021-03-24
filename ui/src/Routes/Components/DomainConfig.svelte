@@ -1,6 +1,6 @@
 <script>
 	import { onMount, onDestroy } from 'svelte'
-	import { fetchJSON, postJSON } from '../../fetchJSON'
+	import { fetchJSON, postJSON, putJSON } from '../../fetchJSON'
 	import { parseISO, format } from 'date-fns'
 	import { CheckIcon } from 'svelte-feather-icons'
 
@@ -13,6 +13,9 @@
 	let error = ''
 	let jobs = []
 	let cancel = null
+	let dontBatch = false
+	let loaded = false
+	let loading = false
 
 	const updateJobs = async () => {
 		try {
@@ -32,13 +35,32 @@
 		}
 	}
 
-	const handleClick = async () => {
+	const requestJob = async () => {
 		await postJSON(`/api/user/jobs/${name}`)
 		await updateJobs()
 	}
 
+	const setDontBatch = async () => {
+		loading = true
+		dontBatch = !dontBatch
+		await putJSON(`/api/user/domain/${name}/batch`, {dont_batch: dontBatch})
+		loading = false
+	}
+
+	const getDomain = async () => {
+		loaded = false
+		try {
+			const domain = await fetchJSON(`/api/user/domain/${name}`)
+			dontBatch = domain.dont_batch
+		} catch (err) {
+			error = err.message
+		}
+		loaded = true
+	}
+
 	onMount(async () => {
 		await updateJobs()
+		await getDomain()
 	})
 
 	onDestroy(() => {
@@ -59,8 +81,20 @@
 	<DeleteDomain {name} />
 </div>
 
-<div class="pt2">
+{#if loaded}
+	<div class="mw8 mt4">
+		<div class="flex items-center mb2 fr">
+	<label class="ma0 pa0 lh-copy pointer">
+		Batched
+		<input disabled={loading} on:click={setDontBatch} type="checkbox" checked={!dontBatch} />
+	</label>
+</div>
+</div>
+{/if}
+
+<div class="pt2 cf">
 	<h2 class="f4 tl fw3">Jobs</h2>
+	<p class="tl f5 lh-copy">Monitor for DNS Record changes on your domain.</p>
 </div>
 
 {#if jobs.length > 0}
@@ -95,13 +129,12 @@
 		</table>
 	</div>
 {/if}
-	<p class="tl f5 lh-copy">A Job looks for records using names you have supplied or using a common list (i.e. www.{name}). Jobs are created daily, but you can request a job be run now.</p>
 
 <div class="cf">
 	{#if !running}
 		<button 
 			class="f5 fr pv1 h2 tc dib bb bt-0 bl-0 br-0 bw2 b--dark-green bg-animate bg-green hover-bg-green white pointer br2 grow"
-			on:click|preventDefault={handleClick}>Request Update</button>
+			on:click|preventDefault={requestJob}>Request Update</button>
 	{/if}
 </div>
 
