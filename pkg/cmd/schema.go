@@ -49,7 +49,7 @@ func setupSchema(db *pg.DB) {
 	}
 
 	for _, model := range models {
-		err := db.CreateTable(model, &orm.CreateTableOptions{
+		err := db.Model(model).CreateTable(&orm.CreateTableOptions{
 			Temp:          false,
 			FKConstraints: true,
 		})
