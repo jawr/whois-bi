@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/go-pg/pg/types"
+	"github.com/go-pg/pg/v10/types"
 	"github.com/miekg/dns"
 )
 
@@ -21,7 +21,7 @@ func (t JsonRRType) String() string {
 
 var _ types.ValueAppender = (*JsonRRType)(nil)
 
-func (t JsonRRType) AppendValue(b []byte, flags int) []byte {
+func (t JsonRRType) AppendValue(b []byte, flags int) ([]byte, error) {
 	if flags == 1 {
 		b = append(b, '\'')
 	}
@@ -29,7 +29,7 @@ func (t JsonRRType) AppendValue(b []byte, flags int) []byte {
 	if flags == 1 {
 		b = append(b, '\'')
 	}
-	return b
+	return b, nil
 }
 
 var _ types.ValueScanner = (*JsonRRType)(nil)

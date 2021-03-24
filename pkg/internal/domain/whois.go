@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/go-pg/pg"
+	"github.com/go-pg/pg/v10"
 	"github.com/likexian/whois-go"
 	whoisparser "github.com/likexian/whois-parser"
 	"github.com/pkg/errors"
@@ -16,7 +16,7 @@ type Whois struct {
 
 	// parent data
 	DomainID int    `sql:",notnull" json:"domain_id"`
-	Domain   Domain `pg:"fk:domain_id" json:"-"`
+	Domain   Domain `pg:"fk:domain_id,rel:has-one" json:"-"`
 
 	Raw []byte `sql:",notnull" json:"raw"`
 

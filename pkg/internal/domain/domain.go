@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/bobesa/go-domain-util/domainutil"
-	"github.com/go-pg/pg"
+	"github.com/go-pg/pg/v10"
 	"github.com/jawr/whois-bi/pkg/internal/user"
 	"github.com/pkg/errors"
 )
@@ -16,7 +16,7 @@ type Domain struct {
 	Domain string `sql:",notnull,unique:domain_owner_id" json:"domain"`
 
 	OwnerID int       `sql:",notnull,unique:domain_owner_id" json:"owner_id"`
-	Owner   user.User `sql:"fk:owner_id" json:"-"`
+	Owner   user.User `sql:"fk:owner_id" json:"-" pg:"rel:has-one"`
 
 	// settings
 	DontBatch bool `sql:",notnull" json:"dont_batch"`

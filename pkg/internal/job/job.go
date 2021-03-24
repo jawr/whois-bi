@@ -3,7 +3,7 @@ package job
 import (
 	"time"
 
-	"github.com/go-pg/pg"
+	"github.com/go-pg/pg/v10"
 	"github.com/jawr/whois-bi/pkg/internal/domain"
 	"github.com/pkg/errors"
 )

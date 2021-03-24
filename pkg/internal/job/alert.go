@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/jawr/whois-bi/pkg/internal/domain"
 	"github.com/jawr/whois-bi/pkg/internal/user"
 	"github.com/pkg/errors"
 )
@@ -23,7 +24,7 @@ type Alert struct {
 	ID int `sql:",pk"`
 
 	OwnerID int       `sql:",notnull"`
-	Owner   user.User `sql:"fk:owner_id"`
+	Owner   user.User `sql:"fk:owner_id" pg:"rel:has-one"`
 
 	Response JobResponse
 
@@ -82,6 +83,51 @@ func (m *Manager) sendAlerts(ctx context.Context) error {
 				}
 			}
 
+			// find domains about to expire
+			var whois []domain.Whois
+
+			err := m.db.Model(&whois).
+				DistinctOn("whois.domain_id").
+				Relation("Domain").
+				Where(
+					"date_trunc('day', whois.expiration_date) = date_trunc('day', ?::timestamp)",
+					time.Now().AddDate(0, 0, 7),
+				).Select()
+			if err != nil {
+				return err
+			}
+
+			if err := m.handleExpirationAlerts(whois); err != nil {
+				log.Printf("Error handling expiration alerts: %s", err)
+			}
+
+			if len(whois) > 0 {
+				log.Printf("Whois alert for %d domains", len(whois))
+			}
+		}
+	}
+
+	return nil
+}
+
+func (m *Manager) handleExpirationAlerts(whois []domain.Whois) error {
+	for _, w := range whois {
+		subject := fmt.Sprintf("ALARM BELLS - %s expires in 7 days")
+
+		body := fmt.Sprintf(
+			"Your domain will expire in 7 days for more information visit: https://%s/domain/%s\n\n",
+			os.Getenv("DOMAIN"),
+			w.Domain.Domain,
+		)
+
+		var owner user.User
+
+		if err := m.db.Model(&owner).Where("id = ?", w.Domain.OwnerID).Select(); err != nil {
+			return errors.WithMessage(err, "Select Owner")
+		}
+
+		if err := m.emailer.Send(owner.Email, subject, body); err != nil {
+			return err
 		}
 	}
 
@@ -89,19 +135,19 @@ func (m *Manager) sendAlerts(ctx context.Context) error {
 }
 
 func (m *Manager) handleAlerts(alerts []Alert) error {
-	alertSubject := fmt.Sprintf("ALARM BELLS - Changes to %d domains", len(alerts))
+	subject := fmt.Sprintf("ALARM BELLS - Changes to %d domains", len(alerts))
 
-	var alertBody strings.Builder
+	var body strings.Builder
 
 	var ownerID int
 
 	for _, alert := range alerts {
 		response := alert.Response
 
-		fmt.Fprintf(&alertBody, "<pre>")
+		fmt.Fprintf(&body, "<pre>")
 
 		fmt.Fprintf(
-			&alertBody,
+			&body,
 			"New changes have been detected, please go to: https://%s/#/dashboard/%s for more details or find a summary of the changes below.\n\n",
 			os.Getenv("DOMAIN"),
 			response.Job.Domain.Domain,
@@ -109,28 +155,28 @@ func (m *Manager) handleAlerts(alerts []Alert) error {
 
 		if response.WhoisUpdated {
 			fmt.Fprintf(
-				&alertBody,
+				&body,
 				"Whois has been updated!\n\n",
 			)
 		}
 
 		for idx, record := range response.RecordAdditions {
 			if idx == 0 {
-				fmt.Fprintf(&alertBody, "-------------------------------- / additions start\n")
+				fmt.Fprintf(&body, "-------------------------------- / additions start\n")
 			}
-			fmt.Fprintf(&alertBody, "\t+++\t%s\n", record.Raw)
+			fmt.Fprintf(&body, "\t+++\t%s\n", record.Raw)
 		}
 
 		for idx, record := range response.RecordRemovals {
 			if idx == 0 {
-				fmt.Fprintf(&alertBody, "-------------------------------- / removals start\n")
+				fmt.Fprintf(&body, "-------------------------------- / removals start\n")
 			}
-			fmt.Fprintf(&alertBody, "\t---\t%s\n", record.Raw)
+			fmt.Fprintf(&body, "\t---\t%s\n", record.Raw)
 		}
 
-		fmt.Fprintf(&alertBody, "-------------------------------- / end\n")
+		fmt.Fprintf(&body, "-------------------------------- / end\n")
 
-		fmt.Fprintf(&alertBody, "</pre>")
+		fmt.Fprintf(&body, "</pre>")
 
 		if ownerID == 0 {
 			ownerID = response.OwnerID
@@ -147,7 +193,7 @@ func (m *Manager) handleAlerts(alerts []Alert) error {
 		return errors.WithMessage(err, "Select Owner")
 	}
 
-	if err := m.emailer.Send(owner.Email, alertSubject, alertBody.String()); err != nil {
+	if err := m.emailer.Send(owner.Email, subject, body.String()); err != nil {
 		return err
 	}
 
