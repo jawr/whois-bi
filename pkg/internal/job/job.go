@@ -29,6 +29,8 @@ type Job struct {
 }
 
 type JobResponse struct {
+	OwnerID int
+
 	Job Job
 
 	Errors []string
@@ -36,6 +38,8 @@ type JobResponse struct {
 	RecordAdditions domain.Records
 	RecordRemovals  domain.Records
 	Whois           domain.Whois
+
+	WhoisUpdated bool
 }
 
 func NewJob(d domain.Domain) Job {

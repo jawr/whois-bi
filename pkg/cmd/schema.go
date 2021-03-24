@@ -45,6 +45,7 @@ func setupSchema(db *pg.DB) {
 		(*domain.Whois)(nil),
 		(*job.Job)(nil),
 		(*list.List)(nil),
+		(*job.Alert)(nil),
 	}
 
 	for _, model := range models {

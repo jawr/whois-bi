@@ -22,3 +22,12 @@ export const postJSON = async (url, data) => {
     body: JSON.stringify(data)
   })
 }
+
+export const putJSON = async (url, data) => {
+  return await fetchJSON(url, {
+    method: 'PUT',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(data)
+  })
+}
+

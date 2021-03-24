@@ -39,7 +39,7 @@
 	<div class="cf mb2">
 		<div class="fl w-100 w-third-ns pv2 pr2-ns">
 			<label class="db fw6 lh-copy f6 tl" for="list type">List Type</label>
-			<select class="h2 pv2 input-reset ba w-100" name="list type" bind:value={list_type}>
+			<select class="h2 pv2 ph1 input-reset ba w-100" name="list type" bind:value={list_type}>
 				<option value="whitelist">Whitelist</option>
 				<option value="blacklist">Blacklist</option>
 			</select>
@@ -49,17 +49,17 @@
 	<div class="cf mb4">
 		<div class="fl w-100 w-third-ns pv2 pr2-ns">
 			<label class="db fw6 lh-copy f6 tl" for="domain">Domain</label>
-			<input placeholder="example.com" class="h2 pv2 input-reset ba w-100" name="domain" type="text" bind:value={domain} />
+			<input placeholder="example.com" class="h2 pv2 ph1 input-reset ba w-100" name="domain" type="text" bind:value={domain} />
 		</div>
 
 		<div class="fl w-100 w-third-ns pv2 pr2-ns">
 			<label class="db fw6 lh-copy f6 tl" for="record">Record</label>
-			<input placeholder="www\..*" class="h2 pv2 input-reset ba w-100" name="record" type="text" bind:value={record} />
+			<input placeholder="www\..*" class="h2 pv2 ph1 input-reset ba w-100" name="record" type="text" bind:value={record} />
 		</div>
 
 		<div class="fl w-100 w-third-ns pv2">
 			<label class="db fw6 lh-copy f6 tl" for="rr_type">RRType</label>
-			<input placeholder="(SOA|NS)" class="h2 pv2 input-reset ba w-100" name="rr_type" type="text" bind:value={rr_type} />
+			<input placeholder="(SOA|NS)" class="h2 pv2 ph1 input-reset ba w-100" name="rr_type" type="text" bind:value={rr_type} />
 		</div>
 	</div>
 
@@ -84,10 +84,3 @@
 		<p class="red">{error}</p>
 	</div>
 {/if}
-
-	<style>
-	.anchor {
-		position: absolute;
-		bottom: 0;
-	}
-	</style>

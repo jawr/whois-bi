@@ -3,10 +3,8 @@ package job
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/ThreeDotsLabs/watermill"
@@ -17,7 +15,6 @@ import (
 	"github.com/go-pg/pg"
 	"github.com/jawr/whois-bi/pkg/internal/domain"
 	"github.com/jawr/whois-bi/pkg/internal/sender"
-	"github.com/jawr/whois-bi/pkg/internal/user"
 	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
 )
@@ -93,20 +90,21 @@ func NewManager(db *pg.DB, emailer *sender.Sender) (*Manager, error) {
 }
 
 func (m *Manager) Run(ctx context.Context) error {
-	ctx, cancel := context.WithCancel(ctx)
-
 	eg, ctx := errgroup.WithContext(ctx)
 
 	// handle creation of jobs
 	eg.Go(func() error {
-		defer cancel()
 		return m.createJobs(ctx)
 	})
 
 	// run router
 	eg.Go(func() error {
-		defer cancel()
 		return m.router.Run(ctx)
+	})
+
+	// handle alerts
+	eg.Go(func() error {
+		return m.sendAlerts(ctx)
 	})
 
 	if err := eg.Wait(); err != nil {
@@ -196,6 +194,8 @@ func (m *Manager) jobResponseHandler() message.NoPublishHandlerFunc {
 
 		log.Printf("JOB RESPONSE %d / %s", response.Job.ID, response.Job.Domain)
 
+		response.OwnerID = response.Job.Domain.OwnerID
+
 		log.Printf(
 			"Found %d additions and %d removals",
 			len(response.RecordAdditions),
@@ -218,7 +218,6 @@ func (m *Manager) jobResponseHandler() message.NoPublishHandlerFunc {
 		}
 
 		// handle whois
-		var whoisUpdated bool
 		if response.Whois.Raw != nil {
 			if err := response.Whois.Insert(m.db); err != nil {
 				// means we hit a dupe
@@ -226,7 +225,7 @@ func (m *Manager) jobResponseHandler() message.NoPublishHandlerFunc {
 					log.Println(errors.WithMessage(err, "inserting whois"))
 				}
 			} else {
-				whoisUpdated = true
+				response.WhoisUpdated = true
 			}
 		}
 
@@ -237,52 +236,19 @@ func (m *Manager) jobResponseHandler() message.NoPublishHandlerFunc {
 
 		// handle alert message
 		if len(response.RecordAdditions) > 0 || len(response.RecordRemovals) > 0 {
-			alertSubject := fmt.Sprintf("ALARM BELLS - Changes to domain '%s'", response.Job.Domain.Domain)
-			var alertBody strings.Builder
-
-			fmt.Fprintf(&alertBody, "<pre>")
-
-			fmt.Fprintf(
-				&alertBody,
-				"New changes have been detected, please go to: https://%s/#/dashboard/%s for more details or find a summary of the changes below.\n\n",
-				os.Getenv("DOMAIN"),
-				response.Job.Domain.Domain,
-			)
-
-			if whoisUpdated {
-				fmt.Fprintf(
-					&alertBody,
-					"Whois has been updated!\n\n",
-				)
+			a := Alert{
+				OwnerID:  response.OwnerID,
+				Response: response,
 			}
 
-			for idx, record := range response.RecordAdditions {
-				if idx == 0 {
-					fmt.Fprintf(&alertBody, "-------------------------------- / additions start\n")
+			if response.Job.Domain.DontBatch {
+				if err := m.handleAlerts([]Alert{a}); err != nil {
+					log.Printf("Error handling alerts: %s", err)
 				}
-				fmt.Fprintf(&alertBody, "\t+++\t%s\n", record.Raw)
-			}
-
-			for idx, record := range response.RecordRemovals {
-				if idx == 0 {
-					fmt.Fprintf(&alertBody, "-------------------------------- / removals start\n")
+			} else {
+				if _, err := m.db.Model(&a).Insert(); err != nil {
+					log.Printf("Error inserting alert: %s", err)
 				}
-				fmt.Fprintf(&alertBody, "\t---\t%s\n", record.Raw)
-			}
-
-			fmt.Fprintf(&alertBody, "-------------------------------- / end\n")
-
-			fmt.Fprintf(&alertBody, "</pre>")
-
-			// get user
-			var owner user.User
-
-			if err := m.db.Model(&owner).Where("id = ?", response.Job.Domain.OwnerID).Select(); err != nil {
-				return errors.WithMessage(err, "Select Owner")
-			}
-
-			if err := m.emailer.Send(owner.Email, alertSubject, alertBody.String()); err != nil {
-				log.Printf("Error Sending to %s: %s", owner.Email, err)
 			}
 		}
 
@@ -294,7 +260,7 @@ func (m *Manager) jobResponseHandler() message.NoPublishHandlerFunc {
 				response.Job.FinishedAt,
 				len(response.RecordAdditions),
 				len(response.RecordRemovals),
-				whoisUpdated,
+				response.WhoisUpdated,
 			).
 			WherePK().
 			Update()

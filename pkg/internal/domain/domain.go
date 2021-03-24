@@ -18,6 +18,9 @@ type Domain struct {
 	OwnerID int       `sql:",notnull,unique:domain_owner_id" json:"owner_id"`
 	Owner   user.User `sql:"fk:owner_id" json:"-"`
 
+	// settings
+	DontBatch bool `sql:",notnull" json:"dont_batch"`
+
 	// meta data
 	AddedAt   time.Time   `sql:",type:timestamptz,notnull,default:now()" json:"added_at"`
 	DeletedAt pg.NullTime `pg:",type:timestamptz,soft_delete" json:"deleted_at"`
