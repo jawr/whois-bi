@@ -8,11 +8,16 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: traefik
     traefik.ingress.kubernetes.io/redirect-entry-point: https
+    traefik.ingress.kubernetes.io/preserve-host: "true"
+    traefik.ingress.kubernetes.io/redirect-permanent: "true"
+    traefik.ingress.kubernetes.io/redirect-regex: "^https://whois.bi"
+    traefik.ingress.kubernetes.io/redirect-replacement: "https://www.whois.bi"
     cert-manager.io/cluster-issuer: cert-manager-issuer
 spec:
   tls:
     - secretName: whois-bi-tls
       hosts:
+        - whois.bi
         - www.whois.bi
         - adminer.k3s.jl.lu
         - rabbit.k3s.jl.lu
