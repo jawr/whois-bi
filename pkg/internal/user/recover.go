@@ -10,7 +10,7 @@ type Recover struct {
 	ID int `pg:",pk"`
 
 	UserID int  `pg:",notnull,unique:user_id"`
-	User   User `pg:"fk:owner_id,rel:has-one"`
+	User   User `pg:"fk:user_id,rel:has-one"`
 
 	Code string `pg:",notnull"`
 
