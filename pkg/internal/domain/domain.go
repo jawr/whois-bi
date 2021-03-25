@@ -26,8 +26,8 @@ type Domain struct {
 	DeletedAt pg.NullTime `pg:",type:timestamptz,soft_delete" json:"deleted_at"`
 
 	// when was this domain last updated, useful for starting jobs
-	LastJobAt     time.Time `pg:",type:timestamptz,null" json:"last_job_at"`
-	LastUpdatedAt time.Time `pg:",type:timestamptz,null" json:"last_updated_at"`
+	LastJobAt     time.Time `pg:",type:timestamptz" json:"last_job_at"`
+	LastUpdatedAt time.Time `pg:",type:timestamptz" json:"last_updated_at"`
 }
 
 // create a new domain attached to an owner

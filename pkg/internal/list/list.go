@@ -21,7 +21,7 @@ type List struct {
 	ID int `pg:",pk" json:"id"`
 
 	OwnerID int       `pg:",notnull,unique:list_type_domain_rrtype_record_owner_id" json:"owner_id"`
-	Owner   user.User `pg:"fk:owner_id" json:"-"`
+	Owner   user.User `pg:"fk:owner_id,rel:has-one" json:"-"`
 
 	ListType ListType `pg:",notnull,type:text,unique:list_type_domain_rrtype_record_owner_id" json:"list_type"`
 

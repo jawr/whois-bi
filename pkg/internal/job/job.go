@@ -12,7 +12,7 @@ type Job struct {
 	ID int `pg:",pk" json:"id"`
 
 	DomainID int           `pg:",notnull" json:"domain_id"`
-	Domain   domain.Domain `pg:"fk:domain_id"`
+	Domain   domain.Domain `pg:"fk:domain_id,rel:has-one"`
 
 	Errors []string `pg:",notnull" json:"errors"`
 
