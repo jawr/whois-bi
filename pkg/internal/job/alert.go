@@ -21,14 +21,14 @@ const (
 )
 
 type Alert struct {
-	ID int `sql:",pk"`
+	ID int `pg:",pk"`
 
-	OwnerID int       `sql:",notnull"`
-	Owner   user.User `sql:"fk:owner_id" pg:"rel:has-one"`
+	OwnerID int       `pg:",notnull"`
+	Owner   user.User `pg:"fk:owner_id,rel:has-one"`
 
 	Response JobResponse
 
-	CreatedAt time.Time `sql:",notnull,default:now()"`
+	CreatedAt time.Time `pg:",notnull,default:now()"`
 }
 
 func (m *Manager) sendAlerts(ctx context.Context) error {

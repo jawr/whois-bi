@@ -40,6 +40,7 @@ func init() {
 func setupSchema(db *pg.DB) {
 	models := []interface{}{
 		(*user.User)(nil),
+		(*user.Recover)(nil),
 		(*domain.Domain)(nil),
 		(*domain.Record)(nil),
 		(*domain.Whois)(nil),

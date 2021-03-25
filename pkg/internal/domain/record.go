@@ -21,35 +21,35 @@ const (
 )
 
 type Record struct {
-	ID int `sql:",pk" json:"id"`
+	ID int `pg:",pk" json:"id"`
 
 	// parent data
-	DomainID int    `sql:",notnull" json:"domain_id"`
+	DomainID int    `pg:",notnull" json:"domain_id"`
 	Domain   Domain `pg:"fk:domain_id" json:"-"`
 
 	// how was this record generated
-	RecordSource RecordSource `sql:",notnull" json:"record_source"`
+	RecordSource RecordSource `pg:",notnull" json:"record_source"`
 
 	// textual representaion of the record
-	Raw string `sql:",notnull" json:"raw"`
+	Raw string `pg:",notnull" json:"raw"`
 
 	// fields part of the record:
 	// 		facebook.com.	59	IN	A	`31.13.76.35`
 	//		facebook.com.	59	IN	TXT	`0 issue "digicert.com"`
-	Fields string `sql:",notnull" json:"fields"`
+	Fields string `pg:",notnull" json:"fields"`
 
-	Name   string     `sql:",notnull" json:"name"`
-	RRType JsonRRType `sql:",notnull" json:"rr_type"`
-	Class  uint16     `sql:",notnull" json:"rr_class"`
-	TTL    uint32     `sql:",notnull" json:"ttl"`
+	Name   string     `pg:",notnull" json:"name"`
+	RRType JsonRRType `pg:",notnull" json:"rr_type"`
+	Class  uint16     `pg:",notnull" json:"rr_class"`
+	TTL    uint32     `pg:",notnull" json:"ttl"`
 
 	// this is a hash of the fields data and the ttl for
 	// easy change detection
-	Hash uint32 `sql:",notnull,unique" json:"hash"`
+	Hash uint32 `pg:",notnull,unique" json:"hash"`
 
 	// meta data
-	AddedAt   time.Time `sql:",type:timestamptz,notnull,default:now()" json:"added_at"`
-	RemovedAt time.Time `sql:",type:timestamptz" json:"removed_at"`
+	AddedAt   time.Time `pg:",type:timestamptz,notnull,default:now()" json:"added_at"`
+	RemovedAt time.Time `pg:",type:timestamptz" json:"removed_at"`
 	DeletedAt time.Time `pg:",soft_delete" json:"deleted_at"`
 }
 

@@ -15,6 +15,9 @@
 	import Registered from './Routes/Registered.svelte'
 	import Verify from './Routes/Verify.svelte'
 	import Login from './Routes/Login.svelte'
+	import Recover from './Routes/Recover.svelte'
+	import Recovering from './Routes/Recovering.svelte'
+	import RecoverCode from './Routes/RecoverCode.svelte'
 
 	let loading = true
 	onMount(async () => {
@@ -46,6 +49,9 @@
 				<Route path="register" component={Register} />
 				<Route path="registered" component={Registered} />
 				<Route path="login" component={Login} />
+				<Route path="recover" component={Recover} />
+				<Route path="recovering" component={Recovering} />
+				<Route path="recover/:code" component={RecoverCode} />
 				<Route component={NotFound} />
 			</section>
 		</section>

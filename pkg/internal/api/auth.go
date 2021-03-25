@@ -98,7 +98,7 @@ func (s Server) handlePostRegister() gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{"status": "Registration complete. Verification sent. (not really yet)."})
+		c.JSON(http.StatusOK, gin.H{"status": "Registration complete. Verification sent."})
 	}
 }
 

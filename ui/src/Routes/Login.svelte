@@ -1,5 +1,5 @@
 <script>
-	import { Link, navigate } from 'svelte-routing'
+	import { Link, link, navigate } from 'svelte-routing'
 	import { loggedIn } from '../stores'
 	import { postJSON } from '../fetchJSON'
 
@@ -27,7 +27,7 @@
 	<fieldset id="sign_up" class="ba b--transparent ph0 mh0">
 		<legend class="ph0 mh0 fw6 clip">Sign Up</legend>
 		<div class="mt3">
-			<label class="db fw4 lh-copy f6" for="email-address">Email address</label>
+			<label class="db fw4 lh-copy f6 mb2" for="email-address">Email address</label>
 			<input 
 				class="pa2 input-reset ba bg-transparent w-100 measure" 
 				type="email" 
@@ -36,7 +36,7 @@
 			/>
 		</div>
 		<div class="mt3">
-			<label class="db fw4 lh-copy f6" for="password">Password</label>
+			<label class="db fw4 lh-copy f6 mb2" for="password">Password</label>
 			<input 
 				class="b pa2 input-reset ba bg-transparent w-100 measure"
 				type="password"
@@ -56,6 +56,11 @@
 		{#if sending}
 			<p>Logging in...</p>
 		{:else}
+
+			<div class="lh-copy mt3">
+				<a use:link href="/recover" class="f6 link dim black db">Forgot your password?</a>
+			</div>
+
 			<button type="submit" class="f4 bb bt-0 bl-0 br-0 bw2 b--dark-green br2 pointer dim ph3 pv2 mt5 fw3 mb2 dib white bg-green grow">Let me in!</button>
 		{/if}
 	</div>

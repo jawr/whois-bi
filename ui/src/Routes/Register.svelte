@@ -35,7 +35,7 @@
 	<fieldset id="sign_up" class="ba b--transparent ph0 mh0">
 		<legend class="ph0 mh0 fw6 clip">Sign Up</legend>
 		<div class="mt3">
-			<label class="db fw4 lh-copy f6" for="email">Email address</label>
+			<label class="db fw4 lh-copy f6 mb2" for="email">Email address</label>
 			<input 
 				class="pa2 input-reset ba bg-transparent w-100 measure" 
 				type="email"
@@ -45,7 +45,7 @@
 		</div>
 
 		<div class="mt3">
-			<label class="db fw4 lh-copy f6" for="password">Password</label>
+			<label class="db fw4 lh-copy f6 mb2" for="password">Password</label>
 			<input 
 			class="b pa2 input-reset ba bg-transparent w-100 measure" 
 			type="password" 
@@ -55,7 +55,7 @@
 		</div>
 
 		<div class="mt3">
-			<label class="db fw4 lh-copy f6" for="confirmPassword">Confirm Password</label>
+			<label class="db fw4 lh-copy f6 mb2" for="confirmPassword">Confirm Password</label>
 			<input 
 			class="b pa2 input-reset ba bg-transparent w-100 measure" 
 			type="password" 

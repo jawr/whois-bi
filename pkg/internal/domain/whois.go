@@ -12,24 +12,24 @@ import (
 )
 
 type Whois struct {
-	ID int `sql:",pk" json:"id"`
+	ID int `pg:",pk" json:"id"`
 
 	// parent data
-	DomainID int    `sql:",notnull" json:"domain_id"`
+	DomainID int    `pg:",notnull" json:"domain_id"`
 	Domain   Domain `pg:"fk:domain_id,rel:has-one" json:"-"`
 
-	Raw []byte `sql:",notnull" json:"raw"`
+	Raw []byte `pg:",notnull" json:"raw"`
 
-	Version []byte `sql:",notnull,unique" json:"version"`
+	Version []byte `pg:",notnull,unique" json:"version"`
 
-	CreatedDate    time.Time `sql:",notnull" json:"created_date"`
-	UpdatedDate    time.Time `sql:",notnull" json:"updated_date"`
-	ExpirationDate time.Time `sql:",notnull" json:"expiration_date"`
+	CreatedDate    time.Time `pg:",notnull" json:"created_date"`
+	UpdatedDate    time.Time `pg:",notnull" json:"updated_date"`
+	ExpirationDate time.Time `pg:",notnull" json:"expiration_date"`
 
-	DateErrors []string `sql:",notnull" json:"date_errors"`
+	DateErrors []string `pg:",notnull" json:"date_errors"`
 
 	// meta data
-	AddedAt   time.Time `sql:",notnull,default:now()" json:"added_at"`
+	AddedAt   time.Time `pg:",notnull,default:now()" json:"added_at"`
 	DeletedAt time.Time `pg:",soft_delete" json:"deleted_at"`
 }
 

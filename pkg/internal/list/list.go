@@ -18,24 +18,24 @@ const (
 )
 
 type List struct {
-	ID int `sql:",pk" json:"id"`
+	ID int `pg:",pk" json:"id"`
 
-	OwnerID int       `sql:",notnull,unique:list_type_domain_rrtype_record_owner_id" json:"owner_id"`
-	Owner   user.User `sql:"fk:owner_id" json:"-"`
+	OwnerID int       `pg:",notnull,unique:list_type_domain_rrtype_record_owner_id" json:"owner_id"`
+	Owner   user.User `pg:"fk:owner_id" json:"-"`
 
-	ListType ListType `sql:",notnull,type:text,unique:list_type_domain_rrtype_record_owner_id" json:"list_type"`
+	ListType ListType `pg:",notnull,type:text,unique:list_type_domain_rrtype_record_owner_id" json:"list_type"`
 
 	// fields to match
-	Domain string `json:"domain" sql:",notnull,unique:list_type_domain_rrtype_record_owner_id"`
-	RRType string `json:"rr_type" sql:",notnull,unique:list_type_domain_rrtype_record_owner_id"`
-	Record string `json:"record" sql:",notnull,unique:list_type_domain_rrtype_record_owner_id"`
+	Domain string `json:"domain" pg:",notnull,unique:list_type_domain_rrtype_record_owner_id"`
+	RRType string `json:"rr_type" pg:",notnull,unique:list_type_domain_rrtype_record_owner_id"`
+	Record string `json:"record" pg:",notnull,unique:list_type_domain_rrtype_record_owner_id"`
 
 	domainMatch *regexp.Regexp
 	recordMatch *regexp.Regexp
 	rrtypeMatch *regexp.Regexp
 	once        sync.Once
 
-	AddedAt   time.Time `sql:",type:timestamptz,notnull,default:now()" json:"added_at"`
+	AddedAt   time.Time `pg:",type:timestamptz,notnull,default:now()" json:"added_at"`
 	DeletedAt time.Time `json:"deleted_at"`
 }
 

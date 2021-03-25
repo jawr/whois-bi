@@ -9,23 +9,23 @@ import (
 )
 
 type Job struct {
-	ID int `sql:",pk" json:"id"`
+	ID int `pg:",pk" json:"id"`
 
-	DomainID int           `sql:",notnull" json:"domain_id"`
-	Domain   domain.Domain `sql:"fk:domain_id"`
+	DomainID int           `pg:",notnull" json:"domain_id"`
+	Domain   domain.Domain `pg:"fk:domain_id"`
 
-	Errors []string `sql:",notnull" json:"errors"`
+	Errors []string `pg:",notnull" json:"errors"`
 
-	Additions    int  `sql:",notnull" json:"additions"`
-	Removals     int  `sql:",notnull" json:"removals"`
-	WhoisUpdated bool `sql:",notnull" json:"whois_updated"`
+	Additions    int  `pg:",notnull" json:"additions"`
+	Removals     int  `pg:",notnull" json:"removals"`
+	WhoisUpdated bool `pg:",notnull" json:"whois_updated"`
 
-	CreatedAt  time.Time `sql:",notnull,default:now()" json:"created_at"`
+	CreatedAt  time.Time `pg:",notnull,default:now()" json:"created_at"`
 	StartedAt  time.Time `json:"started_at"`
 	FinishedAt time.Time `json:"finished_at"`
 
 	// dont persist, what is this for?
-	CurrentRecords domain.Records `sql:"-" json:"current_records"`
+	CurrentRecords domain.Records `pg:"-" json:"current_records"`
 }
 
 type JobResponse struct {

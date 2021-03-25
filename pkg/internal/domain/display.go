@@ -63,7 +63,7 @@ func (t *JsonRRType) UnmarshalJSON(data []byte) error {
 }
 
 type DisplayDomain struct {
-	tableName struct{} `sql:"domains,select:domains,alias:domain"`
+	tableName struct{} `pg:"domains,select:domains,alias:domain"`
 
 	Domain
 

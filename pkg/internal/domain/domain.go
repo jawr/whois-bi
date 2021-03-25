@@ -11,23 +11,23 @@ import (
 )
 
 type Domain struct {
-	ID int `sql:",pk" json:"id"`
+	ID int `pg:",pk" json:"id"`
 
-	Domain string `sql:",notnull,unique:domain_owner_id" json:"domain"`
+	Domain string `pg:",notnull,unique:domain_owner_id" json:"domain"`
 
-	OwnerID int       `sql:",notnull,unique:domain_owner_id" json:"owner_id"`
-	Owner   user.User `sql:"fk:owner_id" json:"-" pg:"rel:has-one"`
+	OwnerID int       `pg:",notnull,unique:domain_owner_id" json:"owner_id"`
+	Owner   user.User `pg:"fk:owner_id,rel:has-one" json:"-"`
 
 	// settings
-	DontBatch bool `sql:",notnull" json:"dont_batch"`
+	DontBatch bool `pg:",notnull" json:"dont_batch"`
 
 	// meta data
-	AddedAt   time.Time   `sql:",type:timestamptz,notnull,default:now()" json:"added_at"`
+	AddedAt   time.Time   `pg:",type:timestamptz,notnull,default:now()" json:"added_at"`
 	DeletedAt pg.NullTime `pg:",type:timestamptz,soft_delete" json:"deleted_at"`
 
 	// when was this domain last updated, useful for starting jobs
-	LastJobAt     time.Time `sql:",type:timestamptz,null" json:"last_job_at"`
-	LastUpdatedAt time.Time `sql:",type:timestamptz,null" json:"last_updated_at"`
+	LastJobAt     time.Time `pg:",type:timestamptz,null" json:"last_job_at"`
+	LastUpdatedAt time.Time `pg:",type:timestamptz,null" json:"last_updated_at"`
 }
 
 // create a new domain attached to an owner

@@ -17,6 +17,9 @@ func (s Server) setupRoutes() {
 	base.GET("/logout", s.handleGetLogout())
 	base.POST("/verify/:code", s.handlePostVerify())
 
+	base.POST("/recover", s.handlePostRecover())
+	base.POST("/recover/code", s.handlePostRecoverCode())
+
 	// user routes
 	user := base.Group("/user/")
 	user.Use(handleAuth)

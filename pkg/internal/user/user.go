@@ -10,27 +10,36 @@ import (
 )
 
 type User struct {
-	ID int `sql:",pk"`
+	ID int `pg:",pk"`
 
-	Email    string `sql:",unique,notnull"`
-	Password []byte `sql:",notnull"`
+	Email    string `pg:",unique,notnull"`
+	Password []byte `pg:",notnull"`
 
 	// meta data
-	AddedAt   time.Time `sql:",notnull,default:now()"`
+	AddedAt   time.Time `pg:",notnull,default:now()"`
 	DeletedAt time.Time `pg:",soft_delete"`
 
 	VerifiedAt   time.Time
-	VerifiedCode string `sql:",notnull"`
+	VerifiedCode string `pg:",notnull"`
 
 	LastLoginAt time.Time
+}
+
+func CreatePassword(password string) ([]byte, error) {
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, errors.Wrap(err, "bcrypt")
+	}
+
+	return hash, nil
 }
 
 // create a new user and bcrypt the password
 func NewUser(email, password string) (User, error) {
 
-	passwordHash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	passwordHash, err := CreatePassword(password)
 	if err != nil {
-		return User{}, errors.Wrap(err, "bcrypt")
+		return User{}, err
 	}
 
 	verifiedCode := uniuri.NewLen(32)
