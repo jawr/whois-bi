@@ -116,7 +116,7 @@ func (s Server) handlePostRecoverCode() gin.HandlerFunc {
 		if err != nil {
 			c.JSON(
 				http.StatusInternalServerError,
-				gin.H{"error": "Internal Server Error"},
+				gin.H{"error": err.Error()},
 			)
 			return
 		}

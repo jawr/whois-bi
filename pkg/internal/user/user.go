@@ -5,6 +5,7 @@ import (
 
 	"github.com/dchest/uniuri"
 	"github.com/go-pg/pg/v10"
+	"github.com/hesahesa/pwdbro"
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -25,7 +26,27 @@ type User struct {
 	LastLoginAt time.Time
 }
 
+func ValidatePassword(password string) error {
+	checker := pwdbro.NewDefaultPwdBro()
+	status, err := checker.RunChecks(password)
+	if err != nil {
+		return err
+	}
+
+	for _, s := range status {
+		if !s.Safe {
+			return errors.New(s.Message)
+		}
+	}
+
+	return nil
+}
+
 func CreatePassword(password string) ([]byte, error) {
+	if err := ValidatePassword(password); err != nil {
+		return nil, err
+	}
+
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, errors.Wrap(err, "bcrypt")
