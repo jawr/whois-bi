@@ -136,10 +136,7 @@ func (m *Manager) createJobs(ctx context.Context) error {
 			return errors.WithMessage(err, "GetdomainsWhereLastJobBefore")
 		}
 
-		log.Printf("Found %d domains", len(domains))
-
 		for _, d := range domains {
-			log.Printf("CREATE JOB FOR %s", d.Domain)
 			j := NewJob(d)
 			if err := j.Insert(m.db); err != nil {
 				continue
@@ -156,7 +153,6 @@ func (m *Manager) createJobs(ctx context.Context) error {
 		log.Printf("Found %d jobs", len(jobs))
 
 		for _, j := range jobs {
-			log.Printf("job: %+v", j)
 
 			currentRecords, err := j.Domain.GetRecords(m.db)
 			if err != nil {
@@ -192,20 +188,15 @@ func (m *Manager) jobResponseHandler() message.NoPublishHandlerFunc {
 			return errors.WithMessage(err, "Unmarshal")
 		}
 
-		log.Printf("JOB RESPONSE %d / %s", response.Job.ID, response.Job.Domain)
-
 		response.OwnerID = response.Job.Domain.OwnerID
 
 		log.Printf(
-			"Found %d additions and %d removals",
+			"Job %d  / %s Found %d additions and %d removals",
+			response.Job.ID,
+			response.Job.Domain,
 			len(response.RecordAdditions),
 			len(response.RecordRemovals),
 		)
-
-		log.Println("Removals: ")
-		for _, record := range response.RecordRemovals {
-			log.Printf("\t%d\t%s", record.ID, record.Raw)
-		}
 
 		// handle removals
 		if err := response.RecordRemovals.Remove(m.db); err != nil {
