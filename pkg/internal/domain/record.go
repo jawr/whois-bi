@@ -3,7 +3,6 @@ package domain
 import (
 	"fmt"
 	"hash/fnv"
-	"log"
 	"strings"
 	"time"
 
@@ -28,7 +27,7 @@ type Record struct {
 	Domain   Domain `pg:"fk:domain_id,rel:has-one" json:"-"`
 
 	// how was this record generated
-	RecordSource RecordSource `pg:",notnull" json:"record_source"`
+	recordSource RecordSource `pg:",notnull,use_zero" json:"record_source"`
 
 	// textual representaion of the record
 	Raw string `pg:",notnull" json:"raw"`
@@ -76,7 +75,6 @@ func (r *Records) Remove(db *pg.DB) error {
 		return nil
 	}
 	for _, record := range *r {
-		log.Printf("remove record: %+v", record)
 		_, err := db.Model(&record).
 			Set("removed_at = now()").
 			WherePK().
@@ -107,8 +105,6 @@ func NewRecord(domain Domain, rr dns.RR, source RecordSource) Record {
 		Class:  header.Class,
 		TTL:    header.Ttl,
 	}
-
-	log.Printf("record: %s record.RRType", record.RRType)
 
 	// create and set our fields data
 	numFields := dns.NumField(rr)
