@@ -5,6 +5,8 @@
 	import { CheckIcon } from 'svelte-feather-icons'
 
 	import DeleteDomain from './DeleteDomain.svelte'
+	import Checkbox from './Checkbox.svelte'
+
 
 	export let name = ''
 
@@ -56,6 +58,7 @@
 			error = err.message
 		}
 		loaded = true
+		console.log('loaded', loaded)
 	}
 
 	onMount(async () => {
@@ -79,18 +82,14 @@
 
 <div class="mw8 mt4">
 	<DeleteDomain {name} />
-</div>
 
-{#if loaded}
+	{#if loaded}
 	<div class="mw8 mt4">
 		<div class="flex items-center mb2 fr">
-	<label class="ma0 pa0 lh-copy pointer">
-		Batched
-		<input disabled={loading} on:click={setDontBatch} type="checkbox" checked={!dontBatch} />
-	</label>
-</div>
-</div>
-{/if}
+			<Checkbox on:click={setDontBatch} disabled={loading} checked={!dontBatch}>Batch alerts with other Domains</Checkbox>
+		</div>
+	</div>
+	{/if}
 
 <div class="pt2 cf">
 	<h2 class="f4 tl fw3">Jobs</h2>
@@ -148,6 +147,7 @@
 	{#if error.length > 0}
 		<p class="mt3 pr3 fr light-red">{error}</p>
 	{/if}
+</div>
 </div>
 
 

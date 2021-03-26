@@ -18,15 +18,15 @@ type Whois struct {
 	DomainID int    `pg:",notnull" json:"domain_id"`
 	Domain   Domain `pg:"fk:domain_id,rel:has-one" json:"-"`
 
-	Raw []byte `pg:",notnull" json:"raw"`
+	Raw []byte `pg:",use_zero" json:"raw"`
 
-	Version []byte `pg:",notnull,unique" json:"version"`
+	Version []byte `pg:",use_zero,unique" json:"version"`
 
 	CreatedDate    time.Time `pg:",notnull" json:"created_date"`
 	UpdatedDate    time.Time `pg:",notnull" json:"updated_date"`
 	ExpirationDate time.Time `pg:",notnull" json:"expiration_date"`
 
-	DateErrors []string `pg:",notnull" json:"date_errors"`
+	DateErrors []string `pg:",use_zero" json:"date_errors"`
 
 	// meta data
 	AddedAt   time.Time `pg:",notnull,default:now()" json:"added_at"`

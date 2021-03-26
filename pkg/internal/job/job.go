@@ -14,11 +14,11 @@ type Job struct {
 	DomainID int           `pg:",notnull" json:"domain_id"`
 	Domain   domain.Domain `pg:"fk:domain_id,rel:has-one"`
 
-	Errors []string `pg:",notnull" json:"errors"`
+	Errors []string `pg:",use_zero" json:"errors"`
 
-	Additions    int  `pg:",notnull" json:"additions"`
-	Removals     int  `pg:",notnull" json:"removals"`
-	WhoisUpdated bool `pg:",notnull" json:"whois_updated"`
+	Additions    int  `pg:",use_zero" json:"additions"`
+	Removals     int  `pg:",use_zero" json:"removals"`
+	WhoisUpdated bool `pg:",use_zero" json:"whois_updated"`
 
 	CreatedAt  time.Time `pg:",notnull,default:now()" json:"created_at"`
 	StartedAt  time.Time `json:"started_at"`

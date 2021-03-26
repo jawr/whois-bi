@@ -33,6 +33,7 @@
 	}
 </script>
 
+<div class="mw8 center">
 <div in:fade class="pt6">
 	{#if $domains.length > 0}
 		<Search store={domainsQuery} text="Filter domains" />
@@ -68,6 +69,7 @@
 	{/if}
 
 	<CreateDomains />
+</div>
 </div>
 
 	<style>

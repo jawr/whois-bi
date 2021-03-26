@@ -44,7 +44,6 @@
 
 </script>
 
-<div class="pa4-l">
 	<form class="bg-washed-green mw8 center pa4 br2-ns ba b--black-10" on:submit|preventDefault={handleSubmit}>
 		<fieldset class="cf bn ma0 pa0">
 			<legend class="pa0 f5 f4-ns mb3 black-80">Enter a Domain per line to start monitoring</legend>
@@ -77,4 +76,3 @@
 			</div>
 		</fieldset>
 	</form>
-	</div>

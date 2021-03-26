@@ -8,6 +8,7 @@
 	import Search from './Search.svelte'
 	import RTypeLabel from './RTypeLabel.svelte'
 	import CreateRecord from './CreateRecord.svelte'
+	import Checkbox from './Checkbox.svelte'
 
 	export let name = ''
 
@@ -63,11 +64,12 @@
 	}
 </script>
 
-<div class="mt4 mb4">
+<div class="pv5">
 	<Search store={recordsQuery} text="Filter records" />
-
-	<div class="flex items-center mb2 fr">
-		<label class="ma0 pa0 lh-copy pointer"><input type="checkbox" bind:checked={current}> Current</label>
+	<div class="mt2">
+		<span class="fr">
+			<Checkbox bind:checked={current}>Only show Current records</Checkbox>
+		</span>
 	</div>
 </div>
 
