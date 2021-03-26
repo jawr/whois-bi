@@ -22,9 +22,9 @@ type Whois struct {
 
 	Version []byte `pg:",use_zero,unique" json:"version"`
 
-	CreatedDate    time.Time `pg:",notnull" json:"created_date"`
-	UpdatedDate    time.Time `pg:",notnull" json:"updated_date"`
-	ExpirationDate time.Time `pg:",notnull" json:"expiration_date"`
+	CreatedDate    time.Time `json:"created_date"`
+	UpdatedDate    time.Time `json:"updated_date"`
+	ExpirationDate time.Time `json:"expiration_date"`
 
 	DateErrors []string `pg:",use_zero" json:"date_errors"`
 
