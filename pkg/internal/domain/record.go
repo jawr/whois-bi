@@ -27,7 +27,7 @@ type Record struct {
 	Domain   Domain `pg:"fk:domain_id,rel:has-one" json:"-"`
 
 	// how was this record generated
-	recordSource RecordSource `pg:",notnull,use_zero" json:"record_source"`
+	RecordSource RecordSource `pg:",notnull,use_zero" json:"record_source"`
 
 	// textual representaion of the record
 	Raw string `pg:",notnull" json:"raw"`
