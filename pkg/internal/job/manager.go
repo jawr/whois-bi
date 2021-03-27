@@ -150,7 +150,9 @@ func (m *Manager) createJobs(ctx context.Context) error {
 			return errors.WithMessage(err, "GetJobs")
 		}
 
-		log.Printf("Found %d jobs", len(jobs))
+		if len(jobs) > 0 {
+			log.Printf("Found %d jobs", len(jobs))
+		}
 
 		for _, j := range jobs {
 

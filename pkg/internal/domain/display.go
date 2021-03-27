@@ -4,10 +4,24 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/go-pg/pg/v10/types"
 	"github.com/miekg/dns"
 )
+
+type DisplayDomain struct {
+	tableName struct{} `pg:"domains,select:domains,alias:domain"`
+
+	Domain
+
+	CreatedAt time.Time `json:"created_at"`
+	ExpiresAt time.Time `json:"expires_at"`
+
+	Records int `json:"records"`
+
+	Whois int `json:"whois"`
+}
 
 type JsonRRType struct{ V uint16 }
 
@@ -60,14 +74,4 @@ func (t *JsonRRType) UnmarshalJSON(data []byte) error {
 	s = strings.Trim(s, `"`)
 	t.V = dns.StringToType[s]
 	return nil
-}
-
-type DisplayDomain struct {
-	tableName struct{} `pg:"domains,select:domains,alias:domain"`
-
-	Domain
-
-	Records int `json:"records"`
-
-	Whois int `json:"whois"`
 }

@@ -44,7 +44,8 @@
 					<th scope="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Name</th>
 					<th scope="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white w-10">#Records</th>
 					<th scope="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white w-10">#Whois</th>
-					<th scope="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white w-20">Added</th>
+					<th scope="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white w-20">Created</th>
+					<th scope="col" class="fw6 bb b--black-20 tl pb3 pr3 bg-white w-10">Expires</th>
 				</tr>
 			</thead>
 			<tbody class="tl lh-copy">
@@ -55,7 +56,8 @@
 						</td>
 						<td data-label="#Records" class="pv3 pr3 bb b--black-20">{domain.records}</td>
 						<td data-label="#Whois"   class="pv3 pr3 bb b--black-20">{domain.whois}</td>
-						<td data-label="#Added"   class="pv3 pr3 bb b--black-20">{formatDateTime(domain.added_at)}</td>
+						<td data-label="#Created"   class="pv3 pr3 bb b--black-20">{formatDateTime(domain.created_at)}</td>
+						<td data-label="#Expires"   class="pv3 pr3 bb b--black-20">{formatDateTime(domain.expires_at)}</td>
 					</tr>
 				{/each}
 			</tbody>
