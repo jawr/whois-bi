@@ -58,10 +58,10 @@
 		{:else}
 
 			<div class="lh-copy mt3">
-				<a use:link href="/recover" class="f6 link dim black db">Forgot your password?</a>
+				<a use:link href="/recover" class="f6 link black db">Forgot your password?</a>
 			</div>
 
-			<button type="submit" class="f4 bb bt-0 bl-0 br-0 bw2 b--dark-green br2 pointer dim ph3 pv2 mt5 fw3 mb2 dib white bg-green grow">Let me in!</button>
+			<button type="submit" class="f4 bb bt-0 bl-0 br-0 bw2 b--dark-green br2 pointer ph3 pv2 mt5 fw3 mb2 dib white bg-green grow">Let me in!</button>
 		{/if}
 	</div>
 </form>

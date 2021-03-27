@@ -63,7 +63,7 @@
 			{#if sending}
 				<p>Processing..</p>
 			{:else}
-				<button type="submit" class="f4 bb bt-0 bl-0 br-0 bw2 b--dark-green br2 pointer dim ph3 pv2 mt5 fw3 mb2 dib white bg-green grow">Recover!</button>
+				<button type="submit" class="f4 bb bt-0 bl-0 br-0 bw2 b--dark-green br2 pointer ph3 pv2 mt5 fw3 mb2 dib white bg-green grow">Recover!</button>
 			{/if}
 		</div>
 	</form>

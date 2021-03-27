@@ -12,4 +12,4 @@
 	Add a domain, select monitoring frequency and when we detect any changes we will let you know.
 </h3>
 
-<Link to="/register" class="bb bt-0 bl-0 br-0 bw2 b--dark-green br2 pointer f4 link dim br1 ph3 pv2 mt5 fw3 mb2 dib white bg-green grow">Start Monitoring</Link>
+<Link to="/register" class="bb bt-0 bl-0 br-0 bw2 b--dark-green br2 pointer f4 link br1 ph3 pv2 mt5 fw3 mb2 dib white bg-green grow">Start Monitoring</Link>
