@@ -47,6 +47,7 @@ func setupSchema(db *pg.DB) {
 		(*job.Job)(nil),
 		(*list.List)(nil),
 		(*job.Alert)(nil),
+		(*job.ExpirationAlert)(nil),
 	}
 
 	for _, model := range models {
