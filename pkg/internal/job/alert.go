@@ -102,6 +102,7 @@ func (m *Manager) sendAlerts(ctx context.Context) error {
 						AND date_trunc('day', ea.sent_at) != date_trunc('day', ?::timestamp)
 					`,
 					time.Now().AddDate(0, 0, 7),
+					time.Now().AddDate(0, 0, 7),
 				).Select()
 			if err != nil {
 				return err
