@@ -18,7 +18,7 @@ type Sender struct {
 func NewSender() (*Sender, error) {
 	auth := smtp.PlainAuth(
 		"",
-		os.Getenv("SMTP_EMAIL"),
+		os.Getenv("SMTP_USER"),
 		os.Getenv("SMTP_PASSWORD"),
 		os.Getenv("SMTP_HOST"),
 	)
