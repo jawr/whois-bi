@@ -5,14 +5,17 @@ import (
 	"net/smtp"
 	"os"
 
+	lru "github.com/hashicorp/golang-lru"
 	"github.com/jhillyerd/enmime"
+	"github.com/segmentio/fasthash/fnv1a"
 )
 
 type Sender struct {
-	auth smtp.Auth
+	auth  smtp.Auth
+	cache *lru.Cache
 }
 
-func NewSender() *Sender {
+func NewSender() (*Sender, error) {
 	auth := smtp.PlainAuth(
 		"",
 		os.Getenv("SMTP_EMAIL"),
@@ -20,14 +23,27 @@ func NewSender() *Sender {
 		os.Getenv("SMTP_HOST"),
 	)
 
-	sender := Sender{
-		auth: auth,
+	cache, err := lru.New(256)
+	if err != nil {
+		return nil, err
 	}
 
-	return &sender
+	sender := Sender{
+		auth:  auth,
+		cache: cache,
+	}
+
+	return &sender, nil
 }
 
-func (s Sender) Send(to, subject, body string) error {
+func (s *Sender) Send(to, subject, body string) error {
+	hash := fnv1a.HashString64(to + subject + body)
+	if s.cache.Contains(hash) {
+		return nil
+	}
+
+	s.cache.Add(hash, struct{}{})
+
 	message := enmime.Builder().
 		From(os.Getenv("SMTP_FROM_NAME"), os.Getenv("SMTP_EMAIL")).
 		To(to, to).

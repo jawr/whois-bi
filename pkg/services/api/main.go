@@ -24,7 +24,10 @@ func run() error {
 	}
 	defer db.Close()
 
-	emailer := sender.NewSender()
+	emailer, err := sender.NewSender()
+	if err != nil {
+		return errors.WithMessage(err, "NewSender")
+	}
 
 	server := api.NewServer(db, emailer)
 
