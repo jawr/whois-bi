@@ -31,6 +31,14 @@ type Alert struct {
 	CreatedAt time.Time `pg:",notnull,default:now()"`
 }
 
+type ExpirationAlert struct {
+	ID int `pg:",pk"`
+
+	DomainID int           `pg:",notnull"`
+	Domain   domain.Domain `pg:"fk:domain_id,rel:has-one"`
+	SentAt   time.time     `pg:",notnull,default:now()"`
+}
+
 func (m *Manager) sendAlerts(ctx context.Context) error {
 	ticker := time.NewTicker(time.Minute)
 	defer ticker.Stop()
@@ -40,8 +48,6 @@ func (m *Manager) sendAlerts(ctx context.Context) error {
 		case <-ctx.Done():
 			return ctx.Err()
 		case <-ticker.C:
-
-		default:
 			// get all alerts
 			var alerts []Alert
 			if err := m.db.Model(&alerts).Select(); err != nil {
@@ -88,9 +94,13 @@ func (m *Manager) sendAlerts(ctx context.Context) error {
 
 			err := m.db.Model(&whois).
 				DistinctOn("whois.domain_id").
+				Join("JOIN expiration_alerts AS ea ON ea.domain_id = whois.domain_id").
 				Relation("Domain").
 				Where(
-					"date_trunc('day', whois.expiration_date) = date_trunc('day', ?::timestamp)",
+					`
+						date_trunc('day', whois.expiration_date) = date_trunc('day', ?::timestamp) 
+						AND date_trunc('day', ea.sent_at) != date_trunc('day', ?::timestamp)
+					`,
 					time.Now().AddDate(0, 0, 7),
 				).Select()
 			if err != nil {
@@ -112,6 +122,13 @@ func (m *Manager) sendAlerts(ctx context.Context) error {
 
 func (m *Manager) handleExpirationAlerts(whois []domain.Whois) error {
 	for _, w := range whois {
+		var ea = ExpirationAlert{
+			DomainID: w.DomainID,
+		}
+		if _, err := m.db.Model(&ea).Insert(); err != nil {
+			return err
+		}
+
 		subject := fmt.Sprintf("ALARM BELLS - %s expires in 7 days")
 
 		body := fmt.Sprintf(

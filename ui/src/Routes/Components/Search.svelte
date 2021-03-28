@@ -8,6 +8,4 @@
 	placeholder={text}
 	type="text" 
 	bind:value={$store}
-	on:focus|preventDefault={() => expanded = true}
-	on:blur|preventDefault={() => expanded = false}
 />
