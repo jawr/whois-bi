@@ -36,7 +36,7 @@ type ExpirationAlert struct {
 
 	DomainID int           `pg:",notnull"`
 	Domain   domain.Domain `pg:"fk:domain_id,rel:has-one"`
-	SentAt   time.time     `pg:",notnull,default:now()"`
+	SentAt   time.Time     `pg:",notnull,default:now()"`
 }
 
 func (m *Manager) sendAlerts(ctx context.Context) error {
