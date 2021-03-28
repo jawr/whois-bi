@@ -94,14 +94,13 @@ func (m *Manager) sendAlerts(ctx context.Context) error {
 
 			err := m.db.Model(&whois).
 				DistinctOn("whois.domain_id").
-				Join("JOIN expiration_alerts AS ea ON ea.domain_id = whois.domain_id").
+				Join("LEFT JOIN expiration_alerts AS ea ON ea.domain_id = whois.domain_id AND date_trunc('day', ea.sent_at) = date_trunc('day', NOW())").
 				Relation("Domain").
 				Where(
 					`
 						date_trunc('day', whois.expiration_date) = date_trunc('day', ?::timestamp) 
-						AND date_trunc('day', ea.sent_at) != date_trunc('day', ?::timestamp)
+						AND ea.id IS NULL
 					`,
-					time.Now().AddDate(0, 0, 7),
 					time.Now().AddDate(0, 0, 7),
 				).Select()
 			if err != nil {

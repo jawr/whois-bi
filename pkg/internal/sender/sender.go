@@ -2,6 +2,7 @@ package sender
 
 import (
 	"fmt"
+	"log"
 	"net/smtp"
 	"os"
 
@@ -28,6 +29,9 @@ func NewSender() *Sender {
 }
 
 func (s Sender) Send(to, subject, body string) error {
+	log.Printf("Send %s to %s", subject, to)
+
+	return nil
 	message := enmime.Builder().
 		From(os.Getenv("SMTP_FROM_NAME"), os.Getenv("SMTP_EMAIL")).
 		To(to, to).

@@ -40,7 +40,7 @@ type Record struct {
 	Name   string     `pg:",notnull" json:"name"`
 	RRType JsonRRType `pg:",notnull" json:"rr_type"`
 	Class  uint16     `pg:",notnull" json:"rr_class"`
-	TTL    uint32     `pg:",notnull" json:"ttl"`
+	TTL    uint32     `pg:",notnull,use_zero" json:"ttl"`
 
 	// this is a hash of the fields data and the ttl for
 	// easy change detection
