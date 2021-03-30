@@ -220,6 +220,8 @@ github.com/jhillyerd/enmime v0.8.0 h1:PHc/2LXtnDmCDm0V4+5NlBx+MoubmufhuNXwpKSV2o
 github.com/jhillyerd/enmime v0.8.0/go.mod h1:MBHs3ugk03NGjMM6PuRynlKf+HA5eSillZ+TRCm73AE=
 github.com/jhillyerd/enmime v0.8.4 h1:y4fFRV5Rf60G5mNUzyzcXIpsA9Ju7+lFx1MBBhO3or0=
 github.com/jhillyerd/enmime v0.8.4/go.mod h1:SWWlqKsXJMl00Nnuh04RSu6XoEo83B/VaujD/xzoBP0=
+github.com/jhillyerd/enmime v0.8.5-0.20210221174146-6fabdedd3425 h1:9DKYLUH8L8jZ2IYlY6uNGzTFfqjYRHwBtyA4y3TSTDU=
+github.com/jhillyerd/enmime v0.8.5-0.20210221174146-6fabdedd3425/go.mod h1:SWWlqKsXJMl00Nnuh04RSu6XoEo83B/VaujD/xzoBP0=
 github.com/jinzhu/inflection v1.0.0 h1:K317FqzuhWc8YvSVlFMCCUb36O/S9MCKRDI7QkRKD/E=
 github.com/jinzhu/inflection v1.0.0/go.mod h1:h+uFLlag+Qp1Va5pdKtLDYj+kHp5pxUVkryuEj+Srlc=
 github.com/joho/godotenv v1.3.0 h1:Zjp+RcGpHhGlrMbJzXTrZZPrWj+1vfm90La1wgB6Bhc=

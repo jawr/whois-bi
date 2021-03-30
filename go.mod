@@ -32,7 +32,7 @@ require (
 	github.com/hesahesa/pwdbro v0.0.0-20200103124734-0fb34fd61758
 	github.com/jawr/whois-parser-go v1.10.3
 	github.com/jaytaylor/html2text v0.0.0-20200412013138-3577fbdbcff7 // indirect
-	github.com/jhillyerd/enmime v0.8.4
+	github.com/jhillyerd/enmime v0.8.5-0.20210221174146-6fabdedd3425
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/joho/godotenv v1.3.0
 	github.com/json-iterator/go v1.1.10 // indirect

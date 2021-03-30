@@ -14,7 +14,7 @@ import (
 	"github.com/ThreeDotsLabs/watermill/message/router/plugin"
 	"github.com/go-pg/pg/v10"
 	"github.com/jawr/whois-bi/pkg/internal/domain"
-	"github.com/jawr/whois-bi/pkg/internal/sender"
+	"github.com/jawr/whois-bi/pkg/internal/emailer"
 	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
 )
@@ -22,13 +22,13 @@ import (
 type Manager struct {
 	db      *pg.DB
 	router  *message.Router
-	emailer *sender.Sender
+	emailer *emailer.Emailer
 
 	publisher  message.Publisher
 	subscriber message.Subscriber
 }
 
-func NewManager(db *pg.DB, emailer *sender.Sender) (*Manager, error) {
+func NewManager(db *pg.DB, emailer *emailer.Emailer) (*Manager, error) {
 	logger := watermill.NewStdLogger(false, false)
 
 	addr := os.Getenv("RABBITMQ_URI")
