@@ -4,9 +4,12 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/jawr/whois-bi/pkg/internal/job"
 	"github.com/pkg/errors"
+	"golang.org/x/sync/errgroup"
 )
 
 func main() {
@@ -17,17 +20,37 @@ func main() {
 }
 
 func run() error {
-	worker, err := job.NewWorker()
+	addr := os.Getenv("RABBITMQ_URI")
+	if len(addr) == 0 {
+		return errors.New("No RABBITMQ_URI")
+	}
+
+	worker, err := job.NewWorker(addr)
 	if err != nil {
 		return errors.WithMessage(err, "NewWorker")
 	}
-	defer worker.Close()
 
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
-	if err := worker.Run(ctx); err != nil {
-		return errors.WithMessage(err, "Run")
-	}
+	var wg errgroup.Group
 
-	return nil
+	wg.Go(func() error {
+		return worker.Run(ctx)
+	})
+
+	wg.Go(func() error {
+		sigc := make(chan os.Signal, 1)
+		signal.Notify(sigc, syscall.SIGINT, os.Interrupt, syscall.SIGTERM)
+
+		select {
+		case <-sigc:
+			cancel()
+			return nil
+		case <-ctx.Done():
+			return ctx.Err()
+		}
+	})
+
+	return wg.Wait()
 }

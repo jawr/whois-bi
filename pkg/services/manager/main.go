@@ -19,6 +19,11 @@ func main() {
 }
 
 func run() error {
+	addr := os.Getenv("RABBITMQ_URI")
+	if len(addr) == 0 {
+		return errors.New("No RABBITMQ_URI")
+	}
+
 	db, err := cmdutil.SetupDatabase()
 	if err != nil {
 		return errors.WithMessage(err, "SetupDatabase")
@@ -35,11 +40,10 @@ func run() error {
 		return errors.WithMessage(err, "NewEmailer")
 	}
 
-	manager, err := job.NewManager(db, emailer)
+	manager, err := job.NewManager(addr, db, emailer)
 	if err != nil {
 		return errors.WithMessage(err, "NewManager")
 	}
-	defer manager.Close()
 
 	ctx := context.Background()
 

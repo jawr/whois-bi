@@ -26,7 +26,7 @@ type Alert struct {
 	OwnerID int       `pg:",notnull"`
 	Owner   user.User `pg:"fk:owner_id,rel:has-one"`
 
-	Response JobResponse
+	Response Job
 
 	CreatedAt time.Time `pg:",notnull,default:now()"`
 }
@@ -167,7 +167,7 @@ func (m *Manager) handleAlerts(alerts []Alert) error {
 			&body,
 			"New changes have been detected, please go to: https://%s/domain/%s for more details or find a summary of the changes below.\n\n",
 			os.Getenv("DOMAIN"),
-			response.Job.Domain.Domain,
+			response.Domain.Domain,
 		)
 
 		if response.WhoisUpdated {
@@ -196,7 +196,7 @@ func (m *Manager) handleAlerts(alerts []Alert) error {
 		fmt.Fprintf(&body, "</pre>")
 
 		if ownerID == 0 {
-			ownerID = response.OwnerID
+			ownerID = response.Domain.OwnerID
 		}
 	}
 

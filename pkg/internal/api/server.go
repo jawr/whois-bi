@@ -13,8 +13,9 @@ import (
 )
 
 type Server struct {
-	db      *pg.DB
-	router  *gin.Engine
+	db     *pg.DB
+	router *gin.Engine
+
 	emailer *emailer.Emailer
 }
 

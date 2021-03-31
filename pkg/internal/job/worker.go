@@ -4,164 +4,103 @@ import (
 	"context"
 	"encoding/json"
 	"log"
-	"os"
 	"time"
 
-	"github.com/ThreeDotsLabs/watermill"
-	"github.com/ThreeDotsLabs/watermill-amqp/pkg/amqp"
-	"github.com/ThreeDotsLabs/watermill/message"
-	"github.com/ThreeDotsLabs/watermill/message/router/middleware"
-	"github.com/ThreeDotsLabs/watermill/message/router/plugin"
 	"github.com/jawr/whois-bi/pkg/internal/domain"
+	"github.com/jawr/whois-bi/pkg/internal/queue"
+	"github.com/jawr/whois-bi/pkg/internal/queue/rabbit"
 	"github.com/miekg/dns"
 	"github.com/pkg/errors"
+	"github.com/streadway/amqp"
+	"golang.org/x/sync/errgroup"
+)
+
+var (
+	subdomainsToCheck = []string{
+		"", "www", "mx", "media", "assets", "dashboard", "api",
+		"cdn", "download", "downloads", "mail", "applytics", "email", "app",
+		"img", "default._domainkey",
+	}
 )
 
 type Worker struct {
-	router *message.Router
+	publisher queue.Publisher
+	consumer  queue.Consumer
 
-	publisher  message.Publisher
-	subscriber message.Subscriber
+	dnsClient dns.Client
 }
 
-func NewWorker() (*Worker, error) {
-	logger := watermill.NewStdLogger(false, false)
-
-	addr := os.Getenv("RABBITMQ_URI")
-	if len(addr) == 0 {
-		return nil, errors.New("No RABBITMQ_URI")
-	}
-
-	amqpConfig := amqp.NewDurableQueueConfig(addr)
-	amqpConfig.Consume.NoRequeueOnNack = true
-
-	// setup publisher
-	publisher, err := amqp.NewPublisher(amqpConfig, logger)
-	if err != nil {
-		return nil, errors.Wrap(err, "NewPublisher")
-	}
-
-	// setup subscriber
-	subscriber, err := amqp.NewSubscriber(amqpConfig, logger)
-	if err != nil {
-		return nil, errors.Wrap(err, "NewSubscriber")
-	}
-
-	routerConfig := message.RouterConfig{}
-
-	// setup router
-	router, err := message.NewRouter(routerConfig, logger)
-	if err != nil {
-		return nil, errors.Wrap(err, "NewRouter")
-	}
+func NewWorker(addr string) (*Worker, error) {
+	publisher := rabbit.NewPublisher(addr)
+	consumer := rabbit.NewConsumer("", "job.queue", addr)
 
 	worker := Worker{
-		router:     router,
-		publisher:  publisher,
-		subscriber: subscriber,
+		publisher: publisher,
+		consumer:  consumer,
 	}
-
-	// finish setting up router
-	router.AddPlugin(
-		// gracefully handle SIGTERM
-		plugin.SignalsHandler,
-	)
-
-	router.AddMiddleware(
-		// recover from any panics
-		middleware.Recoverer,
-	)
-
-	router.AddNoPublisherHandler(
-		"job.queue",
-		"job.queue",
-		subscriber,
-		worker.jobHandler(),
-	)
 
 	return &worker, nil
 }
 
 func (w *Worker) Run(ctx context.Context) error {
-	return w.router.Run(ctx)
+	var wg errgroup.Group
+
+	wg.Go(func() error {
+		return w.publisher.Run(ctx)
+	})
+
+	wg.Go(func() error {
+		return w.consumer.Run(ctx, w.handleJob)
+	})
+
+	return wg.Wait()
 }
 
-func (w *Worker) Close() error {
-	return w.router.Close()
-}
+func (w *Worker) handleJob(ctx context.Context, msg *amqp.Delivery) {
+	var job Job
 
-func (w *Worker) jobHandler() message.NoPublishHandlerFunc {
-	// make further upstream?
-	client := dns.Client{}
-
-	return func(msg *message.Message) (finalErr error) {
-		var job Job
-		if err := json.Unmarshal(msg.Payload, &job); err != nil {
-			return errors.Wrap(err, "Unmarshal")
-		}
-
-		job.StartedAt = time.Now()
-		response := JobResponse{
-			Job: job,
-		}
-
-		// always dispatch our response
-		defer func() {
-			response.Job.FinishedAt = time.Now()
-
-			b, err := json.Marshal(&response)
-			if err != nil {
-				finalErr = errors.Wrap(err, "Marshal")
-				return
-			}
-
-			msg := message.NewMessage(watermill.NewUUID(), b)
-
-			if err := w.publisher.Publish("job.response", msg); err != nil {
-				finalErr = errors.Wrap(err, "Publish")
-				return
-			}
-
-			if len(response.Errors) > 0 {
-				finalErr = errors.Errorf("%d errors encountered", len(response.Errors))
-			}
-		}()
-
-		log.Printf("JOB / %d / %s", job.ID, job.Domain.Domain)
-
-		records, err := job.Domain.QueryANY(&client, job.Domain.Domain)
-		if err != nil {
-			response.Errors = append(response.Errors, errors.Wrap(err, "QueryANY").Error())
-		}
-
-		enumRecords, err := job.Domain.QueryEnumerate(&client, []string{
-			"", "www", "mx", "media", "assets", "dashboard", "api",
-			"cdn", "download", "downloads", "mail", "applytics", "email", "app",
-			"img", "default._domainkey",
-		})
-		if err != nil {
-			response.Errors = append(response.Errors, errors.Wrap(err, "QueryEnumerate").Error())
-		}
-
-		log.Printf("Found %d enumRecords", len(enumRecords))
-
-		records = append(records, enumRecords...)
-
-		additions, removals, err := job.Domain.CheckDelta(&client, job.CurrentRecords, records)
-		if err != nil {
-			response.Errors = append(response.Errors, errors.Wrap(err, "CheckDelta").Error())
-		}
-
-		response.RecordAdditions = additions
-		response.RecordRemovals = removals
-
-		w, err := domain.NewWhois(job.Domain)
-		if err != nil {
-			response.Errors = append(response.Errors, errors.Wrap(err, "NewWhois").Error())
-		} else {
-			response.Whois = w
-		}
-
-		return nil
+	if err := json.Unmarshal(msg.Body, &job); err != nil {
+		return
 	}
+
+	job.StartedAt = time.Now()
+
+	log.Printf("JOB / %d / %s", job.ID, job.Domain.Domain)
+
+	records := w.handleRecords(&job)
+
+	additions, removals, err := job.Domain.CheckDelta(&w.dnsClient, job.CurrentRecords, records)
+	if err != nil {
+		job.Errors = append(job.Errors, errors.Wrap(err, "CheckDelta").Error())
+	}
+
+	job.RecordAdditions = additions
+	job.RecordRemovals = removals
+	job.FinishedAt = time.Now()
+
+	err = w.publisher.Publish(ctx, "job.response", &job)
+	if err != nil {
+		log.Printf("Error handling job %d, unable to publish: %s", job.ID, err)
+		return
+	}
+}
+
+// build a list of current records using ANY and enumeration
+func (w *Worker) handleRecords(job *Job) domain.Records {
+	records, err := job.Domain.QueryANY(&w.dnsClient, job.Domain.Domain)
+	if err != nil {
+		job.Errors = append(job.Errors, errors.Wrap(err, "QueryANY").Error())
+	}
+
+	// explain what this does, or give it a better name
+	enumRecords, err := job.Domain.QueryEnumerate(&w.dnsClient, subdomainsToCheck)
+	if err != nil {
+		job.Errors = append(job.Errors, errors.Wrap(err, "QueryEnumerate").Error())
+	}
+
+	if len(enumRecords) > 0 {
+		records = append(records, enumRecords...)
+	}
+
+	return records
 }
