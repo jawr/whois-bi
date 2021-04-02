@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - master
-
 jobs:
   docker-build-api:
     runs-on: ubuntu-latest
@@ -16,11 +15,10 @@ jobs:
           password: ${{ secrets.CR_PAT }}
       - uses: docker/build-push-action@v2
         with:
-          file: ./build/service.dockerfile
+          file: ./prod/service.dockerfile
           build-args: service=api
           tags: ghcr.io/jawr/whois-bi/api:latest
           push: true
-
   docker-build-manager:
     runs-on: ubuntu-latest
     steps:
@@ -32,11 +30,10 @@ jobs:
           password: ${{ secrets.CR_PAT }}
       - uses: docker/build-push-action@v2
         with:
-          file: ./build/service.dockerfile
+          file: ./prod/service.dockerfile
           build-args: service=manager
           tags: ghcr.io/jawr/whois-bi/manager:latest
           push: true
-
   docker-build-worker:
     runs-on: ubuntu-latest
     steps:
@@ -48,11 +45,10 @@ jobs:
           password: ${{ secrets.CR_PAT }}
       - uses: docker/build-push-action@v2
         with:
-          file: ./build/service.dockerfile
+          file: ./prod/service.dockerfile
           build-args: service=worker
           tags: ghcr.io/jawr/whois-bi/worker:latest
           push: true
-
   docker-build-ui:
     runs-on: ubuntu-latest
     steps:
@@ -65,10 +61,9 @@ jobs:
       - uses: docker/build-push-action@v2
         with:
           context: ./ui/
-          file: ./build/ui.dockerfile
+          file: ./prod/ui.dockerfile
           tags: ghcr.io/jawr/whois-bi/ui:latest
           push: true
-
   docker-build-toolbox:
     runs-on: ubuntu-latest
     steps:
@@ -80,6 +75,6 @@ jobs:
           password: ${{ secrets.CR_PAT }}
       - uses: docker/build-push-action@v2
         with:
-          file: ./build/toolbox.dockerfile
+          file: ./prod/toolbox.dockerfile
           tags: ghcr.io/jawr/whois-bi/toolbox:latest
           push: true
