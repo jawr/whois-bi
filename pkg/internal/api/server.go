@@ -9,16 +9,17 @@ import (
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"github.com/go-pg/pg/v10"
-	"github.com/jawr/whois-bi/pkg/internal/sender"
+	"github.com/jawr/whois-bi/pkg/internal/emailer"
 )
 
 type Server struct {
-	db      *pg.DB
-	router  *gin.Engine
-	emailer *sender.Sender
+	db     *pg.DB
+	router *gin.Engine
+
+	emailer *emailer.Emailer
 }
 
-func NewServer(db *pg.DB, emailer *sender.Sender) *Server {
+func NewServer(db *pg.DB, emailer *emailer.Emailer) *Server {
 	router := gin.Default()
 
 	store := cookie.NewStore([]byte(os.Getenv("HTTP_COOKIE_SECRET")))

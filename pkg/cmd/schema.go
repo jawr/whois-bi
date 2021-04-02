@@ -6,7 +6,7 @@ import (
 
 	"github.com/go-pg/pg/v10"
 	"github.com/go-pg/pg/v10/orm"
-	"github.com/jawr/whois-bi/pkg/internal/cmdutil"
+	"github.com/jawr/whois-bi/pkg/internal/db"
 	"github.com/jawr/whois-bi/pkg/internal/domain"
 	"github.com/jawr/whois-bi/pkg/internal/job"
 	"github.com/jawr/whois-bi/pkg/internal/list"
@@ -20,15 +20,15 @@ func init() {
 		Use:   "schema",
 		Short: "Add a domain to a user",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cmdutil.LoadDotEnv()
+			loadDotEnv()
 
-			db, err := cmdutil.SetupDatabase()
+			dbConn, err := db.SetupDatabase()
 			if err != nil {
 				return errors.WithMessage(err, "SetupDatabase")
 			}
-			defer db.Close()
+			defer dbConn.Close()
 
-			setupSchema(db)
+			setupSchema(dbConn)
 
 			return nil
 		},

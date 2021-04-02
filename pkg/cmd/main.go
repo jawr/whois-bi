@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
 )
 
@@ -17,4 +18,9 @@ func Execute() {
 		fmt.Fprintf(os.Stderr, "ERROR: %s\n", err)
 		os.Exit(1)
 	}
+}
+
+// LoadDotEnv reads in .env variables
+func loadDotEnv() error {
+	return godotenv.Load()
 }

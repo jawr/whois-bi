@@ -1,0 +1,45 @@
+version: '3'
+networks:
+  whoisbi-test:
+    driver: bridge
+services:
+  postgres:
+    container_name: postgres-test
+    image: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    networks:
+      - whoisbi-test
+    restart: on-failure
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+  test:
+    build:
+      context: .
+      dockerfile: dev/test.dockerfile
+    command: ["bash", "-c", "until nc postgres 5432; do sleep 2; done ; toolbox schema && go test -v ./..."]
+    networks:
+      - whoisbi-test
+    depends_on:
+      - postgres
+    environment:
+      POSTGRES_URI: ${POSTGRES_URI}
+      HTTP_API_ADDR: ${HTTP_API_ADDR}
+      HTTP_SESSION_ID: ${HTTP_SESSION_ID}
+      HTTP_COOKIE_SECRET: ${HTTP_COOKIE_SECRET}
+      SMTP_FROM_NAME: ${SMTP_FROM_NAME}
+      SMTP_EMAIL: ${SMTP_EMAIL}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      RABBITMQ_URI: ${RABBITMQ_URI}
+      MODE: ${MODE}
+      CGO_ENABLED: 0
+    volumes:
+      - .:/build

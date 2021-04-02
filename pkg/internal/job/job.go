@@ -24,22 +24,12 @@ type Job struct {
 	StartedAt  time.Time `json:"started_at"`
 	FinishedAt time.Time `json:"finished_at"`
 
-	// dont persist, what is this for?
-	CurrentRecords domain.Records `pg:"-" json:"current_records"`
-}
-
-type JobResponse struct {
-	OwnerID int
-
-	Job Job
-
-	Errors []string
-
-	RecordAdditions domain.Records
-	RecordRemovals  domain.Records
-	Whois           domain.Whois
-
-	WhoisUpdated bool
+	// for workers to respond, unfortunately this leaks into
+	// the api
+	CurrentRecords  domain.Records `pg:"-"`
+	RecordAdditions domain.Records `pg:"-"`
+	RecordRemovals  domain.Records `pg:"-"`
+	Whois           domain.Whois   `pg:"-"`
 }
 
 func NewJob(d domain.Domain) Job {

@@ -16,7 +16,7 @@ const (
 	RecordSourceANY = iota
 	RecordSourceAXFR
 	RecordSourceManual
-	RecordSourceEnum
+	RecordSourceIterate
 )
 
 type Record struct {

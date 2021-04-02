@@ -26,7 +26,7 @@ type Alert struct {
 	OwnerID int       `pg:",notnull"`
 	Owner   user.User `pg:"fk:owner_id,rel:has-one"`
 
-	Response JobResponse
+	Response Job
 
 	CreatedAt time.Time `pg:",notnull,default:now()"`
 }
@@ -129,7 +129,7 @@ func (m *Manager) handleExpirationAlerts(whois []domain.Whois) error {
 			return err
 		}
 
-		subject := fmt.Sprintf("ALARM BELLS - %s expires in 7 days")
+		subject := fmt.Sprintf("ALARM BELLS - %s expires in 7 days", w.Domain.Domain)
 
 		body := fmt.Sprintf(
 			"Your domain will expire in 7 days for more information visit: https://%s/domain/%s\n\n",
@@ -167,7 +167,7 @@ func (m *Manager) handleAlerts(alerts []Alert) error {
 			&body,
 			"New changes have been detected, please go to: https://%s/domain/%s for more details or find a summary of the changes below.\n\n",
 			os.Getenv("DOMAIN"),
-			response.Job.Domain.Domain,
+			response.Domain.Domain,
 		)
 
 		if response.WhoisUpdated {
@@ -196,7 +196,7 @@ func (m *Manager) handleAlerts(alerts []Alert) error {
 		fmt.Fprintf(&body, "</pre>")
 
 		if ownerID == 0 {
-			ownerID = response.OwnerID
+			ownerID = response.Domain.OwnerID
 		}
 	}
 

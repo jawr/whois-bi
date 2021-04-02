@@ -5,8 +5,8 @@ import (
 	"os"
 
 	"github.com/jawr/whois-bi/pkg/internal/api"
-	"github.com/jawr/whois-bi/pkg/internal/cmdutil"
-	"github.com/jawr/whois-bi/pkg/internal/sender"
+	"github.com/jawr/whois-bi/pkg/internal/db"
+	"github.com/jawr/whois-bi/pkg/internal/emailer"
 	"github.com/pkg/errors"
 )
 
@@ -18,18 +18,23 @@ func main() {
 }
 
 func run() error {
-	db, err := cmdutil.SetupDatabase()
+	dbConn, err := db.SetupDatabase()
 	if err != nil {
 		return errors.WithMessage(err, "SetupDatabase")
 	}
-	defer db.Close()
+	defer dbConn.Close()
 
-	emailer, err := sender.NewSender()
+	sender := emailer.NewSMTPSenderFromEnv()
+	emailer, err := emailer.NewEmailer(
+		os.Getenv("SMTP_FROM_NAME"),
+		os.Getenv("SMTP_EMAIL"),
+		sender,
+	)
 	if err != nil {
-		return errors.WithMessage(err, "NewSender")
+		return errors.WithMessage(err, "NewEmailer")
 	}
 
-	server := api.NewServer(db, emailer)
+	server := api.NewServer(dbConn, emailer)
 
 	if err := server.Run(os.Getenv("HTTP_API_ADDR")); err != nil {
 		return errors.Wrap(err, "Run")

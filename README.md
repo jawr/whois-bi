@@ -1,3 +1,5 @@
+[![Coverage Status](https://coveralls.io/repos/github/jawr/whois-bi/badge.svg?branch=master)](https://coveralls.io/github/jawr/whois-bi?branch=master)
+
 # Whois.bi
 Tool for monitoring domains. Scan for common DNS records, or manually add them.
 Periodically check for changes on the records. Periodically Check for Whois

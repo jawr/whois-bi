@@ -15,6 +15,7 @@ require (
 	github.com/cpuguy83/go-md2man v1.0.10 // indirect
 	github.com/dchest/uniuri v0.0.0-20200228104902-7aecb25e1fe5
 	github.com/dlclark/regexp2 v1.4.0 // indirect
+	github.com/furdarius/rabbitroutine v0.7.0
 	github.com/fvbock/endless v0.0.0-20170109170031-447134032cb6
 	github.com/gin-contrib/sessions v0.0.3
 	github.com/gin-gonic/contrib v0.0.0-20191209060500-d6e26eeaa607
@@ -32,7 +33,7 @@ require (
 	github.com/hesahesa/pwdbro v0.0.0-20200103124734-0fb34fd61758
 	github.com/jawr/whois-parser-go v1.10.3
 	github.com/jaytaylor/html2text v0.0.0-20200412013138-3577fbdbcff7 // indirect
-	github.com/jhillyerd/enmime v0.8.4
+	github.com/jhillyerd/enmime v0.8.5-0.20210221174146-6fabdedd3425
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/joho/godotenv v1.3.0
 	github.com/json-iterator/go v1.1.10 // indirect
@@ -47,8 +48,8 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/segmentio/fasthash v1.0.3
-	github.com/spf13/cobra v1.1.3 // indirect
-	github.com/streadway/amqp v1.0.0 // indirect
+	github.com/spf13/cobra v1.1.3
+	github.com/streadway/amqp v1.0.0
 	github.com/ugorji/go v1.2.4 // indirect
 	github.com/xordataexchange/crypt v0.0.3-0.20170626215501-b2862e3d0a77 // indirect
 	golang.org/x/crypto v0.0.0-20210220033148-5ea612d1eb83

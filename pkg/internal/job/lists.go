@@ -7,16 +7,16 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (m *Manager) handleLists(response *JobResponse) error {
+func (m *Manager) handleLists(response *Job) error {
 	// eventually we will want to cache this, but for now its
 	// better to give the user a real time feeling as db calls
 	// will be cheap
 	var whitelists, blacklists []list.List
 
-	if response.Job.Domain.OwnerID == 0 {
+	if response.Domain.OwnerID == 0 {
 		return errors.New("expected a user id")
 	}
-	uID := response.Job.Domain.OwnerID
+	uID := response.Domain.OwnerID
 
 	err := m.db.Model(&whitelists).Where("owner_id = ? AND list_type = ?", uID, list.Whitelist).Select()
 	if err != nil {
@@ -31,7 +31,7 @@ func (m *Manager) handleLists(response *JobResponse) error {
 	return handleLists(response, whitelists, blacklists)
 }
 
-func handleLists(response *JobResponse, whitelists, blacklists []list.List) error {
+func handleLists(response *Job, whitelists, blacklists []list.List) error {
 	for _, w := range whitelists {
 		// if we match anything, drop out before checking blacklists
 		for _, r := range response.RecordAdditions {

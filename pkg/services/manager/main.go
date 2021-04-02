@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/jawr/whois-bi/pkg/internal/cmdutil"
+	"github.com/jawr/whois-bi/pkg/internal/db"
+	"github.com/jawr/whois-bi/pkg/internal/emailer"
 	"github.com/jawr/whois-bi/pkg/internal/job"
-	"github.com/jawr/whois-bi/pkg/internal/sender"
+	"github.com/jawr/whois-bi/pkg/internal/queue/rabbit"
 	"github.com/pkg/errors"
 )
 
@@ -19,22 +20,34 @@ func main() {
 }
 
 func run() error {
-	db, err := cmdutil.SetupDatabase()
+	addr := os.Getenv("RABBITMQ_URI")
+	if len(addr) == 0 {
+		return errors.New("No RABBITMQ_URI")
+	}
+
+	publisher := rabbit.NewPublisher(addr)
+	consumer := rabbit.NewConsumer("", "job.response", addr)
+
+	dbConn, err := db.SetupDatabase()
 	if err != nil {
 		return errors.WithMessage(err, "SetupDatabase")
 	}
-	defer db.Close()
+	defer dbConn.Close()
 
-	emailer, err := sender.NewSender()
+	sender := emailer.NewSMTPSenderFromEnv()
+	emailer, err := emailer.NewEmailer(
+		os.Getenv("SMTP_FROM_NAME"),
+		os.Getenv("SMTP_EMAIL"),
+		sender,
+	)
 	if err != nil {
-		return errors.WithMessage(err, "NewSender")
+		return errors.WithMessage(err, "NewEmailer")
 	}
 
-	manager, err := job.NewManager(db, emailer)
+	manager, err := job.NewManager(publisher, consumer, dbConn, emailer)
 	if err != nil {
 		return errors.WithMessage(err, "NewManager")
 	}
-	defer manager.Close()
 
 	ctx := context.Background()
 

@@ -1,16 +1,10 @@
-package cmdutil
+package db
 
 import (
 	"os"
 
 	"github.com/go-pg/pg/v10"
-	"github.com/joho/godotenv"
 )
-
-// LoadDotEnv reads in .env variables
-func LoadDotEnv() error {
-	return godotenv.Load()
-}
 
 // SetupDatabase uses the POSTGRES_URI environment variable
 // to create an pg.DB instance

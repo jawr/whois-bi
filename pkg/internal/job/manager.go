@@ -4,119 +4,59 @@ import (
 	"context"
 	"encoding/json"
 	"log"
-	"os"
 	"time"
 
-	"github.com/ThreeDotsLabs/watermill"
-	"github.com/ThreeDotsLabs/watermill-amqp/pkg/amqp"
-	"github.com/ThreeDotsLabs/watermill/message"
-	"github.com/ThreeDotsLabs/watermill/message/router/middleware"
-	"github.com/ThreeDotsLabs/watermill/message/router/plugin"
 	"github.com/go-pg/pg/v10"
 	"github.com/jawr/whois-bi/pkg/internal/domain"
-	"github.com/jawr/whois-bi/pkg/internal/sender"
+	"github.com/jawr/whois-bi/pkg/internal/emailer"
+	"github.com/jawr/whois-bi/pkg/internal/queue"
 	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
 )
 
 type Manager struct {
 	db      *pg.DB
-	router  *message.Router
-	emailer *sender.Sender
+	emailer *emailer.Emailer
 
-	publisher  message.Publisher
-	subscriber message.Subscriber
+	publisher queue.Publisher
+	consumer  queue.Consumer
 }
 
-func NewManager(db *pg.DB, emailer *sender.Sender) (*Manager, error) {
-	logger := watermill.NewStdLogger(false, false)
-
-	addr := os.Getenv("RABBITMQ_URI")
-	if len(addr) == 0 {
-		return nil, errors.New("No RABBITMQ_URI")
-	}
-
-	amqpConfig := amqp.NewDurableQueueConfig(addr)
-	amqpConfig.Consume.NoRequeueOnNack = true
-
-	// setup publisher
-	publisher, err := amqp.NewPublisher(amqpConfig, logger)
-	if err != nil {
-		return nil, errors.WithMessage(err, "NewPublisher")
-	}
-
-	// setup subscriber
-	subscriber, err := amqp.NewSubscriber(amqpConfig, logger)
-	if err != nil {
-		return nil, errors.WithMessage(err, "NewSubscriber")
-	}
-
-	routerConfig := message.RouterConfig{}
-
-	// setup router
-	router, err := message.NewRouter(routerConfig, logger)
-	if err != nil {
-		return nil, errors.WithMessage(err, "NewRouter")
-	}
+func NewManager(publisher queue.Publisher, consumer queue.Consumer, db *pg.DB, emailer *emailer.Emailer) (*Manager, error) {
 
 	// setup manager
 	manager := Manager{
-		db:         db,
-		emailer:    emailer,
-		router:     router,
-		publisher:  publisher,
-		subscriber: subscriber,
+		db:        db,
+		emailer:   emailer,
+		publisher: publisher,
+		consumer:  consumer,
 	}
-
-	// finish setting up router
-	router.AddPlugin(
-		// gracefully handle SIGTERM
-		plugin.SignalsHandler,
-	)
-
-	router.AddMiddleware(
-		// recover from any panics
-		middleware.Recoverer,
-	)
-
-	router.AddNoPublisherHandler(
-		"job.response",
-		"job.response",
-		subscriber,
-		manager.jobResponseHandler(),
-	)
 
 	return &manager, nil
 }
 
 func (m *Manager) Run(ctx context.Context) error {
-	eg, ctx := errgroup.WithContext(ctx)
+	wg, ctx := errgroup.WithContext(ctx)
 
 	// handle creation of jobs
-	eg.Go(func() error {
+	wg.Go(func() error {
 		return m.createJobs(ctx)
 	})
 
-	// run router
-	eg.Go(func() error {
-		return m.router.Run(ctx)
+	wg.Go(func() error {
+		return m.publisher.Run(ctx)
+	})
+
+	wg.Go(func() error {
+		return m.consumer.Run(ctx, m.handleJobResponses)
 	})
 
 	// handle alerts
-	eg.Go(func() error {
+	wg.Go(func() error {
 		return m.sendAlerts(ctx)
 	})
 
-	if err := eg.Wait(); err != nil {
-		log.Printf("Error encountered: %s", err)
-		return err
-	}
-
-	return nil
-}
-
-func (m *Manager) Close() error {
-	return m.router.Close()
+	return wg.Wait()
 }
 
 func (m *Manager) createJobs(ctx context.Context) error {
@@ -162,14 +102,7 @@ func (m *Manager) createJobs(ctx context.Context) error {
 			}
 			j.CurrentRecords = currentRecords
 
-			b, err := json.Marshal(&j)
-			if err != nil {
-				return errors.WithMessage(err, "Marhsal")
-			}
-
-			msg := message.NewMessage(watermill.NewUUID(), b)
-
-			if err := m.publisher.Publish("job.queue", msg); err != nil {
+			if err := m.publisher.Publish(ctx, "job.queue", &j); err != nil {
 				return errors.WithMessage(err, "Publish")
 			}
 		}
@@ -183,90 +116,88 @@ func (m *Manager) createJobs(ctx context.Context) error {
 	return nil
 }
 
-func (m *Manager) jobResponseHandler() message.NoPublishHandlerFunc {
-	return func(msg *message.Message) error {
-		var response JobResponse
-		if err := json.Unmarshal(msg.Payload, &response); err != nil {
-			return errors.WithMessage(err, "Unmarshal")
+func (m *Manager) handleJobResponses(ctx context.Context, body []byte) {
+	var job Job
+	if err := json.Unmarshal(body, &job); err != nil {
+		return
+	}
+
+	log.Printf(
+		"Job %d  / %s Found %d additions and %d removals",
+		job.ID,
+		job.Domain,
+		len(job.RecordAdditions),
+		len(job.RecordRemovals),
+	)
+
+	// handle removals
+	if err := job.RecordRemovals.Remove(m.db); err != nil {
+		log.Printf("Error RecordRemovals.Remove() job %d: %s", job.ID, err)
+		return
+	}
+
+	// handle additions
+	if err := job.RecordAdditions.Insert(m.db); err != nil {
+		log.Printf("Error RecordAdditions.Insert() job %d: %s", job.ID, err)
+		return
+	}
+
+	// handle whois
+	if job.Whois.Raw != nil {
+		if err := job.Whois.Insert(m.db); err != nil {
+			// means we hit a dupe
+			if err != pg.ErrNoRows {
+				log.Println(errors.WithMessage(err, "inserting whois"))
+			}
+		} else {
+			job.WhoisUpdated = true
+		}
+	}
+
+	// parse the record additions and removals through our lists to avoid sending alarm bells
+	if err := m.handleLists(&job); err != nil {
+		log.Printf("Error parsing lists for job %d: %s", job.ID, err)
+	}
+
+	// handle alert message
+	if len(job.RecordAdditions) > 0 || len(job.RecordRemovals) > 0 {
+		a := Alert{
+			OwnerID:  job.Domain.OwnerID,
+			Response: job,
 		}
 
-		response.OwnerID = response.Job.Domain.OwnerID
-
-		log.Printf(
-			"Job %d  / %s Found %d additions and %d removals",
-			response.Job.ID,
-			response.Job.Domain,
-			len(response.RecordAdditions),
-			len(response.RecordRemovals),
-		)
-
-		// handle removals
-		if err := response.RecordRemovals.Remove(m.db); err != nil {
-			return errors.WithMessage(err, "removals.Remove")
-		}
-
-		// handle additions
-		if err := response.RecordAdditions.Insert(m.db); err != nil {
-			return errors.WithMessage(err, "additions.Insert")
-		}
-
-		// handle whois
-		if response.Whois.Raw != nil {
-			if err := response.Whois.Insert(m.db); err != nil {
-				// means we hit a dupe
-				if err != pg.ErrNoRows {
-					log.Println(errors.WithMessage(err, "inserting whois"))
-				}
-			} else {
-				response.WhoisUpdated = true
+		if job.Domain.DontBatch {
+			if err := m.handleAlerts([]Alert{a}); err != nil {
+				log.Printf("Error handling alerts for job %d: %s", job.ID, err)
+			}
+		} else {
+			if _, err := m.db.Model(&a).Insert(); err != nil {
+				log.Printf("Error inserting alert for job %d: %s", job.ID, err)
 			}
 		}
+	}
 
-		// parse the record additions and removals through our lists to avoid sending alarm bells
-		if err := m.handleLists(&response); err != nil {
-			log.Printf("Error parsing lists: %s", err)
-		}
+	_, err := m.db.Model(&job).
+		Set(
+			"errors = ?, started_at = ?, finished_at = ?, additions = ?, removals = ?, whois_updated = ?",
+			job.Errors,
+			job.StartedAt,
+			job.FinishedAt,
+			len(job.RecordAdditions),
+			len(job.RecordRemovals),
+			job.WhoisUpdated,
+		).
+		WherePK().
+		Update()
 
-		// handle alert message
-		if len(response.RecordAdditions) > 0 || len(response.RecordRemovals) > 0 {
-			a := Alert{
-				OwnerID:  response.OwnerID,
-				Response: response,
-			}
+	if err != nil {
+		log.Printf("Error updating job %d: %s", job.ID, err)
+		return
+	}
 
-			if response.Job.Domain.DontBatch {
-				if err := m.handleAlerts([]Alert{a}); err != nil {
-					log.Printf("Error handling alerts: %s", err)
-				}
-			} else {
-				if _, err := m.db.Model(&a).Insert(); err != nil {
-					log.Printf("Error inserting alert: %s", err)
-				}
-			}
-		}
-
-		_, err := m.db.Model(&response.Job).
-			Set(
-				"errors = ?, started_at = ?, finished_at = ?, additions = ?, removals = ?, whois_updated = ?",
-				response.Errors,
-				response.Job.StartedAt,
-				response.Job.FinishedAt,
-				len(response.RecordAdditions),
-				len(response.RecordRemovals),
-				response.WhoisUpdated,
-			).
-			WherePK().
-			Update()
-
-		if err != nil {
-			return errors.WithMessage(err, "Update Job")
-		}
-
-		_, err = m.db.Model(&response.Job.Domain).Set("last_updated_at = now()").WherePK().Update()
-		if err != nil {
-			return errors.WithMessage(err, "Update Domain")
-		}
-
-		return nil
+	_, err = m.db.Model(&job.Domain).Set("last_updated_at = now()").WherePK().Update()
+	if err != nil {
+		log.Printf("Error updating domain %d: %s", job.ID, err)
+		return
 	}
 }

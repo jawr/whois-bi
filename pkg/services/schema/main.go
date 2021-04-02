@@ -8,7 +8,7 @@ import (
 
 	"github.com/go-pg/pg/v10"
 	"github.com/go-pg/pg/v10/orm"
-	"github.com/jawr/whois-bi/pkg/internal/cmdutil"
+	"github.com/jawr/whois-bi/pkg/internal/db"
 	"github.com/jawr/whois-bi/pkg/internal/domain"
 	"github.com/jawr/whois-bi/pkg/internal/job"
 	"github.com/jawr/whois-bi/pkg/internal/user"
@@ -23,18 +23,19 @@ func main() {
 }
 
 func run() error {
-	db, err := cmdutil.SetupDatabase()
+	dbConn, err := db.SetupDatabase()
 	if err != nil {
 		return errors.Wrap(err, "SetupDatabase")
 	}
+	defer dbConn.Close()
 
-	setupSchema(db)
+	setupSchema(dbConn)
 
 	if len(os.Getenv("ADMIN_EMAIL")) == 0 {
 		return nil
 	}
 
-	if _, err := user.GetUser(db, os.Getenv("ADMIN_EMAIL")); err == nil {
+	if _, err := user.GetUser(dbConn, os.Getenv("ADMIN_EMAIL")); err == nil {
 		return nil
 	}
 
@@ -48,7 +49,7 @@ func run() error {
 
 	user.VerifiedAt = time.Now()
 
-	if err := user.Insert(db); err != nil {
+	if err := user.Insert(dbConn); err != nil {
 		return err
 	}
 
@@ -65,7 +66,7 @@ func setupSchema(db *pg.DB) {
 	}
 
 	for _, model := range models {
-		err := db.CreateTable(model, &orm.CreateTableOptions{
+		err := db.Model(model).CreateTable(&orm.CreateTableOptions{
 			Temp:          false,
 			FKConstraints: true,
 		})

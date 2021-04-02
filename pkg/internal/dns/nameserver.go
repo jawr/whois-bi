@@ -1,4 +1,4 @@
-package domain
+package dns
 
 import (
 	"strings"
@@ -7,7 +7,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func getNameservers(client *dns.Client, domain string) ([]string, error) {
+func (c *DNSClient) getNameservers(domain string) ([]string, error) {
 	var msg dns.Msg
 
 	msg.SetQuestion(
@@ -15,7 +15,7 @@ func getNameservers(client *dns.Client, domain string) ([]string, error) {
 		dns.TypeNS,
 	)
 
-	reply, _, err := client.Exchange(&msg, "8.8.8.8:53")
+	reply, _, err := c.Exchange(&msg, "8.8.8.8:53")
 	if err != nil {
 		return nil, errors.Wrap(err, "Exchange")
 	}
@@ -28,7 +28,10 @@ func getNameservers(client *dns.Client, domain string) ([]string, error) {
 			return nil, errors.New("casting ns")
 		}
 
-		nameservers = append(nameservers, strings.TrimSuffix(ns.Ns, "."))
+		nameservers = append(
+			nameservers,
+			strings.TrimSuffix(ns.Ns, "."),
+		)
 	}
 
 	if len(nameservers) == 0 {
