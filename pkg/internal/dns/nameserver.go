@@ -28,7 +28,10 @@ func (c *DNSClient) getNameservers(domain string) ([]string, error) {
 			return nil, errors.New("casting ns")
 		}
 
-		nameservers = append(nameservers, strings.TrimSuffix(ns.Ns, "."))
+		nameservers = append(
+			nameservers,
+			strings.TrimSuffix(ns.Ns, "."),
+		)
 	}
 
 	if len(nameservers) == 0 {

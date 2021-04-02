@@ -2,6 +2,7 @@ package dns
 
 import (
 	"strings"
+	"time"
 
 	"github.com/jawr/whois-bi/pkg/internal/domain"
 	"github.com/miekg/dns"
@@ -11,6 +12,7 @@ import (
 var (
 	subdomainsToCheck = map[string]struct{}{
 		"":                   struct{}{},
+		"*":                  struct{}{},
 		"www":                struct{}{},
 		"mx":                 struct{}{},
 		"media":              struct{}{},
@@ -26,6 +28,8 @@ var (
 		"app":                struct{}{},
 		"img":                struct{}{},
 		"default._domainkey": struct{}{},
+		"_dmarc":             struct{}{},
+		"spf":                struct{}{},
 	}
 )
 
@@ -45,18 +49,18 @@ func (c DNSClient) GetLive(dom domain.Domain, stored domain.Records) (domain.Rec
 		}
 	}
 
-	// query against targets
-	live, err := c.queryANY(dom, nameservers)
-	if err != nil {
-		return nil, errors.WithMessage(err, "queryANY")
+	var live domain.Records
+
+	for i := 0; i < 10; i++ {
+		live, err = c.queryIterate(dom, nameservers, subdomainsToCheck)
+		if err != nil {
+			if strings.Contains(err.Error(), "timeout") {
+				time.Sleep(time.Millisecond * 500)
+				continue
+			}
+		}
+		break
 	}
 
-	iterated, err := c.queryIterate(dom, nameservers, subdomainsToCheck)
-	if err != nil {
-		return nil, errors.WithMessage(err, "queryIterate")
-	}
-
-	live = append(live, iterated...)
-
-	return live, nil
+	return live, err
 }
