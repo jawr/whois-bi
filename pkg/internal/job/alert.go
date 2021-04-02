@@ -129,7 +129,7 @@ func (m *Manager) handleExpirationAlerts(whois []domain.Whois) error {
 			return err
 		}
 
-		subject := fmt.Sprintf("ALARM BELLS - %s expires in 7 days")
+		subject := fmt.Sprintf("ALARM BELLS - %s expires in 7 days", w.Domain.Domain)
 
 		body := fmt.Sprintf(
 			"Your domain will expire in 7 days for more information visit: https://%s/domain/%s\n\n",

@@ -7,7 +7,9 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/jawr/whois-bi/pkg/internal/job"
+	"github.com/jawr/whois-bi/pkg/internal/dns"
+	"github.com/jawr/whois-bi/pkg/internal/queue/rabbit"
+	"github.com/jawr/whois-bi/pkg/internal/worker"
 	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
 )
@@ -25,10 +27,11 @@ func run() error {
 		return errors.New("No RABBITMQ_URI")
 	}
 
-	worker, err := job.NewWorker(addr)
-	if err != nil {
-		return errors.WithMessage(err, "NewWorker")
-	}
+	dnsClient := dns.NewDNSClient()
+	publisher := rabbit.NewPublisher(addr)
+	consumer := rabbit.NewConsumer("", "job.queue", addr)
+
+	wrk := worker.NewWorker(dnsClient, publisher, consumer)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -36,7 +39,7 @@ func run() error {
 	var wg errgroup.Group
 
 	wg.Go(func() error {
-		return worker.Run(ctx)
+		return wrk.Run(ctx)
 	})
 
 	wg.Go(func() error {

@@ -10,9 +10,7 @@ import (
 	"github.com/jawr/whois-bi/pkg/internal/domain"
 	"github.com/jawr/whois-bi/pkg/internal/emailer"
 	"github.com/jawr/whois-bi/pkg/internal/queue"
-	"github.com/jawr/whois-bi/pkg/internal/queue/rabbit"
 	"github.com/pkg/errors"
-	"github.com/streadway/amqp"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -24,10 +22,7 @@ type Manager struct {
 	consumer  queue.Consumer
 }
 
-func NewManager(addr string, db *pg.DB, emailer *emailer.Emailer) (*Manager, error) {
-
-	publisher := rabbit.NewPublisher(addr)
-	consumer := rabbit.NewConsumer("", "job.response", addr)
+func NewManager(publisher queue.Publisher, consumer queue.Consumer, db *pg.DB, emailer *emailer.Emailer) (*Manager, error) {
 
 	// setup manager
 	manager := Manager{
@@ -121,9 +116,9 @@ func (m *Manager) createJobs(ctx context.Context) error {
 	return nil
 }
 
-func (m *Manager) handleJobResponses(ctx context.Context, msg *amqp.Delivery) {
+func (m *Manager) handleJobResponses(ctx context.Context, body []byte) {
 	var job Job
-	if err := json.Unmarshal(msg.Body, &job); err != nil {
+	if err := json.Unmarshal(body, &job); err != nil {
 		return
 	}
 

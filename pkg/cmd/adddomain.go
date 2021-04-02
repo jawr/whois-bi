@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"github.com/jawr/whois-bi/pkg/internal/cmdutil"
 	"github.com/jawr/whois-bi/pkg/internal/domain"
 	"github.com/jawr/whois-bi/pkg/internal/user"
 	"github.com/pkg/errors"
@@ -15,9 +14,9 @@ func init() {
 		Use:   "adddomain",
 		Short: "Add a domain to a user",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cmdutil.LoadDotEnv()
+			loadDotEnv()
 
-			db, err := cmdutil.SetupDatabase()
+			db, err := setupDatabase()
 			if err != nil {
 				return errors.WithMessage(err, "SetupDatabase")
 			}

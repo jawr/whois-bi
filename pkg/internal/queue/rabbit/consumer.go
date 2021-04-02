@@ -105,7 +105,7 @@ func (c *Consumer) Consume(ctx context.Context, ch *amqp.Channel) error {
 				return amqp.ErrClosed
 			}
 
-			c.handler(ctx, &msg)
+			c.handler(ctx, msg.Body)
 
 			// do we care about errors here
 			msg.Ack(false)
