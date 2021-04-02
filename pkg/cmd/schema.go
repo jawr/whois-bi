@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-pg/pg/v10"
 	"github.com/go-pg/pg/v10/orm"
+	"github.com/jawr/whois-bi/pkg/internal/db"
 	"github.com/jawr/whois-bi/pkg/internal/domain"
 	"github.com/jawr/whois-bi/pkg/internal/job"
 	"github.com/jawr/whois-bi/pkg/internal/list"
@@ -21,13 +22,13 @@ func init() {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			loadDotEnv()
 
-			db, err := setupDatabase()
+			dbConn, err := db.SetupDatabase()
 			if err != nil {
 				return errors.WithMessage(err, "SetupDatabase")
 			}
-			defer db.Close()
+			defer dbConn.Close()
 
-			setupSchema(db)
+			setupSchema(dbConn)
 
 			return nil
 		},
