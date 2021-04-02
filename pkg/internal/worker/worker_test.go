@@ -121,10 +121,10 @@ func Test_RunAdditions(t *testing.T) {
 
 	// setup the mockDnsClient to contain the additions we want
 	w.dnsClient.(*mockDnsClient).live = domain.Records{
-		domain.NewRecord(j.Domain, mustCreateRR(t, "whois.bi.	43200	IN	MX	10 ehlo.mx.ax."), domain.RecordSourceEnum),
-		domain.NewRecord(j.Domain, mustCreateRR(t, "whois.bi.	43200	IN	MX	20 helo.mx.ax."), domain.RecordSourceEnum),
-		domain.NewRecord(j.Domain, mustCreateRR(t, `whois.bi.	43200	IN	TXT	"v=spf1 include:spf.mx.ax ~all"`), domain.RecordSourceEnum),
-		domain.NewRecord(j.Domain, mustCreateRR(t, "www.whois.bi.	300	IN	CNAME	traefik.jl.lu."), domain.RecordSourceEnum),
+		domain.NewRecord(j.Domain, mustCreateRR(t, "whois.bi.	43200	IN	MX	10 ehlo.mx.ax."), domain.RecordSourceIterate),
+		domain.NewRecord(j.Domain, mustCreateRR(t, "whois.bi.	43200	IN	MX	20 helo.mx.ax."), domain.RecordSourceIterate),
+		domain.NewRecord(j.Domain, mustCreateRR(t, `whois.bi.	43200	IN	TXT	"v=spf1 include:spf.mx.ax ~all"`), domain.RecordSourceIterate),
+		domain.NewRecord(j.Domain, mustCreateRR(t, "www.whois.bi.	300	IN	CNAME	traefik.jl.lu."), domain.RecordSourceIterate),
 	}
 
 	if err := w.consumer.(*queue.MemoryConsumer).Publish(&j); err != nil {
@@ -172,10 +172,10 @@ func Test_RunRemovals(t *testing.T) {
 	w.dnsClient.(*mockDnsClient).live = domain.Records{}
 
 	j.CurrentRecords = domain.Records{
-		domain.NewRecord(j.Domain, mustCreateRR(t, "whois.bi.	43200	IN	MX	10 ehlo.mx.ax."), domain.RecordSourceEnum),
-		domain.NewRecord(j.Domain, mustCreateRR(t, "whois.bi.	43200	IN	MX	20 helo.mx.ax."), domain.RecordSourceEnum),
-		domain.NewRecord(j.Domain, mustCreateRR(t, `whois.bi.	43200	IN	TXT	"v=spf1 include:spf.mx.ax ~all"`), domain.RecordSourceEnum),
-		domain.NewRecord(j.Domain, mustCreateRR(t, "www.whois.bi.	300	IN	CNAME	traefik.jl.lu."), domain.RecordSourceEnum),
+		domain.NewRecord(j.Domain, mustCreateRR(t, "whois.bi.	43200	IN	MX	10 ehlo.mx.ax."), domain.RecordSourceIterate),
+		domain.NewRecord(j.Domain, mustCreateRR(t, "whois.bi.	43200	IN	MX	20 helo.mx.ax."), domain.RecordSourceIterate),
+		domain.NewRecord(j.Domain, mustCreateRR(t, `whois.bi.	43200	IN	TXT	"v=spf1 include:spf.mx.ax ~all"`), domain.RecordSourceIterate),
+		domain.NewRecord(j.Domain, mustCreateRR(t, "www.whois.bi.	300	IN	CNAME	traefik.jl.lu."), domain.RecordSourceIterate),
 	}
 
 	if err := w.consumer.(*queue.MemoryConsumer).Publish(&j); err != nil {
@@ -221,17 +221,17 @@ func Test_RunMix(t *testing.T) {
 
 	// setup the mockDnsClient to contain the additions we want
 	w.dnsClient.(*mockDnsClient).live = domain.Records{
-		domain.NewRecord(j.Domain, mustCreateRR(t, "whois.bi.	43200	IN	MX	10 ehlo.mx.ax."), domain.RecordSourceEnum),
-		domain.NewRecord(j.Domain, mustCreateRR(t, "whois.bi.	43200	IN	MX	20 helo.mx.ax."), domain.RecordSourceEnum),
-		domain.NewRecord(j.Domain, mustCreateRR(t, `whois.bi.	43200	IN	TXT	"v=spf1 include:spf.mx.ax ~all"`), domain.RecordSourceEnum),
-		domain.NewRecord(j.Domain, mustCreateRR(t, `whois.bi.	86400	IN	NS	ns2.he.net.`), domain.RecordSourceEnum),
+		domain.NewRecord(j.Domain, mustCreateRR(t, "whois.bi.	43200	IN	MX	10 ehlo.mx.ax."), domain.RecordSourceIterate),
+		domain.NewRecord(j.Domain, mustCreateRR(t, "whois.bi.	43200	IN	MX	20 helo.mx.ax."), domain.RecordSourceIterate),
+		domain.NewRecord(j.Domain, mustCreateRR(t, `whois.bi.	43200	IN	TXT	"v=spf1 include:spf.mx.ax ~all"`), domain.RecordSourceIterate),
+		domain.NewRecord(j.Domain, mustCreateRR(t, `whois.bi.	86400	IN	NS	ns2.he.net.`), domain.RecordSourceIterate),
 	}
 
 	j.CurrentRecords = domain.Records{
-		domain.NewRecord(j.Domain, mustCreateRR(t, "whois.bi.	43200	IN	MX	10 ehlo.mx.ax."), domain.RecordSourceEnum),
-		domain.NewRecord(j.Domain, mustCreateRR(t, "whois.bi.	43200	IN	MX	20 helo.mx.ax."), domain.RecordSourceEnum),
-		domain.NewRecord(j.Domain, mustCreateRR(t, `whois.bi.	43200	IN	TXT	"v=spf1 include:spf.mx.ax ~all"`), domain.RecordSourceEnum),
-		domain.NewRecord(j.Domain, mustCreateRR(t, "www.whois.bi.	300	IN	CNAME	traefik.jl.lu."), domain.RecordSourceEnum),
+		domain.NewRecord(j.Domain, mustCreateRR(t, "whois.bi.	43200	IN	MX	10 ehlo.mx.ax."), domain.RecordSourceIterate),
+		domain.NewRecord(j.Domain, mustCreateRR(t, "whois.bi.	43200	IN	MX	20 helo.mx.ax."), domain.RecordSourceIterate),
+		domain.NewRecord(j.Domain, mustCreateRR(t, `whois.bi.	43200	IN	TXT	"v=spf1 include:spf.mx.ax ~all"`), domain.RecordSourceIterate),
+		domain.NewRecord(j.Domain, mustCreateRR(t, "www.whois.bi.	300	IN	CNAME	traefik.jl.lu."), domain.RecordSourceIterate),
 	}
 
 	if err := w.consumer.(*queue.MemoryConsumer).Publish(&j); err != nil {
