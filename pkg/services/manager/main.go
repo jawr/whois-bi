@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/jawr/whois-bi/pkg/internal/cmdutil"
+	"github.com/jawr/whois-bi/pkg/internal/db"
 	"github.com/jawr/whois-bi/pkg/internal/emailer"
 	"github.com/jawr/whois-bi/pkg/internal/job"
 	"github.com/jawr/whois-bi/pkg/internal/queue/rabbit"
@@ -28,11 +28,11 @@ func run() error {
 	publisher := rabbit.NewPublisher(addr)
 	consumer := rabbit.NewConsumer("", "job.response", addr)
 
-	db, err := cmdutil.SetupDatabase()
+	dbConn, err := db.SetupDatabase()
 	if err != nil {
 		return errors.WithMessage(err, "SetupDatabase")
 	}
-	defer db.Close()
+	defer dbConn.Close()
 
 	sender := emailer.NewSMTPSenderFromEnv()
 	emailer, err := emailer.NewEmailer(
@@ -44,7 +44,7 @@ func run() error {
 		return errors.WithMessage(err, "NewEmailer")
 	}
 
-	manager, err := job.NewManager(publisher, consumer, db, emailer)
+	manager, err := job.NewManager(publisher, consumer, dbConn, emailer)
 	if err != nil {
 		return errors.WithMessage(err, "NewManager")
 	}
