@@ -48,7 +48,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/segmentio/fasthash v1.0.3
-	github.com/spf13/cobra v1.1.3 // indirect
+	github.com/spf13/cobra v1.1.3
 	github.com/streadway/amqp v1.0.0
 	github.com/ugorji/go v1.2.4 // indirect
 	github.com/xordataexchange/crypt v0.0.3-0.20170626215501-b2862e3d0a77 // indirect

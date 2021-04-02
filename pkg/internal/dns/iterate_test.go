@@ -1,6 +1,7 @@
 package dns
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/jawr/whois-bi/pkg/internal/domain"
@@ -54,12 +55,17 @@ func Test_queryIterate(t *testing.T) {
 				)
 			}
 
-			got, err := c.queryIterate(dom, ns, targets)
-			if err != nil {
-				tt.Fatalf("queryIterate unexpected error: %q", err)
-			}
+			for i := 0; i < 10; i++ {
+				got, err := c.queryIterate(dom, ns, targets)
+				if err != nil {
+					if strings.Contains(err.Error(), "i/o timeout") {
+						continue
+					}
+					tt.Fatalf("queryIterate unexpected error: %q", err)
+				}
 
-			compareRecords(tt, got, expectedRecords)
+				compareRecords(tt, got, expectedRecords)
+			}
 		})
 	}
 }
