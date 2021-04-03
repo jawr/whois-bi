@@ -35,7 +35,7 @@ func init() {
 		},
 	}
 
-	adduserCmd.Flags().StringVarP(&email, "email", "u", "", "email to add")
+	adduserCmd.Flags().StringVarP(&email, "email", "e", "", "email to add")
 	adduserCmd.Flags().StringVarP(&password, "password", "p", "", "password for new user")
 
 	adduserCmd.MarkFlagRequired("email")

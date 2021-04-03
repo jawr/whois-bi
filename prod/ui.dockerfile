@@ -1,11 +1,15 @@
-FROM node 
+FROM node AS builder
 
 WORKDIR /build
 
 COPY package.json ./
-COPY public ./public
-COPY src ./src
+COPY rollup.config.js ./
+COPY public/ ./public
+COPY src/ ./src
 
 RUN npm install
+RUN npm run build
 
-ENTRYPOINT npm run dev
+FROM nginx:1.19.0
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY --from=builder /build/public/ /usr/share/nginx/html

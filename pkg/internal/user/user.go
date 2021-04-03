@@ -1,11 +1,12 @@
 package user
 
 import (
+	"fmt"
 	"time"
+	"unicode"
 
 	"github.com/dchest/uniuri"
 	"github.com/go-pg/pg/v10"
-	"github.com/hesahesa/pwdbro"
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -26,19 +27,26 @@ type User struct {
 	LastLoginAt time.Time
 }
 
+var passwordValidation = map[string][]*unicode.RangeTable{
+	"upper case": {unicode.Upper, unicode.Title},
+	"lower case": {unicode.Lower},
+	"numeric":    {unicode.Number, unicode.Digit},
+}
+
 func ValidatePassword(password string) error {
-	checker := pwdbro.NewDefaultPwdBro()
-	status, err := checker.RunChecks(password)
-	if err != nil {
-		return err
+	if len(password) < 8 {
+		return fmt.Errorf("password must be at least 8 characters long")
 	}
 
-	for _, s := range status {
-		if !s.Safe {
-			return errors.New(s.Message)
+next:
+	for name, classes := range passwordValidation {
+		for _, r := range password {
+			if unicode.IsOneOf(classes, r) {
+				continue next
+			}
 		}
+		return fmt.Errorf("password must have at least one %s character", name)
 	}
-
 	return nil
 }
 

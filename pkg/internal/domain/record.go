@@ -123,7 +123,8 @@ func NewRecord(domain Domain, rr dns.RR, source RecordSource) Record {
 	// hash fields + rrtype + name
 	h := fnv.New32a()
 	h.Write([]byte(fmt.Sprintf(
-		"%s%d%s",
+		"%d%s%d%s",
+		record.DomainID,
 		record.Name,
 		record.RRType,
 		record.Fields,
