@@ -25,16 +25,14 @@ func init() {
 			}
 			defer dbConn.Close()
 
-			setupSchema(dbConn)
-
-			return nil
+			return setupSchema(dbConn)
 		},
 	}
 
 	rootCmd.AddCommand(schemaCmd)
 }
 
-func setupSchema(db *pg.DB) {
+func setupSchema(db *pg.DB) error {
 	models := []interface{}{
 		(*user.User)(nil),
 		(*user.Recover)(nil),
@@ -57,4 +55,6 @@ func setupSchema(db *pg.DB) {
 			return errors.WithMessagef(err, "error creating models idx %d", idx)
 		}
 	}
+
+	return nil
 }
