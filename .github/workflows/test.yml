@@ -19,10 +19,12 @@ jobs:
         # Docker Hub image
         image: postgres
         # Provide the password for postgres
+        ports:
+          - 5432:5432
         env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_USERNAME: postgres
-          POSTGRES_DB: whois.bi
+          POSTGRES_PASSWORD: user
+          POSTGRES_USERNAME: pass
+          POSTGRES_DB: test
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
@@ -37,11 +39,11 @@ jobs:
       - name: Create Schema
         run: go run main.go schema
         env: 
-          POSTGRES_URI: "postgres://postgres:postgres@postgres:5432/whois.bi"
+          POSTGRES_URI: "postgres://user:pass@localhost:5432/test"
       - name: Run Tests
         run: go test -v -race -coverprofile=profile.cov ./...
         env: 
-          POSTGRES_URI: "postgres://postgres:postgres@postgres:5432/whois.bi"
+          POSTGRES_URI: "postgres://user:pass@localhost:5432/test"
       - name: Send coverage
         uses: shogo82148/actions-goveralls@v1
         with:
