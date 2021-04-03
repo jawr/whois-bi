@@ -2,6 +2,7 @@ on:
   push:
     branches:
       - master
+      - develop
   pull_request:
     branches:
       - master
@@ -12,13 +13,36 @@ jobs:
       fail-fast: false
       matrix:
         go: ['1.16']
+	# Service containers to run with `container-job`
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres
+        # Provide the password for postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USERNAME: postgres
+		  POSTGRES_DB: whois.bi
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/setup-go@v1
         with:
           go-version: ${{ matrix.go }}
       - uses: actions/checkout@v2
-      - run: go test -v -race -coverprofile=profile.cov ./...
-
+      - name: Create Schema
+      	run: go run main.go schema
+	  	env: 
+		  POSTGRES_URI: "postgres://postgres:postgres@postgres:5432/whois.bi"
+      - name: Run Tests
+      	run: go test -v -race -coverprofile=profile.cov ./...
+	  	env: 
+		  POSTGRES_URI: "postgres://postgres:postgres@postgres:5432/whois.bi"
       - name: Send coverage
         uses: shogo82148/actions-goveralls@v1
         with:
