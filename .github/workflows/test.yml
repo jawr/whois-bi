@@ -23,7 +23,7 @@ jobs:
           - 5432:5432
         env:
           POSTGRES_PASSWORD: pass
-          POSTGRES_USERNAME: user
+          POSTGRES_USER: user
           POSTGRES_DB: test
         # Set health checks to wait until postgres has started
         options: >-
