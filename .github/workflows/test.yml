@@ -13,7 +13,6 @@ jobs:
       fail-fast: false
       matrix:
         go: ['1.16']
-	# Service containers to run with `container-job`
     services:
       # Label used to access the service container
       postgres:
@@ -23,7 +22,7 @@ jobs:
         env:
           POSTGRES_PASSWORD: postgres
           POSTGRES_USERNAME: postgres
-		  POSTGRES_DB: whois.bi
+          POSTGRES_DB: whois.bi
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
@@ -36,24 +35,24 @@ jobs:
           go-version: ${{ matrix.go }}
       - uses: actions/checkout@v2
       - name: Create Schema
-      	run: go run main.go schema
-	  	env: 
-		  POSTGRES_URI: "postgres://postgres:postgres@postgres:5432/whois.bi"
+        run: go run main.go schema
+        env: 
+          POSTGRES_URI: "postgres://postgres:postgres@postgres:5432/whois.bi"
       - name: Run Tests
-      	run: go test -v -race -coverprofile=profile.cov ./...
-	  	env: 
-		  POSTGRES_URI: "postgres://postgres:postgres@postgres:5432/whois.bi"
+        run: go test -v -race -coverprofile=profile.cov ./...
+        env: 
+          POSTGRES_URI: "postgres://postgres:postgres@postgres:5432/whois.bi"
       - name: Send coverage
         uses: shogo82148/actions-goveralls@v1
         with:
           path-to-profile: profile.cov
           flag-name: Go-${{ matrix.go }}
           parallel: true
-  # notifies that all test jobs are finished.
-  finish:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: shogo82148/actions-goveralls@v1
-        with:
-          parallel-finished: true
+      # notifies that all test jobs are finished.
+    finish:
+      needs: test
+      runs-on: ubuntu-latest
+      steps:
+        - uses: shogo82148/actions-goveralls@v1
+          with:
+            parallel-finished: true
