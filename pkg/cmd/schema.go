@@ -1,9 +1,6 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/go-pg/pg/v10"
 	"github.com/go-pg/pg/v10/orm"
 	"github.com/jawr/whois-bi/pkg/internal/db"
@@ -50,14 +47,14 @@ func setupSchema(db *pg.DB) {
 		(*job.ExpirationAlert)(nil),
 	}
 
-	for _, model := range models {
+	for idx, model := range models {
 		err := db.Model(model).CreateTable(&orm.CreateTableOptions{
 			Temp:          false,
 			FKConstraints: true,
+			IfNotExists:   true,
 		})
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error: %s", err)
-			continue
+			return errors.WithMessagef(err, "error creating models idx %d", idx)
 		}
 	}
 }
