@@ -79,6 +79,9 @@ func compareRecords(t *testing.T, got, expected domain.Records) {
 	t.Helper()
 
 	for _, g := range got {
+		if g.RRType.V == dns.TypeSOA {
+			continue
+		}
 		var exists bool
 		for _, e := range expected {
 			if g.Hash == e.Hash {

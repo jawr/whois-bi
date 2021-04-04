@@ -312,31 +312,3 @@ func Test_RunLiveError(t *testing.T) {
 		t.Fatalf("Wait() expected Canceled, got: %s", err)
 	}
 }
-
-func Test_BadJSONInput(t *testing.T) {
-	w := createNewWorker()
-
-	ctx, cancel := context.WithCancel(context.Background())
-
-	var wg errgroup.Group
-
-	wg.Go(func() error {
-		return w.Run(ctx)
-	})
-
-	type badMessage struct {
-		AField string
-		BField int
-		CField time.Time
-	}
-
-	if err := w.consumer.(*queue.MemoryConsumer).Publish(&badMessage{}); err != nil {
-		t.Fatalf("Publish() expected nil got %s", err)
-	}
-
-	cancel()
-
-	if err := wg.Wait(); err != nil {
-		t.Fatalf("Wait() expected nil got %q", err)
-	}
-}

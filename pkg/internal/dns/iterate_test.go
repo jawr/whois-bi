@@ -22,16 +22,46 @@ func Test_queryIterate(t *testing.T) {
 				`lawrence.pm.		10799	IN	NS	ns-113-a.gandi.net.`,
 				`lawrence.pm.		10799	IN	NS	ns-143-b.gandi.net.`,
 				`lawrence.pm.		10799	IN	NS	ns-6-c.gandi.net.`,
-				`lawrence.pm.		10799	IN	SOA	ns1.gandi.net. hostmaster.gandi.net. 1617235200 10800 3600 604800 10800`,
 				`lawrence.pm.		10799	IN	MX	10 ehlo.mx.ax.`,
 				`lawrence.pm.		10799	IN	MX	20 helo.mx.ax.`,
 				`lawrence.pm.		10799	IN	TXT	"v=spf1 include:spf.mx.ax ~all"`,
+			},
+		},
+		tcase{
+			name: "jl.lu",
+			records: []string{
+				`jl.lu.			10799	IN	A	116.203.149.40`,
+				`jl.lu.			10799	IN	NS	ns-147-a.gandi.net.`,
+				`jl.lu.			10799	IN	NS	ns-208-b.gandi.net.`,
+				`jl.lu.			10799	IN	NS	ns-112-c.gandi.net.`,
+				`*.k3s.jl.lu.		10799	IN	CNAME	traefik.jl.lu.`,
+				`traefik.jl.lu.		10799	IN	A	116.203.149.40`,
+			},
+		},
+		tcase{
+			name: "ovh.com",
+			records: []string{
+				`ovh.com.		21599	IN	NS	dns.ovh.net.`,
+				`ovh.com.		21599	IN	NS	ns.ovh.net.`,
+				`ovh.com.		21599	IN	NS	dns200.anycast.me.`,
+				`ovh.com.		21599	IN	NS	ns200.anycast.me.`,
+				`ovh.com.		21599	IN	NS	ns10.ovh.net.`,
+				`ovh.com.		21599	IN	NS	dns10.ovh.net.`,
+				`ovh.com.		21599	IN	MX	5 mx2.ovh.net.`,
+				`ovh.com.		21599	IN	MX	1 mx1.ovh.net.`,
+				`ovh.com.		3599	IN	A	198.27.92.1`,
+				`ovh.com.		21599	IN	TXT	"v=spf1 include:spf.mailjet.com include:mx.ovh.com ~all"`,
+				`ovh.com.		21599	IN	TXT	"google-site-verification=J3fSHAVfI5uZPzM4rlKtSiBnE5iC0lxi0k2-pn0aM1U"`,
+				`ovh.com.		21599	IN	TXT	"google-site-verification=Il9nne-nVT0DAIF9l7jwlycs1fMuu_pWggen5IYZVlA"`,
 			},
 		},
 	}
 
 	targets := map[string]struct{}{
 		"": struct{}{},
+		// added to target wildcard subdomains and following cnames pointed
+		// to the same domain
+		"k3s": struct{}{},
 	}
 
 	for _, tc := range cases {

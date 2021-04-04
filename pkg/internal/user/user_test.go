@@ -196,3 +196,18 @@ func Test_VerifyAlreadyVerified(t *testing.T) {
 		t.Fatalf("VerifyUser dupe expected %q got %q", expected, err)
 	}
 }
+
+func Test_GetInvalidUser(t *testing.T) {
+	conn := createConnection(t)
+	defer conn.Close()
+
+	tx := createTx(t, conn)
+	defer tx.Rollback()
+
+	_, err := GetUser(tx, "doesnotexist")
+
+	expected := `pg: no rows in result set`
+	if err.Error() != expected {
+		t.Fatalf("GetUser() expected %q got %q", expected, err)
+	}
+}
