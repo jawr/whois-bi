@@ -38,30 +38,13 @@ func Test_queryIterate(t *testing.T) {
 				`traefik.jl.lu.		10799	IN	A	116.203.149.40`,
 			},
 		},
-		tcase{
-			name: "ovh.com",
-			records: []string{
-				`ovh.com.		21599	IN	NS	dns.ovh.net.`,
-				`ovh.com.		21599	IN	NS	ns.ovh.net.`,
-				`ovh.com.		21599	IN	NS	dns200.anycast.me.`,
-				`ovh.com.		21599	IN	NS	ns200.anycast.me.`,
-				`ovh.com.		21599	IN	NS	ns10.ovh.net.`,
-				`ovh.com.		21599	IN	NS	dns10.ovh.net.`,
-				`ovh.com.		21599	IN	MX	5 mx2.ovh.net.`,
-				`ovh.com.		21599	IN	MX	1 mx1.ovh.net.`,
-				`ovh.com.		3599	IN	A	198.27.92.1`,
-				`ovh.com.		21599	IN	TXT	"v=spf1 include:spf.mailjet.com include:mx.ovh.com ~all"`,
-				`ovh.com.		21599	IN	TXT	"google-site-verification=J3fSHAVfI5uZPzM4rlKtSiBnE5iC0lxi0k2-pn0aM1U"`,
-				`ovh.com.		21599	IN	TXT	"google-site-verification=Il9nne-nVT0DAIF9l7jwlycs1fMuu_pWggen5IYZVlA"`,
-			},
-		},
 	}
 
 	targets := map[string]struct{}{
 		"": struct{}{},
 		// added to target wildcard subdomains and following cnames pointed
 		// to the same domain
-		"k3s": struct{}{},
+		"*.k3s": struct{}{},
 	}
 
 	for _, tc := range cases {

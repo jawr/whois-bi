@@ -1,7 +1,6 @@
 package dns
 
 import (
-	"log"
 	"strings"
 	"time"
 
@@ -63,7 +62,6 @@ func (c *DNSClient) rawquery(original *dns.Msg, nameservers []string) (*dns.Msg,
 
 		reply, _, err := c.Exchange(msg, ns+":53")
 		if err != nil {
-			log.Printf("error in Exchange with %s: %s", ns, err)
 			continue
 		}
 
