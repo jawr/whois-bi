@@ -90,7 +90,7 @@ func compareRecords(t *testing.T, got, expected domain.Records) {
 			}
 		}
 		if !exists {
-			t.Errorf("Unexpected record: %q", g.Raw)
+			t.Errorf("Unexpected got record: %q", g.Raw)
 		}
 	}
 
@@ -106,7 +106,7 @@ func compareRecords(t *testing.T, got, expected domain.Records) {
 			}
 		}
 		if !exists {
-			t.Errorf("Unexpected record: %q", g.Raw)
+			t.Errorf("Unexpected expected record: %q", g.Raw)
 		}
 	}
 }

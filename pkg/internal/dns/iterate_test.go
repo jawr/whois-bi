@@ -1,7 +1,6 @@
 package dns
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/jawr/whois-bi/pkg/internal/domain"
@@ -40,11 +39,12 @@ func Test_queryIterate(t *testing.T) {
 		},
 	}
 
-	targets := map[string]struct{}{
-		"": struct{}{},
+	targets := []string{
+		"",
 		// added to target wildcard subdomains and following cnames pointed
 		// to the same domain
-		"*.k3s": struct{}{},
+		"*.k3s",
+		"foo.k3s",
 	}
 
 	for _, tc := range cases {
@@ -68,17 +68,12 @@ func Test_queryIterate(t *testing.T) {
 				)
 			}
 
-			for i := 0; i < 10; i++ {
-				got, err := c.queryIterate(dom, ns, targets)
-				if err != nil {
-					if strings.Contains(err.Error(), "i/o timeout") {
-						continue
-					}
-					tt.Fatalf("queryIterate unexpected error: %q", err)
-				}
-
-				compareRecords(tt, got, expectedRecords)
+			got, err := c.queryIterate(dom, ns, targets)
+			if err != nil {
+				tt.Fatalf("queryIterate unexpected error: %q", err)
 			}
+
+			compareRecords(tt, got, expectedRecords)
 		})
 	}
 }

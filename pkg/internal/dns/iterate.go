@@ -35,22 +35,25 @@ var (
 	}
 )
 
-func (c *DNSClient) queryIterate(dom domain.Domain, nameservers []string, targets map[string]struct{}) (domain.Records, error) {
+func (c *DNSClient) queryIterate(dom domain.Domain, nameservers, targets []string) (domain.Records, error) {
+	cache := make(map[string]struct{})
+	for _, t := range targets {
+		cache[t] = struct{}{}
+	}
+
 	records := make(domain.Records, 0)
 
 	// currently only handles wildcards with depth of 1 correctly
 	wildcards := make(map[uint16]int, 0)
 
-	for tar := range targets {
+	for _, tar := range targets {
 		tar := strings.TrimSuffix(tar, ".")
 
 		depth := len(strings.Split(tar, "."))
 
 		for _, typ := range commonRecordTypes {
-			if tar == "*" {
-				if wdepth, ok := wildcards[typ]; ok && wdepth == depth {
-					continue
-				}
+			if wdepth, ok := wildcards[typ]; ok && wdepth == depth {
+				continue
 			}
 
 			var msg dns.Msg
@@ -68,7 +71,7 @@ func (c *DNSClient) queryIterate(dom domain.Domain, nameservers []string, target
 				return nil, errors.WithMessagef(err, "query %q", msg.String())
 			}
 
-			if tar == "*" && len(reply.Answer) > 0 {
+			if strings.Contains(tar, "*") && len(reply.Answer) > 0 {
 				wildcards[typ] = depth
 			}
 
@@ -92,8 +95,9 @@ func (c *DNSClient) queryIterate(dom domain.Domain, nameservers []string, target
 							"",
 							-1,
 						)
-						if _, ok := targets[name]; !ok {
-							targets[name] = struct{}{}
+						if _, ok := cache[name]; !ok {
+							cache[name] = struct{}{}
+							targets = append(targets, name)
 						}
 					}
 				}
@@ -127,8 +131,9 @@ func (c *DNSClient) queryIterate(dom domain.Domain, nameservers []string, target
 							"",
 							-1,
 						)
-						if _, ok := targets[name]; !ok {
-							targets[name] = struct{}{}
+						if _, ok := cache[name]; !ok {
+							cache[name] = struct{}{}
+							targets = append(targets, name)
 						}
 					}
 				}
