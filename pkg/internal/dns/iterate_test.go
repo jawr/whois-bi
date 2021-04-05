@@ -41,10 +41,11 @@ func Test_queryIterate(t *testing.T) {
 
 	targets := []string{
 		"",
-		// added to target wildcard subdomains and following cnames pointed
-		// to the same domain
-		"*.k3s",
 		"foo.k3s",
+		"blah.k3s",
+		"boo.k3s",
+		"bar.k3s",
+		"*.k3s",
 	}
 
 	for _, tc := range cases {

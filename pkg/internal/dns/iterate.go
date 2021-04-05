@@ -2,6 +2,7 @@ package dns
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/jawr/whois-bi/pkg/internal/domain"
@@ -40,6 +41,11 @@ func (c *DNSClient) queryIterate(dom domain.Domain, nameservers, targets []strin
 	for _, t := range targets {
 		cache[t] = struct{}{}
 	}
+
+	// sort targets to prefer widlcard
+	sort.Slice(targets, func(i, j int) bool {
+		return strings.Index(targets[i], "*") > strings.Index(targets[j], "*")
+	})
 
 	records := make(domain.Records, 0)
 
