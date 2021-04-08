@@ -4,6 +4,8 @@ import (
 	"time"
 
 	"github.com/dchest/uniuri"
+	"github.com/go-pg/pg/v10/orm"
+	"github.com/pkg/errors"
 )
 
 type Recover struct {
@@ -27,4 +29,35 @@ func NewRecover(user User) Recover {
 	}
 
 	return r
+}
+
+func (r *Recover) Insert(db orm.DB) error {
+	_, err := db.Model(r).Returning("*").Insert()
+	return err
+}
+
+func RecoverPassword(db orm.DB, code string, newPassword []byte) error {
+	var rec Recover
+
+	if err := db.Model(&rec).Where("code = ?", code).Select(); err != nil {
+		return errors.New("invalid code")
+	}
+
+	if time.Now().After(rec.ValidUntil) {
+		// delete expired recover
+		db.Model(&rec).Delete()
+		return errors.New("expired code")
+	}
+
+	_, err := db.Model((*User)(nil)).
+		Set("password = ?", newPassword).
+		Where("id = ?", rec.UserID).
+		Update()
+	if err != nil {
+		return errors.WithMessage(err, "Update")
+	}
+
+	db.Model(&rec).Delete()
+
+	return nil
 }

@@ -26,7 +26,7 @@ func createRecord(d, n string, rt uint16) domain.Record {
 	}
 }
 
-func TestWildcardMatch(t *testing.T) {
+func Test_WildcardMatch(t *testing.T) {
 	l := createList("*", "*", "*")
 	rec := createRecord("whois.bi", "www", dns.TypeA)
 
@@ -35,7 +35,7 @@ func TestWildcardMatch(t *testing.T) {
 	}
 }
 
-func TestRRTypeMatch(t *testing.T) {
+func Test_RRTypeMatch(t *testing.T) {
 	l := createList("*", "A", "*")
 
 	passes := []domain.Record{
@@ -64,7 +64,7 @@ func TestRRTypeMatch(t *testing.T) {
 	}
 }
 
-func TestDomainMatch(t *testing.T) {
+func Test_DomainMatch(t *testing.T) {
 	l := createList("whois.bi", "*", "*")
 
 	type testcase struct {
@@ -98,7 +98,7 @@ func TestDomainMatch(t *testing.T) {
 	}
 }
 
-func TestRecordMatch(t *testing.T) {
+func Test_RecordMatch(t *testing.T) {
 	l := createList("*", "*", "www")
 
 	type testcase struct {
@@ -128,5 +128,82 @@ func TestRecordMatch(t *testing.T) {
 		if !l.Match(&r) {
 			t.Errorf("expected a match: %s", r.String())
 		}
+	}
+}
+
+func Test_Validate(t *testing.T) {
+	type tcase struct {
+		domain   string
+		rrtype   string
+		record   string
+		expected string
+	}
+
+	cases := []tcase{
+		tcase{
+			domain:   "",
+			rrtype:   "*",
+			record:   "*",
+			expected: "missing fields",
+		},
+		tcase{
+			domain:   "*",
+			rrtype:   "*",
+			record:   "",
+			expected: "missing fields",
+		},
+		tcase{
+			domain:   "*",
+			rrtype:   "",
+			record:   "*",
+			expected: "missing fields",
+		},
+		tcase{
+			domain:   "[A--]*",
+			rrtype:   "*",
+			record:   "*",
+			expected: "Domain: error parsing regexp: invalid character class range: `A--`",
+		},
+		tcase{
+			domain:   "*",
+			rrtype:   "[A--]*",
+			record:   "*",
+			expected: "RRType: error parsing regexp: invalid character class range: `A--`",
+		},
+		tcase{
+			domain:   "*",
+			rrtype:   "*",
+			record:   "[A--]*",
+			expected: "Record: error parsing regexp: invalid character class range: `A--`",
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.expected, func(tt *testing.T) {
+			l := List{
+				Domain: tc.domain,
+				RRType: tc.rrtype,
+				Record: tc.record,
+			}
+			err := l.Validate()
+			if err == nil {
+				tt.Fatal("Validate() expected an error got nil")
+			}
+			if err.Error() != tc.expected {
+				tt.Fatalf("Validate() expected %q got %q", tc.expected, err)
+			}
+		})
+	}
+}
+
+func Test_ValidateSuccess(t *testing.T) {
+	l := List{
+		Domain: "*",
+		RRType: "*",
+		Record: "*",
+	}
+
+	if err := l.Validate(); err != nil {
+		t.Fatalf("Validate() expected nil got %q", err)
 	}
 }

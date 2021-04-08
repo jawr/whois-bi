@@ -19,7 +19,7 @@ type Domain struct {
 	Owner   user.User `pg:"fk:owner_id,rel:has-one" json:"-"`
 
 	// settings
-	DontBatch bool `pg:",notnull" json:"dont_batch"`
+	DontBatch bool `pg:",notnull,use_zero" json:"dont_batch"`
 
 	// meta data
 	AddedAt   time.Time   `pg:",type:timestamptz,notnull,default:now()" json:"added_at"`

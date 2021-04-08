@@ -1,11 +1,12 @@
 package user
 
 import (
+	"fmt"
 	"time"
+	"unicode"
 
 	"github.com/dchest/uniuri"
-	"github.com/go-pg/pg/v10"
-	"github.com/hesahesa/pwdbro"
+	"github.com/go-pg/pg/v10/orm"
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -26,19 +27,26 @@ type User struct {
 	LastLoginAt time.Time
 }
 
+var passwordValidation = map[string][]*unicode.RangeTable{
+	"upper case": {unicode.Upper, unicode.Title},
+	"lower case": {unicode.Lower},
+	"numeric":    {unicode.Number, unicode.Digit},
+}
+
 func ValidatePassword(password string) error {
-	checker := pwdbro.NewDefaultPwdBro()
-	status, err := checker.RunChecks(password)
-	if err != nil {
-		return err
+	if len(password) < 8 {
+		return fmt.Errorf("password must be at least 8 characters long")
 	}
 
-	for _, s := range status {
-		if !s.Safe {
-			return errors.New(s.Message)
+next:
+	for name, classes := range passwordValidation {
+		for _, r := range password {
+			if unicode.IsOneOf(classes, r) {
+				continue next
+			}
 		}
+		return fmt.Errorf("password must have at least one %s character", name)
 	}
-
 	return nil
 }
 
@@ -49,7 +57,7 @@ func CreatePassword(password string) ([]byte, error) {
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		return nil, errors.Wrap(err, "bcrypt")
+		return nil, errors.WithMessage(err, "bcrypt")
 	}
 
 	return hash, nil
@@ -75,14 +83,14 @@ func NewUser(email, password string) (User, error) {
 }
 
 // insert user in to database
-func (u *User) Insert(db *pg.DB) error {
+func (u *User) Insert(db orm.DB) error {
 	if _, err := db.Model(u).Returning("*").Insert(); err != nil {
 		return err
 	}
 	return nil
 }
 
-func GetUser(db *pg.DB, email string) (User, error) {
+func GetUser(db orm.DB, email string) (User, error) {
 	var user User
 	if err := db.Model(&user).Where("email = ?", email).Select(); err != nil {
 		return User{}, err
@@ -91,19 +99,15 @@ func GetUser(db *pg.DB, email string) (User, error) {
 	return user, nil
 }
 
-func VerifyUser(db *pg.DB, code string) error {
+func VerifyUser(db orm.DB, code string) error {
 	var user User
 	err := db.Model(&user).Where("verified_code = ? AND verified_at IS NULL", code).Select()
 	if err != nil {
-		return errors.Wrap(err, "Count")
-	}
-
-	if user.ID == 0 {
-		return errors.New("Not found")
+		return errors.WithMessage(err, "Select")
 	}
 
 	if _, err := db.Model(&user).Set("verified_at = now()").WherePK().Update(); err != nil {
-		return errors.Wrap(err, "Update")
+		return errors.WithMessage(err, "Update")
 	}
 
 	return nil

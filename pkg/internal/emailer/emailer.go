@@ -29,15 +29,8 @@ type Emailer struct {
 
 // Creates an SMTP sender using environment variables
 func NewSMTPSenderFromEnv() enmime.Sender {
-	auth := smtp.PlainAuth(
-		"",
-		os.Getenv("SMTP_USER"),
-		os.Getenv("SMTP_PASSWORD"),
-		os.Getenv("SMTP_HOST"),
-	)
-
+	auth := smtp.PlainAuth("", os.Getenv("SMTP_USER"), os.Getenv("SMTP_PASSWORD"), os.Getenv("SMTP_HOST"))
 	addr := fmt.Sprintf("%s:%s", os.Getenv("SMTP_HOST"), os.Getenv("SMTP_PORT"))
-
 	return enmime.NewSMTP(addr, auth)
 }
 

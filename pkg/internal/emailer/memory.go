@@ -18,6 +18,7 @@ type email struct {
 type MemorySender struct {
 	emails []email
 	sync.Mutex
+	err error
 }
 
 // create a new MemorySender
@@ -31,6 +32,11 @@ func NewMemorySender() *MemorySender {
 func (s *MemorySender) Send(from string, to []string, msg []byte) error {
 	s.Lock()
 	defer s.Unlock()
+	if s.err != nil {
+		err := s.err
+		s.err = nil
+		return err
+	}
 	s.emails = append(s.emails, email{from, to, msg})
 	return nil
 }

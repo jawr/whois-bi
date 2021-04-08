@@ -1,7 +1,6 @@
 package dns
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/jawr/whois-bi/pkg/internal/domain"
@@ -22,16 +21,31 @@ func Test_queryIterate(t *testing.T) {
 				`lawrence.pm.		10799	IN	NS	ns-113-a.gandi.net.`,
 				`lawrence.pm.		10799	IN	NS	ns-143-b.gandi.net.`,
 				`lawrence.pm.		10799	IN	NS	ns-6-c.gandi.net.`,
-				`lawrence.pm.		10799	IN	SOA	ns1.gandi.net. hostmaster.gandi.net. 1617235200 10800 3600 604800 10800`,
 				`lawrence.pm.		10799	IN	MX	10 ehlo.mx.ax.`,
 				`lawrence.pm.		10799	IN	MX	20 helo.mx.ax.`,
 				`lawrence.pm.		10799	IN	TXT	"v=spf1 include:spf.mx.ax ~all"`,
 			},
 		},
+		tcase{
+			name: "jl.lu",
+			records: []string{
+				`jl.lu.			10799	IN	A	116.203.149.40`,
+				`jl.lu.			10799	IN	NS	ns-147-a.gandi.net.`,
+				`jl.lu.			10799	IN	NS	ns-208-b.gandi.net.`,
+				`jl.lu.			10799	IN	NS	ns-112-c.gandi.net.`,
+				`*.k3s.jl.lu.		10799	IN	CNAME	traefik.jl.lu.`,
+				`traefik.jl.lu.		10799	IN	A	116.203.149.40`,
+			},
+		},
 	}
 
-	targets := map[string]struct{}{
-		"": struct{}{},
+	targets := []string{
+		"",
+		"foo.k3s",
+		"blah.k3s",
+		"boo.k3s",
+		"bar.k3s",
+		"*.k3s",
 	}
 
 	for _, tc := range cases {
@@ -55,17 +69,12 @@ func Test_queryIterate(t *testing.T) {
 				)
 			}
 
-			for i := 0; i < 10; i++ {
-				got, err := c.queryIterate(dom, ns, targets)
-				if err != nil {
-					if strings.Contains(err.Error(), "i/o timeout") {
-						continue
-					}
-					tt.Fatalf("queryIterate unexpected error: %q", err)
-				}
-
-				compareRecords(tt, got, expectedRecords)
+			got, err := c.queryIterate(dom, ns, targets)
+			if err != nil {
+				tt.Fatalf("queryIterate unexpected error: %q", err)
 			}
+
+			compareRecords(tt, got, expectedRecords)
 		})
 	}
 }

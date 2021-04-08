@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jawr/whois-bi/pkg/internal/user"
@@ -37,7 +36,8 @@ func (s Server) handlePostRecover() gin.HandlerFunc {
 		}
 
 		rec := user.NewRecover(u)
-		if _, err := s.db.Model(&rec).Insert(); err != nil {
+
+		if err := rec.Insert(s.db); err != nil {
 			c.JSON(
 				http.StatusBadRequest,
 				gin.H{"error": "Recovery already in progress"},
@@ -82,26 +82,6 @@ func (s Server) handlePostRecoverCode() gin.HandlerFunc {
 			return
 		}
 
-		// search for the code with a valid time (if not delete it)
-		var rec user.Recover
-		if err := s.db.Model(&rec).Where("code = ?", request.Code).Select(); err != nil {
-			c.JSON(
-				http.StatusBadRequest,
-				gin.H{"error": "Invalid Code"},
-			)
-			return
-		}
-
-		if time.Now().After(rec.ValidUntil) {
-			// delete expired recover
-			s.db.Model(&rec).Delete()
-			c.JSON(
-				http.StatusBadRequest,
-				gin.H{"error": "Invalid Code"},
-			)
-			return
-		}
-
 		// validate password
 		if len(request.Password) == 0 || request.Password != request.PasswordConfirm {
 			c.JSON(
@@ -121,19 +101,14 @@ func (s Server) handlePostRecoverCode() gin.HandlerFunc {
 			return
 		}
 
-		_, err = s.db.Model((*user.User)(nil)).
-			Set("password = ?", newPassword).
-			Where("id = ?", rec.UserID).
-			Update()
+		err = user.RecoverPassword(s.db, request.Code, newPassword)
 		if err != nil {
 			c.JSON(
 				http.StatusInternalServerError,
-				gin.H{"error": "Internal Server Error"},
+				gin.H{"error": err.Error()},
 			)
 			return
 		}
-
-		s.db.Model(&rec).Delete()
 
 		c.JSON(http.StatusOK, gin.H{"status": "Recovery complete. Please login with your new credentials!"})
 	}

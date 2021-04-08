@@ -16,6 +16,8 @@ RUN GOOS=linux \
 
 FROM golang:alpine
 
+RUN apk add netcat-openbsd bash
+
 COPY --from=builder /build/toolbox /bin/toolbox
 
 WORKDIR /build
@@ -25,4 +27,3 @@ RUN go mod download
 
 COPY . .
 
-RUN apk add netcat-openbsd bash

@@ -79,6 +79,9 @@ func compareRecords(t *testing.T, got, expected domain.Records) {
 	t.Helper()
 
 	for _, g := range got {
+		if g.RRType.V == dns.TypeSOA {
+			continue
+		}
 		var exists bool
 		for _, e := range expected {
 			if g.Hash == e.Hash {
@@ -87,7 +90,23 @@ func compareRecords(t *testing.T, got, expected domain.Records) {
 			}
 		}
 		if !exists {
-			t.Errorf("Unexpected record: %q", g.Raw)
+			t.Errorf("Unexpected got record: %q", g.Raw)
+		}
+	}
+
+	for _, g := range expected {
+		if g.RRType.V == dns.TypeSOA {
+			continue
+		}
+		var exists bool
+		for _, e := range got {
+			if g.Hash == e.Hash {
+				exists = true
+				break
+			}
+		}
+		if !exists {
+			t.Errorf("Unexpected expected record: %q", g.Raw)
 		}
 	}
 }

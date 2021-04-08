@@ -57,7 +57,7 @@ services:
   toolbox:
     build:
       context: .
-      dockerfile: build/toolbox.dockerfile
+      dockerfile: prod/toolbox.dockerfile
     command: ["sh", "-c", "tail -f /dev/null"]
     networks:
       - whoisbi
@@ -98,8 +98,8 @@ services:
       - .:/build
   ui:
     build:
-      context: ui/
-      dockerfile: dev/ui.dockerfile
+      context: ui
+      dockerfile: ../dev/ui.dockerfile
     ports:
       - 5000:5000
       - 35729:35729

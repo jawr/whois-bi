@@ -1,7 +1,8 @@
 package dns
 
 import (
-	"log"
+	"strings"
+	"time"
 
 	"github.com/miekg/dns"
 	"github.com/pkg/errors"
@@ -9,6 +10,24 @@ import (
 
 // query against the auth nameservers using UDP, EDNS and TCP
 func (c *DNSClient) query(original *dns.Msg, nameservers []string) (*dns.Msg, error) {
+	for i := 0; i < 10; i++ {
+		msg, err := c.rawquery(original, nameservers)
+		if err != nil {
+			if strings.Contains(err.Error(), "i/o timeout") {
+				time.Sleep(time.Millisecond * 250)
+				continue
+			}
+
+			// fall through and return msg and err
+		}
+
+		return msg, err
+	}
+
+	return nil, errors.New("timeout")
+}
+
+func (c *DNSClient) rawquery(original *dns.Msg, nameservers []string) (*dns.Msg, error) {
 
 	// not intrested in recursion?
 	original.RecursionDesired = false
@@ -43,7 +62,6 @@ func (c *DNSClient) query(original *dns.Msg, nameservers []string) (*dns.Msg, er
 
 		reply, _, err := c.Exchange(msg, ns+":53")
 		if err != nil {
-			log.Printf("error in Exchange with %s: %s", ns, err)
 			continue
 		}
 

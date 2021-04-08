@@ -10,26 +10,26 @@ import (
 )
 
 var (
-	subdomainsToCheck = map[string]struct{}{
-		"":                   struct{}{},
-		"*":                  struct{}{},
-		"www":                struct{}{},
-		"mx":                 struct{}{},
-		"media":              struct{}{},
-		"assets":             struct{}{},
-		"dashboard":          struct{}{},
-		"api":                struct{}{},
-		"cdn":                struct{}{},
-		"download":           struct{}{},
-		"downloads":          struct{}{},
-		"mail":               struct{}{},
-		"applytics":          struct{}{},
-		"email":              struct{}{},
-		"app":                struct{}{},
-		"img":                struct{}{},
-		"default._domainkey": struct{}{},
-		"_dmarc":             struct{}{},
-		"spf":                struct{}{},
+	subdomainsToCheck = []string{
+		"",
+		"*",
+		"www",
+		"mx",
+		"media",
+		"assets",
+		"dashboard",
+		"api",
+		"cdn",
+		"download",
+		"downloads",
+		"mail",
+		"applytics",
+		"email",
+		"app",
+		"img",
+		"default._domainkey",
+		"_dmarc",
+		"spf",
 	}
 )
 
@@ -44,8 +44,15 @@ func (c DNSClient) GetLive(dom domain.Domain, stored domain.Records) (domain.Rec
 	// create a list of targets we want to check against
 	for _, r := range stored {
 		name := strings.Replace(r.Name, dns.Fqdn(dom.Domain), "", -1)
-		if _, ok := subdomainsToCheck[name]; !ok {
-			subdomainsToCheck[name] = struct{}{}
+		var exists bool
+		for _, t := range subdomainsToCheck {
+			if t == name {
+				exists = true
+				break
+			}
+		}
+		if !exists {
+			subdomainsToCheck = append(subdomainsToCheck, name)
 		}
 	}
 
