@@ -62,6 +62,8 @@ func createJob() job.Job {
 }
 
 func Test_RunPublishConsumeStop(t *testing.T) {
+	t.Parallel()
+
 	w := createNewWorker()
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -107,6 +109,8 @@ func Test_RunPublishConsumeStop(t *testing.T) {
 }
 
 func Test_RunAdditions(t *testing.T) {
+	t.Parallel()
+
 	w := createNewWorker()
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -156,6 +160,8 @@ func Test_RunAdditions(t *testing.T) {
 }
 
 func Test_RunRemovals(t *testing.T) {
+	t.Parallel()
+
 	w := createNewWorker()
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -207,6 +213,8 @@ func Test_RunRemovals(t *testing.T) {
 }
 
 func Test_RunMix(t *testing.T) {
+	t.Parallel()
+
 	w := createNewWorker()
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -263,6 +271,8 @@ func Test_RunMix(t *testing.T) {
 }
 
 func Test_RunLiveError(t *testing.T) {
+	t.Parallel()
+
 	w := createNewWorker()
 
 	ctx, cancel := context.WithCancel(context.Background())

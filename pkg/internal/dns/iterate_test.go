@@ -7,6 +7,8 @@ import (
 )
 
 func Test_queryIterate(t *testing.T) {
+	t.Parallel()
+
 	c := NewDNSClient()
 
 	type tcase struct {

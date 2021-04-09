@@ -48,6 +48,8 @@ func createUser(t *testing.T, db orm.DB) User {
 }
 
 func Test_ValidatePassword(t *testing.T) {
+	t.Parallel()
+
 	type tcase struct {
 		password string
 		err      string
@@ -74,6 +76,7 @@ func Test_ValidatePassword(t *testing.T) {
 }
 
 func Test_NewUser(t *testing.T) {
+	t.Parallel()
 
 	conn := createConnection(t)
 	defer conn.Close()
@@ -110,6 +113,8 @@ func Test_NewUser(t *testing.T) {
 }
 
 func Test_DuplicateUser(t *testing.T) {
+	t.Parallel()
+
 	email := "testuser@place.com"
 	password := "MyFancyPassword1"
 
@@ -138,6 +143,8 @@ func Test_DuplicateUser(t *testing.T) {
 }
 
 func Test_BadPassword(t *testing.T) {
+	t.Parallel()
+
 	email := "testuser@place.com"
 	password := "mybadpassword1"
 
@@ -153,6 +160,7 @@ func Test_BadPassword(t *testing.T) {
 }
 
 func Test_VerifyNoUser(t *testing.T) {
+	t.Parallel()
 
 	conn := createConnection(t)
 	defer conn.Close()
@@ -172,6 +180,7 @@ func Test_VerifyNoUser(t *testing.T) {
 }
 
 func Test_VerifyAlreadyVerified(t *testing.T) {
+	t.Parallel()
 
 	conn := createConnection(t)
 	defer conn.Close()
@@ -198,6 +207,8 @@ func Test_VerifyAlreadyVerified(t *testing.T) {
 }
 
 func Test_GetInvalidUser(t *testing.T) {
+	t.Parallel()
+
 	conn := createConnection(t)
 	defer conn.Close()
 

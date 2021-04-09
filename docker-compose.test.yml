@@ -23,7 +23,7 @@ services:
     build:
       context: .
       dockerfile: dev/test.dockerfile
-    command: ["bash", "-c", "until nc postgres 5432; do sleep 2; done ; toolbox schema && go test -parallel 4 ./..."]
+    command: ["bash", "-c", "until nc postgres 5432; do sleep 2; done ; toolbox schema && go test -failfast ./..."]
     networks:
       - whoisbi-test
     depends_on:
