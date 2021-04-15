@@ -6,8 +6,8 @@ import (
 
 	"github.com/bobesa/go-domain-util/domainutil"
 	"github.com/go-pg/pg/v10"
+	"github.com/go-pg/pg/v10/orm"
 	"github.com/jawr/whois-bi/pkg/internal/user"
-	"github.com/pkg/errors"
 )
 
 type Domain struct {
@@ -47,7 +47,7 @@ func NewDomain(domain string, owner user.User) Domain {
 }
 
 // get domain by name
-func GetDomain(db *pg.DB, domain string) (Domain, error) {
+func GetDomain(db orm.DB, domain string) (Domain, error) {
 	var dom Domain
 	if err := db.Model(&dom).Where("domain = ?", domain).Select(); err != nil {
 		return Domain{}, err
@@ -56,7 +56,7 @@ func GetDomain(db *pg.DB, domain string) (Domain, error) {
 }
 
 // get domains where lastUpdatedAt > d
-func GetDomainsWhereLastJobBefore(db *pg.DB, d time.Duration) ([]Domain, error) {
+func GetDomainsWhereLastJobBefore(db orm.DB, d time.Duration) ([]Domain, error) {
 	var domains []Domain
 	before := time.Now().Add(d * -1)
 	if err := db.Model(&domains).Where("last_job_at IS NULL OR last_job_at < ?", before).Select(); err != nil {
@@ -66,7 +66,7 @@ func GetDomainsWhereLastJobBefore(db *pg.DB, d time.Duration) ([]Domain, error) 
 }
 
 // insert a domain in to the database
-func (d *Domain) Insert(db *pg.DB) error {
+func (d *Domain) Insert(db orm.DB) error {
 	if _, err := db.Model(d).Returning("*").Insert(); err != nil {
 		return err
 	}
@@ -75,7 +75,7 @@ func (d *Domain) Insert(db *pg.DB) error {
 }
 
 // get most recent records for a domain
-func (d Domain) GetRecords(db *pg.DB) (Records, error) {
+func (d Domain) GetRecords(db orm.DB) (Records, error) {
 	var records Records
 	err := db.Model(&records).
 		Where(
@@ -84,12 +84,13 @@ func (d Domain) GetRecords(db *pg.DB) (Records, error) {
 		).
 		Select()
 	if err != nil {
-		return nil, errors.Wrap(err, "Select records")
+		return nil, err
 	}
 
 	return records, nil
 }
 
+// Implement stringer interface
 func (d Domain) String() string {
 	return d.Domain
 }

@@ -14,6 +14,7 @@ const (
 )
 
 func Test_Send(t *testing.T) {
+	t.Parallel()
 
 	sender := NewMemorySender()
 
@@ -42,6 +43,7 @@ func Test_Send(t *testing.T) {
 }
 
 func Test_SendError(t *testing.T) {
+	t.Parallel()
 
 	sender := NewMemorySender()
 
@@ -64,6 +66,8 @@ func Test_SendError(t *testing.T) {
 }
 
 func Test_DuplicateSend(t *testing.T) {
+	t.Parallel()
+
 	sender := NewMemorySender()
 
 	emailer, err := NewEmailer(fromName, fromEmail, sender)
@@ -91,6 +95,8 @@ func Test_DuplicateSend(t *testing.T) {
 }
 
 func Test_BadEmail(t *testing.T) {
+	t.Parallel()
+
 	sender := NewMemorySender()
 
 	emailer, err := NewEmailer(fromName, fromEmail, sender)
@@ -104,6 +110,8 @@ func Test_BadEmail(t *testing.T) {
 }
 
 func Test_BadMemoryIndex(t *testing.T) {
+	t.Parallel()
+
 	sender := NewMemorySender()
 
 	_, err := sender.EmailAt(0)

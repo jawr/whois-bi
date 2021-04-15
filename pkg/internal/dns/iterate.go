@@ -58,7 +58,7 @@ func (c *DNSClient) queryIterate(dom domain.Domain, nameservers, targets []strin
 		depth := len(strings.Split(tar, "."))
 
 		for _, typ := range commonRecordTypes {
-			if wdepth, ok := wildcards[typ]; ok && wdepth == depth {
+			if wdepth, ok := wildcards[typ]; ok && wdepth <= depth {
 				continue
 			}
 

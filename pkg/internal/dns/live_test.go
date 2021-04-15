@@ -8,6 +8,8 @@ import (
 )
 
 func Test_GetLive(t *testing.T) {
+	t.Parallel()
+
 	type tcase struct {
 		domain  string
 		stored  []string

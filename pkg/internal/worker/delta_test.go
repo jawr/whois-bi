@@ -7,6 +7,8 @@ import (
 )
 
 func Test_deltaAdditions(t *testing.T) {
+	t.Parallel()
+
 	dom := createDomain()
 
 	stored := domain.Records{}
@@ -28,6 +30,8 @@ func Test_deltaAdditions(t *testing.T) {
 }
 
 func Test_deltaRemovals(t *testing.T) {
+	t.Parallel()
+
 	dom := createDomain()
 
 	live := domain.Records{}
@@ -49,6 +53,8 @@ func Test_deltaRemovals(t *testing.T) {
 }
 
 func Test_delta(t *testing.T) {
+	t.Parallel()
+
 	dom := createDomain()
 
 	live := domain.Records{

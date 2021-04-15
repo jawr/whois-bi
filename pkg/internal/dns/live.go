@@ -44,6 +44,7 @@ func (c DNSClient) GetLive(dom domain.Domain, stored domain.Records) (domain.Rec
 	// create a list of targets we want to check against
 	for _, r := range stored {
 		name := strings.Replace(r.Name, dns.Fqdn(dom.Domain), "", -1)
+		name = strings.TrimSuffix(name, ".")
 		var exists bool
 		for _, t := range subdomainsToCheck {
 			if t == name {

@@ -27,6 +27,8 @@ func createRecord(d, n string, rt uint16) domain.Record {
 }
 
 func Test_WildcardMatch(t *testing.T) {
+	t.Parallel()
+
 	l := createList("*", "*", "*")
 	rec := createRecord("whois.bi", "www", dns.TypeA)
 
@@ -36,6 +38,8 @@ func Test_WildcardMatch(t *testing.T) {
 }
 
 func Test_RRTypeMatch(t *testing.T) {
+	t.Parallel()
+
 	l := createList("*", "A", "*")
 
 	passes := []domain.Record{
@@ -65,6 +69,8 @@ func Test_RRTypeMatch(t *testing.T) {
 }
 
 func Test_DomainMatch(t *testing.T) {
+	t.Parallel()
+
 	l := createList("whois.bi", "*", "*")
 
 	type testcase struct {
@@ -99,6 +105,8 @@ func Test_DomainMatch(t *testing.T) {
 }
 
 func Test_RecordMatch(t *testing.T) {
+	t.Parallel()
+
 	l := createList("*", "*", "www")
 
 	type testcase struct {
@@ -132,6 +140,8 @@ func Test_RecordMatch(t *testing.T) {
 }
 
 func Test_Validate(t *testing.T) {
+	t.Parallel()
+
 	type tcase struct {
 		domain   string
 		rrtype   string
@@ -197,6 +207,8 @@ func Test_Validate(t *testing.T) {
 }
 
 func Test_ValidateSuccess(t *testing.T) {
+	t.Parallel()
+
 	l := List{
 		Domain: "*",
 		RRType: "*",

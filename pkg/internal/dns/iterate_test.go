@@ -7,6 +7,8 @@ import (
 )
 
 func Test_queryIterate(t *testing.T) {
+	t.Parallel()
+
 	c := NewDNSClient()
 
 	type tcase struct {
@@ -46,6 +48,7 @@ func Test_queryIterate(t *testing.T) {
 		"boo.k3s",
 		"bar.k3s",
 		"*.k3s",
+		"foobar.place.k3s",
 	}
 
 	for _, tc := range cases {
